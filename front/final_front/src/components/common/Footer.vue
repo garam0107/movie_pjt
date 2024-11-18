@@ -1,14 +1,13 @@
 <template>
   <footer class="footer">
     <div class="footer-content">
-      <a href="#">서비스 이용약관</a> | <a href="#">회사 안내</a>
+      <a href="#">서비스 이용약관</a> | <a href="#">프로젝트 안내</a>
       <div class="contact-info">
-        고객센터: cs@watchapedia.co.kr, 02-515-9985<br />
-        제작 및 대외 협력: <a href="https://watcha.team/contact">https://watcha.team/contact</a><br />
-        주식회사 왓챠 | 대표 박태훈 | 서울특별시 강남대로 343 신덕빌딩 3층<br />
-        사업자 등록 번호: 211-88-66013
+        고객센터: garam@gmail.com, 010-1234-5678<br />
+        제작 및 대외 협력: <a href="https://watcha.team/contact">https://team.garam_jiin/contact</a><br />
+        뮤비디비아 | 대표 이가람 | 1424호<br />
       </div>
-      <div class="copyright">WATCHAPEDIA © 2024 by Watcha, Inc. All rights reserved.</div>
+      <div class="copyright">DOLDAM MOVIEDIA © 2024 by DolDam, Inc. All rights reserved.</div>
     </div>
   </footer>
 </template>
@@ -27,7 +26,7 @@ export default {
   padding: 20px;
   text-align: center;
   font-size: 0.875rem;
-  position: absolute;
+  position: relative;
   left: 0;
   bottom: 0;
 }

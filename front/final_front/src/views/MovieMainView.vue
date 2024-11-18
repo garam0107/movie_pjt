@@ -1,18 +1,24 @@
 <template>
-<h1>영화 메인</h1>
+<div class="container">
+  <h1>영화 메인</h1>
+  <div>
+    트레일러 하나 보이자
+  </div>
+  <div>
+    <TopMovieComponent/>
+  </div>
+</div>
 </template>
 
 <script setup>
-import MovieMain from '@/components/movie/MovieMain.vue';
-import { useMovieStore } from '@/stores/counter';
-import { onMounted } from 'vue';
+import TopMovieComponent from '@/components/movie/TopMovieComponent.vue';
 
-const movies = useMovieStore()
-onMounted(() => {
-  movies.getMovies()
-})
+
+
 </script>
 
 <style scoped>
-
+.container{ 
+  width: 70%;
+}
 </style>
