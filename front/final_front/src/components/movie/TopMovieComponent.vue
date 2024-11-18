@@ -57,7 +57,7 @@ watch(() => store.movies, (newMovies) => {
 
 .wrapper {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 20px;
 }
 
@@ -88,6 +88,7 @@ watch(() => store.movies, (newMovies) => {
 
 .poster_img {
   width: 100%;
+  max-width: 200px;
   aspect-ratio: 2 / 3;
   object-fit: cover;
   border-radius: 8px;

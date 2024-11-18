@@ -1,14 +1,13 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import Footer from './components/common/Footer.vue';
-Footer
+import Header from './components/common/Header.vue';
 </script>
 
 <template>
+  <Header/>
 <div class="container">
-  <nav>
-    <RouterLink to="/main">MovieMain</RouterLink>
-  </nav>
+
   <RouterView />
 </div>
   <Footer/>
