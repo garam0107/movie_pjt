@@ -1,10 +1,5 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
-
-# Create your models here.
-
+from accounts.models import User
 class Actor(models.Model):
     name = models.CharField(max_length=50)
     poster_path = models.CharField(max_length=200, blank= True, null= True)
@@ -18,7 +13,8 @@ class Movie(models.Model):
     popularity = models.FloatField()
     vote_count = models.IntegerField()  
     vote_average = models.FloatField()  
-    overview = models.TextField()   
+    overview = models.TextField()
+    runtime = models.IntegerField()   
     poster_path = models.CharField(max_length=200, blank=True)   #이미지
     backdrop_path = models.CharField(max_length=200)
     genres = models.ManyToManyField(Genre, blank=True)
@@ -26,3 +22,24 @@ class Movie(models.Model):
     actors = models.ManyToManyField(Actor, blank= True)
     director = models.CharField(max_length=100, blank=True)
     words = models.CharField(max_length=255, blank=True)
+
+class Movie_like(models.Model):
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+
+
+class Movie_review(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    likes_count = models.IntegerField()
+    rating = models.IntegerField()
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)   
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class MovieReview_comment(models.Model):
+    content = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    review = models.ForeignKey(Movie_review, on_delete=models.CASCADE)
+    reviewuser = models.ForeignKey(User, on_delete=models.CASCADE)
