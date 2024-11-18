@@ -9,15 +9,12 @@
           <div class="movie-info">
             <p class="movie_title">{{ movie.title }}</p>
             <p class="movie-details">
-              {{ movie.release_date.slice(0, 4) }} • {{ movie.production_countries?.[0]?.name || '국가 정보 없음' }}<br>
-              평점: ★ {{ movie.vote_average.toFixed(1) }}
+              {{ movie.release_date.slice(0, 4) }} •  {{ store.detailMovie.production_country || '정보 없음' }}<br>
+              평점:  {{ movie.vote_average.toFixed(1) }} ★
             </p>
           </div>
         </RouterLink>
       </div>
-    </div>
-    <div v-else>
-      <p>로딩 중...</p>
     </div>
   </div>
 </template>
@@ -33,12 +30,18 @@ const store = useMovieStore();
 onMounted(async () => {
   await store.getMovies();
   movies.value = store.movies;
-  topMovies.value = movies.value.slice(0, 10);
+
+  topMovies.value = [...movies.value]
+    .sort((a, b) => b.popularity - a.popularity)
+    .slice(0, 10);
 });
 
 watch(() => store.movies, (newMovies) => {
   movies.value = newMovies;
-  topMovies.value = newMovies.slice(0, 10);
+  
+  topMovies.value = [...newMovies]
+    .sort((a, b) => b.popularity - a.popularity)
+    .slice(0, 10);
 });
 </script>
 
