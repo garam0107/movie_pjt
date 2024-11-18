@@ -14,7 +14,8 @@ class Movie(models.Model):
     vote_count = models.IntegerField()  
     vote_average = models.FloatField()  
     overview = models.TextField()
-    runtime = models.IntegerField()   
+    runtime = models.IntegerField() 
+    production_country = models.CharField(max_length=100)  
     poster_path = models.CharField(max_length=200, blank=True)   #이미지
     backdrop_path = models.CharField(max_length=200)
     genres = models.ManyToManyField(Genre, blank=True)
