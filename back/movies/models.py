@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import User
+from django.conf import settings
 class Actor(models.Model):
     name = models.CharField(max_length=50)
     poster_path = models.CharField(max_length=200, blank= True, null= True)
@@ -23,9 +23,7 @@ class Movie(models.Model):
     actors = models.ManyToManyField(Actor, blank= True)
     director = models.CharField(max_length=100, blank=True)
     words = models.CharField(max_length=255, blank=True)
-
-class Movie_like(models.Model):
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_movies', blank=True)
 
 
 class Movie_review(models.Model):
@@ -36,11 +34,23 @@ class Movie_review(models.Model):
     likes_count = models.IntegerField()
     rating = models.IntegerField()
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)   
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['movie', 'user'], name='unique_movie_user_review')
+        ]
+
 
 class MovieReview_comment(models.Model):
     content = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     review = models.ForeignKey(Movie_review, on_delete=models.CASCADE)
-    reviewuser = models.ForeignKey(User, on_delete=models.CASCADE)
+    reviewuser = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['review', 'reviewuser'], name='unique_review_user_comment')
+        ]
+
