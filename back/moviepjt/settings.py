@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     # APP
     'movies',
     'accounts',
+    'diaries',
 
     # CORS
     'corsheaders',
