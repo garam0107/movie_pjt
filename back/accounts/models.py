@@ -6,7 +6,7 @@ from allauth.account.utils import user_email, user_field, user_username
 
 class User(AbstractUser):
     nickname = models.CharField(max_length=100)
-    stone = models.IntegerField(null=True)
+    stone = models.IntegerField(default=0)
     profile_image = models.CharField(max_length=255, choices=[
     ('profile_images/profile1.jpg', 'profile 1'),
     ('profile_images/profile2.jpg', 'profile 2'),
