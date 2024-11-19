@@ -87,4 +87,5 @@ class UserSerializer(serializers.ModelSerializer):
     recommend_movie = UserMovieSerializer(source = 'diaries', many = True, read_only = True)
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'nickname', 'profile_image']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'nickname', 'profile_image', 'visit_count'
+                  'my_review','recommend_movie']
