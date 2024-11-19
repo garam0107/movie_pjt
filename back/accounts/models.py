@@ -14,7 +14,7 @@ class User(AbstractUser):
     ('profile_images/profile4.jpg', 'profile 4'),
     ('profile_images/profile5.jpg', 'profile 5'),
     ('profile_images/profile6.jpg', 'profile 6'),
-], default='profile_images/image1.jpg')
+], default='profile_images/default_profile.jpg')
     followings = models.ManyToManyField('self', symmetrical=False, related_name='followers', blank=True)
     visit_count = models.IntegerField(default=0)
 class CustomAccountAdapter(DefaultAccountAdapter):

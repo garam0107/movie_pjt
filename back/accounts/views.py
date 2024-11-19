@@ -67,6 +67,6 @@ def follow(request, user_pk):
         serializer_diaries = UserFollowingDiarySerializer(diaries, many = True)
         serializer_reviews = UserFollowingReviewSerializer(reviews, many = True)
         return Response({
-            'diaries' : serializer_diaries,
-            'review' : serializer_reviews
+            'diaries' : serializer_diaries.data,
+            'review' : serializer_reviews.data
         })
