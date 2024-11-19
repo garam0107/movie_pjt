@@ -9,7 +9,10 @@
         <p>국가: {{ store.detailMovie.production_country || '정보 없음' }}</p>
       </div>
       <div class="backdrop-info2">
-        <button @click="movieLike" class="action-button">❤</button>
+        <p class="likecountnumber">좋아요 수 : {{ likeCount }}</p>
+        <button @click="toggleLike" class="like-button">
+          {{ isLiked ? '❤️' : '🤍' }}
+        </button>
         <button class="action-button">📝</button>
       </div>
     </div>
@@ -23,11 +26,11 @@
       </div>
     </div>
     <div v-if="store.detailMovie.actors && store.detailMovie.actors.length > 0">
-      <p>배우</p>
+      <p>Actors</p>
       <div class="actors">
         <div v-for="actor in store.detailMovie.actors.slice(0, 10)" :key="actor.id" class="actor">
           <img :src="`https://image.tmdb.org/t/p/w500/${actor.poster_path}`" alt="actor" class="actor-poster">
-          <p>{{ actor.name }}</p>
+          <p class="actor_name">{{ actor.name }}</p>
         </div>
       </div>
     </div>
@@ -41,23 +44,71 @@
 </template>
 
 <script setup>
+import router from '@/router';
 import { useMovieStore } from '@/stores/counter';
-import { onMounted } from 'vue';
+import axios from 'axios';
+import { onMounted, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 const store = useMovieStore();
 const route = useRoute();
-
+const isLiked = ref(false)
+const likeCount = ref(0)
+const movieId = route.params.movie_id
 onMounted(async () => {
-  const movieId = route.params.movie_id;
   await store.getDetailMovie(movieId);
+  if(store.token) {
+    axios ({
+      method: 'get',
+      url: `http://127.0.0.1:8000/movies/detail/${movieId}/like/`,
+      headers: {
+        Authorization: `Token ${store.token}`,
+      },
+    })
+    .then((res) => {
+      console.log(res)
+      isLiked.value = res.data.liked
+      likeCount.value = res.data.like_count
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+  }
 });
+const toggleLike = () => {
+  if(!store.token){
+    alert('로그인이 필요합니다.')
+    router.push({ name: 'LoginView' })
+  }
+  const requestUrl = `http://127.0.0.1:8000/movies/detail/${movieId}/like`
+  console.log('Request URL:', requestUrl)
+  axios({
+    method: 'post',
+    url: `http://127.0.0.1:8000/movies/detail/${movieId}/like`,
+    headers: {
+      Authorization: `Token ${store.token}`,
+    },
+  })
+    .then((res) => {
+      console.log(res)
+      isLiked.value = res.data.liked
+      likeCount.value = res.data.like_count
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+
+}
 
 
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Hahmlet:wght@100..900&family=Noto+Sans+KR:wght@100..900&family=Noto+Serif+KR:wght@200..900&display=swap');
+.likecountnumber {
+  font-size: 15px;
+  font-family: "Noto Sans KR", sans-serif;
+}
 
 .noto-sans-kr-container {
   font-family: "Noto Sans KR", sans-serif;
@@ -167,7 +218,9 @@ onMounted(async () => {
 .actor {
   text-align: center;
 }
-
+.actor_name {
+  font-size: 12px;
+}
 .actor-poster {
   width: 100px;
   height: 150px;
@@ -215,5 +268,18 @@ onMounted(async () => {
   width: 100%;
   max-width: 500px;
   margin-bottom: 10px;
+}
+
+.like-button {
+  font-size: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  color: #ff007f;
+}
+
+.like-button:hover {
+  transform: scale(1.1);
 }
 </style>
