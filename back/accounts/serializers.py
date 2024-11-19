@@ -19,12 +19,12 @@ class CustomRegisterSerializer(RegisterSerializer):
     )
     profile_image = serializers.ChoiceField(
         choices=[
-            ('profile_images/character_single1.jpg', 'Image 1'),
-            ('profile_images/character_single2.jpg', 'Image 2'),
-            ('profile_images/character_single3.jpg', 'Image 3'),
-            ('profile_images/character_single4.jpg', 'Image 4'),
-            ('profile_images/character_single5.jpg', 'Image 5'),
-            ('profile_images/character_single6.jpg', 'Image 6'),
+    ('profile_images/profile1.jpg', 'profile 1'),
+    ('profile_images/profile2.jpg', 'profile 2'),
+    ('profile_images/profile3.jpg', 'profile 3'),
+    ('profile_images/profile4.jpg', 'profile 4'),
+    ('profile_images/profile5.jpg', 'profile 5'),
+    ('profile_images/profile6.jpg', 'profile 6'),
         ],
         required=False,
         allow_blank=True
@@ -34,29 +34,7 @@ class CustomRegisterSerializer(RegisterSerializer):
         cleaned_data['nickname'] = self.validated_data.get('nickname', '')  # nickname 추가
         cleaned_data['profile_image'] = self.validated_data.get('profile_image', '')
         return cleaned_data
-class CustomUserDetailsSerializer(UserDetailsSerializer):
-    class Meta:
-        extra_fields = []
-        # see https://github.com/iMerica/dj-rest-auth/issues/181
-        # UserModel.XYZ causing attribute error while importing other
-        # classes from `serializers.py`. So, we need to check whether the auth model has
-        # the attribute or not
-        if hasattr(UserModel, 'USERNAME_FIELD'):
-            extra_fields.append(UserModel.USERNAME_FIELD)
-        if hasattr(UserModel, 'EMAIL_FIELD'):
-            extra_fields.append(UserModel.EMAIL_FIELD)
-        if hasattr(UserModel, 'first_name'):
-            extra_fields.append('first_name')
-        if hasattr(UserModel, 'last_name'):
-            extra_fields.append('last_name')
-        if hasattr(UserModel, 'nickname'):
-            extra_fields.append('nickname')    
-        if hasattr(UserModel, 'profile_image'):
-            extra_fields.append('profile_image')    
-            
-        model = UserModel
-        fields = ('pk', *extra_fields)
-        read_only_fields = ('email',)
+
 
 class UserFollowingDiarySerializer(serializers.ModelSerializer):
     class Meta:
@@ -85,7 +63,52 @@ class UserReviewSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     my_review = UserReviewSerializer(source = 'moviereview_set', many = True, read_only = True)
     recommend_movie = UserMovieSerializer(source = 'diaries', many = True, read_only = True)
+    followings_count = serializers.SerializerMethodField()
+    followers_count = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'nickname', 'profile_image', 'visit_count'
-                  'my_review','recommend_movie']
+                  'my_review','recommend_movie','followings','followers','followings_count','followers_count','stone']
+        
+    def get_followings_count(self, obj):
+        return obj.followings.count()
+
+    def get_followers_count(self, obj):
+        return obj.followers.count()
+    
+
+class CustomUserDetailsSerializer(UserDetailsSerializer):
+    my_review = UserReviewSerializer(source='moviereview_set', many=True, read_only=True)
+    recommend_movie = UserMovieSerializer(source='diaries', many=True, read_only=True)
+    followings_count = serializers.SerializerMethodField()
+    followers_count = serializers.SerializerMethodField()
+    class Meta:
+        extra_fields = []
+        # see https://github.com/iMerica/dj-rest-auth/issues/181
+        # UserModel.XYZ causing attribute error while importing other
+        # classes from `serializers.py`. So, we need to check whether the auth model has
+        # the attribute or not
+        if hasattr(UserModel, 'USERNAME_FIELD'):
+            extra_fields.append(UserModel.USERNAME_FIELD)
+        if hasattr(UserModel, 'EMAIL_FIELD'):
+            extra_fields.append(UserModel.EMAIL_FIELD)
+        if hasattr(UserModel, 'first_name'):
+            extra_fields.append('first_name')
+        if hasattr(UserModel, 'last_name'):
+            extra_fields.append('last_name')
+        if hasattr(UserModel, 'nickname'):
+            extra_fields.append('nickname')    
+        if hasattr(UserModel, 'profile_image'):
+            extra_fields.append('profile_image')    
+        if hasattr(UserModel, 'visit_count'):
+            extra_fields.append('visit_count')                
+        model = UserModel
+        fields = ['pk','my_review','recommend_movie','followings_count','followers_count','stone', *extra_fields]
+        read_only_fields = ('email',)
+
+    def get_followings_count(self, obj):
+        return obj.followings.count()
+
+    def get_followers_count(self, obj):
+        return obj.followers.count()
