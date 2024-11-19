@@ -135,3 +135,14 @@ def search(request):
         movie_list = list(movies.values()) 
         return JsonResponse({'movies': movie_list}, safe=False)
     return JsonResponse({'movies': []}, safe=False)
+
+
+
+@api_view(['GET'])
+def category(request):
+    query = request.GET.get('genre', '')
+    if query:
+        categorymovies = Movie.objects(genres__icontains=query)
+        categorymovies_list = list(categorymovies.values())
+        return JsonResponse({'categorymovies' : categorymovies_list}, safe = False)
+    return JsonResponse({'categorymovies': []}, safe=False)
