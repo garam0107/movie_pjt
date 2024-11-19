@@ -7,13 +7,14 @@
         <nav class="nav-links">
           <RouterLink to="/main"class="nav-link">홈</RouterLink>
           <RouterLink to="/main"class="nav-link">영화</RouterLink>
-          <RouterLink v-if="isLogin" :to="`/mypage/${userId}`" class="nav-link">마이페이지</RouterLink>
+          <RouterLink v-if="userId" :to="{ name: 'MyPageView', params: { user_id: userId } }" class="nav-link">마이페이지</RouterLink>
         </nav>
       </div>
       <div class="header-right">
         <input type="text" placeholder="콘텐츠, 인물, 컬렉션, 유저를 검색해보세요" class="search-input" />
-        <RouterLink v-if="!isLogin" :to="{name: 'LoginView'}"><button class="signup-button">로그인</button></RouterLink>
-        <RouterLink v-if="!isLogin" :to="{name: 'SignupView'}"><button class="signup-button">회원가입</button></RouterLink>
+        <RouterLink v-if="!userId" :to="{name: 'LoginView'}"><button class="signup-button">로그인</button></RouterLink>
+        <RouterLink v-if="!userId" :to="{name: 'SignupView'}"><button class="signup-button">회원가입</button></RouterLink>
+        <button  v-if="userId" @click="logout" class="signup-button">로그아웃</button>
       </div>
     </header>
   </template>
@@ -22,18 +23,17 @@
 import { useMovieStore } from '@/stores/counter';
 import { computed, onMounted, ref } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
-const route =  useRoute()
 const store = useMovieStore()
-const userId = ref(null)
-const isLogin = computed(() => store.isAuthenticated)
-onMounted(()=>{
-  if (store.isAuthenticated) {
-    userId.value = store.user?.id
-  }
-})
+const userId = computed(() => store.userId)
+const logout = () => {
+  store.logout()
+}
+
   </script>
   
   <style scoped>
+
+@import url('https://fonts.googleapis.com/css2?family=Hahmlet:wght@100..900&family=Noto+Sans+KR:wght@100..900&family=Noto+Serif+KR:wght@200..900&display=swap');
   .watchapedia-header {
     display: flex;
     justify-content: space-between;
@@ -41,7 +41,7 @@ onMounted(()=>{
     padding: 10px 20px;
     border-bottom: 1px solid #ddd;
     background-color: #fff;
-    font-family: 'Arial', sans-serif;
+    font-family: "Noto Sans KR", sans-serif;
     max-width: 1200px;
     margin: 0 auto;
     box-sizing: border-box;
