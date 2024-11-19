@@ -34,11 +34,12 @@ const router = createRouter({
       component: LoginView
     },
     // 마이페이지
-    // {
-    //   path: '/mypage/:user_id',
-    //   name: 'MyPageView',
-    //   component: MyPageView
-    // }
+    {
+      path: '/mypage/:user_id',
+      name: 'MyPageView',
+      component: MyPageView
+    },
+
   ],
 })
 

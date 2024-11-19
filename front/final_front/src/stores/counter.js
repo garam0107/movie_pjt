@@ -2,21 +2,20 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import router from '@/router'
-import { parseQuery } from 'vue-router'
 
 export const useMovieStore = defineStore('movie', () => {
   const movies = ref([])
   const API_URL = 'http://127.0.0.1:8000/'
   const detailMovie = ref([])
   const token = ref(null)
-  const isAuthenticated = computed (() => !!token.value)
+  const userData = ref([])
+  const userId = ref(null)
   const getMovies = function() {
     axios ({
       method: 'get',
       url: `${API_URL}movies/`
     })
       .then(res => {
-        // console.log(res.data)
         movies.value = res.data
       })
       .catch(err => console.log(err))
@@ -45,11 +44,28 @@ export const useMovieStore = defineStore('movie', () => {
       }
     })
       .then(res => {
-        console.log(res.data)
         token.value = res.data.key
         localStorage.setItem('token', res.data.key)
-        router.push({ name: 'main'})
+
+        // 사용자 정보 요청
+        axios ({
+          method: 'get',
+          url: `${API_URL}accounts/user/`,
+          headers: {
+            Authorization: `Token ${res.data.key}`
+          }
+        })
+        .then(userRes => {
+          console.log(userRes)
+          userId.value = userRes.data.username
+          localStorage.setItem('userId', userRes.data.username)
+          router.push({ name: 'main' })
+        })
+        .catch(err => {
+          console.log(err)
+        })
       })
+
       .catch(err => {
         console.log(err)
       })
@@ -75,20 +91,61 @@ export const useMovieStore = defineStore('movie', () => {
       })
   }
 
-  const logout = function () {
-    token.value = null
-    localStorage.removeItem('token')
-    router.push({ name: 'LoginView' })
+  // 로그아웃
+  const logout = function() {
+    axios({
+      method: 'post',
+      url: `${API_URL}accounts/logout/`,
+      headers: {
+        Authorization: `Token ${token.value}`
+      }
+    })
+      .then(() => {
+        token.value = null;
+        userId.value = null;
+        localStorage.removeItem('token')
+        localStorage.removeItem('userId')
+        router.push({ name: 'LoginView' })
+      })
+      .catch(err => {
+        console.error('로그아웃 실패:', err)
+      })
   }
 
+  const getMyPage = function() {
+    if (!token.value) {
+      console.error('인증 토큰이 없습니다.');
+      return;
+    }
+    
+    axios({
+      method: 'get',
+      url: `${API_URL}accounts/${userId.value}/mypage/`,
+      headers: {
+        Authorization: `Token ${token.value}`
+      }
+    })
+    .then(res => {
+      console.log(res.data);
+    })
+    .catch(err => {
+      console.error(err);
+    });
+  };
+  
   const checkAuthentication = function () {
-    const storedToken = localStorage.getItem('token')
+    const storedToken = localStorage.getItem('token');
+    const storedUserId = localStorage.getItem('userId');
     if (storedToken) {
       token.value = storedToken;
+      userId.value = storedUserId;
     }
-  }
+  };
+
+  const isAuthenticated = computed(() => token !== null && token !== undefined);
+
 
   return { movies, API_URL, getMovies, getDetailMovie, detailMovie, login, token, signup
-          , isAuthenticated, logout, checkAuthentication
+          , getMyPage, userData, userId, checkAuthentication, isAuthenticated, logout
    }
 }, {persist:true})

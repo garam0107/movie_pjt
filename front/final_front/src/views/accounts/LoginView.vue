@@ -16,7 +16,7 @@
 
 <script setup>
 import { useMovieStore } from '@/stores/counter';
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 const username = ref(null);
 const password = ref(null);
 const store = useMovieStore();
@@ -27,6 +27,7 @@ const login = function() {
     };
     store.login(payload);
 };
+
 </script>
 
 <style scoped>
