@@ -38,6 +38,8 @@ def create_review(request, movie_pk):
         serializer = MovieReviewsSerializer(data = request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(user = user , movie = movie)
+            user.stone += 5
+            user.save()
             return Response(serializer.data , status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -90,9 +92,9 @@ def movie_like(request, movie_pk):
 @api_view(['GET'])
 def detail_review(request, movie_pk):
     movie = get_object_or_404(Movie, pk = movie_pk)
-    serializer = MovieReviewsSerializer(movie, many = True)
+    reviews = Movie_review.objects.filter(movie=movie)  # 해당 영화에 대한 리뷰만 필터링
+    serializer = MovieReviewsSerializer(reviews, many=True)  # 여러 개의 리뷰 직렬화
     return Response(serializer.data)
-
 @api_view(['POST','PUT','DELETE'])
 def create_comment(request,review_pk):
     user = request.user

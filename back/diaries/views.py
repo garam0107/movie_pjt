@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view,permission_classes
 
 from .models import Diary
-from .serializers import DiaryCreateSerializer, DiarySerializer
+from .serializers import DiaryCreateSerializer, DiarySerializer,DiaryCommentSerializer
 # Create your views here.
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -56,4 +56,13 @@ def update_diary(request, user_pk, diary_pk):
 
         diary.delete()
         return Response({"message": "다이어리가 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
-    
+@api_view(['POST','PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def create_comment(request, diary_pk):
+    user = request.user
+    diary = get_object_or_404(Diary, pk = diary_pk)
+    serializer = DiaryCommentSerializer(data = request.data)
+    if serializer.is_valid(raise_exception=True):
+        serializer.save(user = user, diary = diary)
+        return Response(serializer.data , status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
