@@ -5,14 +5,15 @@ from movies.models import Movie
 
 user = get_user_model()
 
-class DiaryDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Diary
-        fields = ['gpt_comment','title','content']
-
-
 
 class DiarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Diary
         fields = '__all__'
+        read_only_fields = ['author']
+
+class DiaryCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Diary
+        fields = ['date', 'mood_emoji','title', 'content']
+        read_only_fields = ['author']

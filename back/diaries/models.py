@@ -4,7 +4,7 @@ from django.conf import settings
 # Create your models here.
 
 class Diary(models.Model):
-    autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='diaries')
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='diaries')
     date = models.DateField(auto_now_add=True)
     mood_emoji = models.CharField(max_length=100, choices=[
         ('emotions/angry.jpg', '분노'),
@@ -17,7 +17,7 @@ class Diary(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
     gpt_comment = models.TextField(blank=True, null= True)
-    recommend_movie = models.ManyToManyField(Movie, blank=True, null= True)
+    recommend_movie = models.ManyToManyField(Movie, blank=True)
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_diaries', blank=True)
 
 class Diary_comment(models.Model):

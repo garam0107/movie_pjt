@@ -22,11 +22,10 @@ class MoiveSerializer(serializers.ModelSerializer):
 
 
 class MovieReviewsSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)  
     class Meta:
         model = Movie_review
-        fields = ['title', 'content', 'rating']
-        read_only_fields = ['movie', 'user']
-
+        fields = ['id', 'title', 'content', 'created_at', 'updated_at', 'likes_count', 'rating', 'username']
 
 class ReviewCommentSerializer(serializers.ModelSerializer):
     class Meta:
