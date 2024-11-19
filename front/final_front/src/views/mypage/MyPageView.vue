@@ -1,8 +1,13 @@
 <template>
-  <div>
+  <div class="mypage-container">
     <h2>마이페이지</h2>
-    <div>
-      <MyData :userData="userData"/>
+    <div class="top">
+      <div class="mydata-container">
+        <MyData :userData="userData" />
+      </div>
+      <div class="calendar-container">
+        <Calendar />
+      </div>
     </div>
   </div>
 </template>
@@ -13,6 +18,7 @@ import { useMovieStore } from '@/stores/counter';
 import { onMounted, ref } from 'vue';
 import axios from 'axios';
 import { useRoute } from 'vue-router';
+import Calendar from '@/components/mypage/Calendar.vue';
 
 const store = useMovieStore();
 const route = useRoute();
@@ -43,5 +49,22 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.mypage-container {
+  max-width: 1200px; /* 페이지 전체 너비를 설정 */
+  width: 95%; /* 페이지 전체를 꽉 채우기 위해 비율 조정 */
+  margin: 0 auto; /* 화면 중앙 정렬 */
+  padding: 20px;
+  }
 
+.top {
+  display: flex;
+  gap: 20px;
+}
+.mydata-container {
+  flex: 3.5; /* MyData의 비율 */
+}
+
+.calendar-container {
+  flex: 6.5; /* Calendar의 비율 */
+}
 </style>

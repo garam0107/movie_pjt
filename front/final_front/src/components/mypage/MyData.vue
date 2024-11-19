@@ -36,7 +36,7 @@ const props = defineProps ({
 
 <style scoped>
 .mydata-container {
-  max-width: 800px;
+  max-width: 400px;
   margin: 20px auto;
   padding: 20px;
   background-color: #fff;
