@@ -1,9 +1,10 @@
 <template>
   <div class="mydata-container">
     <div class="profile-header">
-      <!-- <div class="profile-image">
-        <img src="/path/to/default-profile.png" alt="프로필 이미지">
-      </div> -->
+      <div class="profile-image">
+        <!-- <img :src="`@/assets/${props.userData.profile_image}`" alt="프로필 이미지"> -->
+        <img src="@/assets/default_profile.jpg" alt="profile_img">
+      </div>
       <div class="user-info">
         <h2>{{ props.userData.nickname }}</h2>
         <p>{{ props.userData.email }}</p>
@@ -15,14 +16,14 @@
         <h3>28개</h3>
         <p>평가</p>
       </div>
+
     </div>
     <div class="actions">
       <button>회원 탈퇴</button>
-      <!-- <RouterLink><button>회원정보 수정</button></RouterLink> -->
-      <!-- <RouterLink><button>비밀번호 수정</button></RouterLink> -->
+      <RouterLink><button>회원정보 수정</button></RouterLink>
+      <RouterLink><button>비밀번호 수정</button></RouterLink>
     </div>
   </div>
-</template>
 </template>
 
 <script setup>
@@ -80,7 +81,7 @@ const props = defineProps ({
 .stat h3 {
   font-size: 2rem;
   margin: 0;
-  color: #ff007f;
+  color: gray;
 }
 
 .stat p {
@@ -98,13 +99,13 @@ button {
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  background-color: #ff007f;
+  background-color: gray;
   color: #fff;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #e00070;
+  background-color: #666;
 }
 
 button:active {
