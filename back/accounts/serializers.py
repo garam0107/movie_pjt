@@ -79,8 +79,8 @@ class UserSerializer(serializers.ModelSerializer):
     
 
 class CustomUserDetailsSerializer(UserDetailsSerializer):
-    my_review = UserReviewSerializer(source='moviereview_set', many=True, read_only=True)
-    recommend_movie = UserMovieSerializer(source='diaries', many=True, read_only=True)
+    # my_review = UserReviewSerializer(source='moviereview_set', many=True, read_only=True)
+    # recommend_movie = UserMovieSerializer(source='diaries', many=True, read_only=True)
     followings_count = serializers.SerializerMethodField()
     followers_count = serializers.SerializerMethodField()
     class Meta:
@@ -104,7 +104,7 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
         if hasattr(UserModel, 'visit_count'):
             extra_fields.append('visit_count')                
         model = UserModel
-        fields = ['pk','my_review','recommend_movie','followings_count','followers_count','stone', *extra_fields]
+        fields = ['pk','followers_count','followings_count','stone', *extra_fields]
         read_only_fields = ('email',)
 
     def get_followings_count(self, obj):
