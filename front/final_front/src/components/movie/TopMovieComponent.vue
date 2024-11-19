@@ -1,22 +1,22 @@
 <template>
-  <div class="top-movie-container">
-    <p class="h2tag">돌담뮤비디아 HOT 랭킹</p>
-    <div class="wrapper" v-if="topMovies.length > 0">
-      <div v-for="(movie, index) in topMovies" :key="movie.id" class="movie-item">
-        <div class="rank">{{ index + 1 }}</div>
-        <RouterLink :to="`/movie/${movie.id}`" class="movie-link">
-          <img :src="`https://image.tmdb.org/t/p/w500/${movie.poster_path}`" alt="poster" class="poster_img">
-          <div class="movie-info">
-            <p class="movie_title">{{ movie.title }}</p>
-            <p class="movie-details">
-              {{ movie.release_date.slice(0, 4) }} •  {{ store.detailMovie.production_country || '정보 없음' }}<br>
-              평점:  {{ movie.vote_average.toFixed(1) }} ★
-            </p>
-          </div>
-        </RouterLink>
+    <div class="top-movie-container">
+      <p class="h2tag">돌담뮤비디아 HOT 랭킹</p>
+      <div class="wrapper" v-if="topMovies.length > 0">
+        <div v-for="(movie, index) in topMovies" :key="movie.id" class="movie-item">
+          <div class="rank">{{ index + 1 }}</div>
+          <RouterLink :to="`/movie/${movie.id}`" class="movie-link">
+            <img :src="`https://image.tmdb.org/t/p/w500/${movie.poster_path}`" alt="poster" class="poster_img">
+            <div class="movie-info">
+              <p class="movie_title">{{ movie.title }}</p>
+              <p class="movie-details">
+                {{ movie.release_date.slice(0, 4) }} •  {{ store.detailMovie.production_country || '정보 없음' }}<br>
+                평점:  {{ movie.vote_average.toFixed(1) }} ★
+              </p>
+            </div>
+          </RouterLink>
+        </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>
@@ -56,6 +56,7 @@ watch(() => store.movies, (newMovies) => {
 
 .top-movie-container {
   padding: 5px;
+  /* margin: 0 auto; */
 }
 
 .top-movie-container h2 {
