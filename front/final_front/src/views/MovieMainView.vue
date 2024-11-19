@@ -1,7 +1,7 @@
 <template>
 <div>
   <div>
-    <MovieTrailer/>
+    <!-- <MovieTrailer/> -->
   </div>
   <div>
     <TopMovieComponent/>
@@ -12,8 +12,12 @@
 <script setup>
 import MovieTrailer from '@/components/movie/MovieTrailer.vue';
 import TopMovieComponent from '@/components/movie/TopMovieComponent.vue';
-
-
+import { useMovieStore } from '@/stores/counter';
+import { onMounted } from 'vue';
+const store = useMovieStore()
+onMounted(() => {
+  store.checkAuthentication()
+})
 
 </script>
 

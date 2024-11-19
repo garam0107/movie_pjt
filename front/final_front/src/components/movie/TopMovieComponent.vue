@@ -1,6 +1,6 @@
 <template>
   <div class="top-movie-container">
-    <h2>돌담무비디아 HOT 랭킹</h2>
+    <p class="h2tag">돌담뮤비디아 HOT 랭킹</p>
     <div class="wrapper" v-if="topMovies.length > 0">
       <div v-for="(movie, index) in topMovies" :key="movie.id" class="movie-item">
         <div class="rank">{{ index + 1 }}</div>
@@ -46,6 +46,14 @@ watch(() => store.movies, (newMovies) => {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Hahmlet:wght@100..900&family=Noto+Sans+KR:wght@100..900&family=Noto+Serif+KR:wght@200..900&display=swap');
+.h2tag {
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 400; 
+  font-size: large;
+  font-style: normal;
+}
+
 .top-movie-container {
   padding: 5px;
 }

@@ -30,6 +30,9 @@
     <div v-else>x
       <p>배우 정보가 없습니다.</p>
     </div>
+    <div>
+      <h3>코멘트</h3>
+    </div>
   </div>
 </template>
 
