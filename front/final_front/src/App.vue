@@ -5,26 +5,34 @@ import Header from './components/common/Header.vue';
 </script>
 
 <template>
-  <Header/>
-<div class="container">
-
-  <RouterView />
-</div>
-  <Footer/>
-</template>
+  <Header />
+    <div class="layout-container">
+        <main class="container">
+            <router-view />
+        </main>
+        <Footer />
+    </div>
+</template>s
 
 <style scoped>
+.layout-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
 .container {
-  margin: 0 auto;
-  box-sizing: border-box;
+    flex: 1;
+    margin: 0 auto;
+    padding: 20px;
+    /* box-sizing: border-box; */
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    /* box-sizing: border-box; */
+    font-family: Arial, sans-serif;
 }
-
 
 </style>

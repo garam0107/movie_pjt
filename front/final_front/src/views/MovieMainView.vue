@@ -1,8 +1,7 @@
 <template>
-<div class="container">
-  <h1>영화 메인</h1>
+<div>
   <div>
-    트레일러 하나 보이자
+    <MovieTrailer/>
   </div>
   <div>
     <TopMovieComponent/>
@@ -11,6 +10,7 @@
 </template>
 
 <script setup>
+import MovieTrailer from '@/components/movie/MovieTrailer.vue';
 import TopMovieComponent from '@/components/movie/TopMovieComponent.vue';
 
 
@@ -18,7 +18,5 @@ import TopMovieComponent from '@/components/movie/TopMovieComponent.vue';
 </script>
 
 <style scoped>
-.container{ 
-  width: 70%;
-}
+
 </style>

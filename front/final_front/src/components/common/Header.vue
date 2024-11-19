@@ -7,20 +7,30 @@
         <nav class="nav-links">
           <RouterLink to="/main"class="nav-link">홈</RouterLink>
           <RouterLink to="/main"class="nav-link">영화</RouterLink>
-          <RouterLink to="/main"class="nav-link">마이페이지</RouterLink>
+          <RouterLink v-if="isLogin" :to="`/mypage/${userId}`" class="nav-link">마이페이지</RouterLink>
         </nav>
       </div>
       <div class="header-right">
         <input type="text" placeholder="콘텐츠, 인물, 컬렉션, 유저를 검색해보세요" class="search-input" />
-        <RouterLink :to="{name: 'LoginView'}"><button class="signup-button">로그인</button></RouterLink>
-        <RouterLink :to="{name: 'SignupView'}"><button class="signup-button">회원가입</button></RouterLink>
+        <RouterLink v-if="!isLogin" :to="{name: 'LoginView'}"><button class="signup-button">로그인</button></RouterLink>
+        <RouterLink v-if="!isLogin" :to="{name: 'SignupView'}"><button class="signup-button">회원가입</button></RouterLink>
       </div>
     </header>
   </template>
   
   <script setup>
-import { RouterLink } from 'vue-router';
-
+import { useMovieStore } from '@/stores/counter';
+import { computed, onMounted, ref } from 'vue';
+import { RouterLink, useRoute } from 'vue-router';
+const route =  useRoute()
+const store = useMovieStore()
+const userId = ref(null)
+const isLogin = computed(() => store.isAuthenticated)
+onMounted(()=>{
+  if (store.isAuthenticated) {
+    userId.value = store.user?.id
+  }
+})
   </script>
   
   <style scoped>

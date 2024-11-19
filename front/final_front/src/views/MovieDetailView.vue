@@ -27,7 +27,7 @@
         </div>
       </div>
     </div>
-    <div v-else>
+    <div v-else>x
       <p>배우 정보가 없습니다.</p>
     </div>
   </div>

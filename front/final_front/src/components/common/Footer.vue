@@ -26,10 +26,9 @@ export default {
   padding: 20px;
   text-align: center;
   font-size: 0.875rem;
-  position: relative;
-  left: 0;
-  bottom: 0;
+  margin-top: auto; /* 추가: 페이지의 나머지 공간을 채운 후 하단에 배치 */
 }
+
 
 .footer-content a {
   color: #fff;
