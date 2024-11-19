@@ -15,6 +15,7 @@ class User(AbstractUser):
     ('profile_images/character_single5.jpg', 'Image 5'),
     ('profile_images/character_single6.jpg', 'Image 6'),
 ], default='profile_images/image1.jpg')
+    followings = models.ManyToManyField('self', symmetrical=False, related_name='followers', blank=True)
 class CustomAccountAdapter(DefaultAccountAdapter):
     def save_user(self, request, user, form, commit=True):
         data = form.cleaned_data
