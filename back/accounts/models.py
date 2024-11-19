@@ -8,14 +8,15 @@ class User(AbstractUser):
     nickname = models.CharField(max_length=100)
     stone = models.IntegerField(null=True)
     profile_image = models.CharField(max_length=255, choices=[
-    ('profile_images/character_single1.jpg', 'Image 1'),
-    ('profile_images/character_single2.jpg', 'Image 2'),
-    ('profile_images/character_single3.jpg', 'Image 3'),
-    ('profile_images/character_single4.jpg', 'Image 4'),
-    ('profile_images/character_single5.jpg', 'Image 5'),
-    ('profile_images/character_single6.jpg', 'Image 6'),
+    ('profile_images/profile1.jpg', 'profile 1'),
+    ('profile_images/profile2.jpg', 'profile 2'),
+    ('profile_images/profile3.jpg', 'profile 3'),
+    ('profile_images/profile4.jpg', 'profile 4'),
+    ('profile_images/profile5.jpg', 'profile 5'),
+    ('profile_images/profile6.jpg', 'profile 6'),
 ], default='profile_images/image1.jpg')
     followings = models.ManyToManyField('self', symmetrical=False, related_name='followers', blank=True)
+    visit_count = models.IntegerField(default=0)
 class CustomAccountAdapter(DefaultAccountAdapter):
     def save_user(self, request, user, form, commit=True):
         data = form.cleaned_data

@@ -12,7 +12,7 @@ class Diary(models.Model):
     gpt_comment = models.TextField()
     recommend_movie = models.ManyToManyField(Movie, blank=True)
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_diaries', blank=True)
-    
+
 class Diary_comment(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

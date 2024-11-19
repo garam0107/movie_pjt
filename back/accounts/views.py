@@ -29,10 +29,16 @@ def mypage(request, user_pk):
     User = get_user_model()
     user = get_object_or_404(User, pk = user_pk)
     if request.method == 'GET':
+        user.visit_count += 1
+        user.save()
         serializer = UserSerializer(user)
         return Response(serializer.data)
-
-
+    # elif request.method == 'POST':
+    #     pass
+    # elif request.method == 'POST':
+    #     pass
+    # elif request.method == 'POST':
+    #     pass
 
 
 
