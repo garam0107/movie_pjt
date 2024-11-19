@@ -23,12 +23,12 @@
           <label for="profile_image" class="profile-label">프로필 이미지 선택</label>
           <select v-model="profile_image" id="profile_image" required class="form-select">
             <option disabled value="">선택해 주세요</option>
-            <option value="profile_images/character_single1.jpg">Image 1</option>
-            <option value="profile_images/character_single2.jpg">Image 2</option>
-            <option value="profile_images/character_single3.jpg">Image 3</option>
-            <option value="profile_images/character_single4.jpg">Image 4</option>
-            <option value="profile_images/character_single5.jpg">Image 5</option>
-            <option value="profile_images/character_single6.jpg">Image 6</option>
+            <option value="profile_images/profile1.jpg">Image 1</option>
+            <option value="profile_images/profile2.jpg">Image 2</option>
+            <option value="profile_images/profile3.jpg">Image 3</option>
+            <option value="profile_images/profile4.jpg">Image 4</option>
+            <option value="profile_images/profile5.jpg">Image 5</option>
+            <option value="profile_images/profile6.jpg">Image 6</option>
           </select>
         </div>
   
