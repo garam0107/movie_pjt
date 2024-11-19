@@ -5,7 +5,7 @@
         <MyData :userData="userData" />
       </div>
       <div class="calendar-container">
-        <Calendar />
+        <Calendar :userData="userData"/>
       </div>
     </div>
   </div>
