@@ -1,11 +1,20 @@
 from django.shortcuts import render
+from django.http import JsonResponse
+from django.contrib.auth import get_user_model
+from django.shortcuts import render,get_list_or_404,get_object_or_404
+
 from dj_rest_auth.models import TokenModel
-from rest_framework.generics import CreateAPIView
 from dj_rest_auth.app_settings import api_settings
 
+from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from django.shortcuts import render,get_list_or_404,get_object_or_404
+from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view,permission_classes
+
+from diaries.models import Diary
+from movies.models import Movie_review
+from .serializers import UserFollowingDiarySerializer,UserFollowingReviewSerializer,UserSerializer
 # Create your views here.
 
 class RegisterView(CreateAPIView):
@@ -15,5 +24,43 @@ class RegisterView(CreateAPIView):
     throttle_scope = 'dj_rest_auth'
 
 @api_view(['GET','POST','DELETE','PUT'])
+@permission_classes([IsAuthenticated])
 def mypage(request, user_pk):
-    pass
+    User = get_user_model()
+    user = get_object_or_404(User, pk = user_pk)
+    if request.method == 'GET':
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+
+
+
+
+
+@api_view(['POST','GET'])
+@permission_classes([IsAuthenticated])
+def follow(request, user_pk):
+    User = get_user_model()
+    target_user = get_object_or_404(User, pk = user_pk)
+    if request.method =='POST':
+        if User == target_user:
+            return JsonResponse({'error' :'자기 자신을 팔로우할 수 없습니다.'}, status = status.HTTP_400_BAD_REQUEST)
+        if target_user in request.user.following.all():
+            request.user.following.remove(target_user)
+            return JsonResponse({'message': '언팔로우'})
+        else:
+            request.user.following.add(target_user)
+            return JsonResponse({'message': '팔로우'})
+    elif request.method == 'GET':
+        user = request.user
+        following_users = user.following.all()
+
+        diaries = Diary.objects.filter(autor__in = following_users)
+        reviews = Movie_review.objects.filter(user__in = following_users)
+
+        serializer_diaries = UserFollowingDiarySerializer(diaries, many = True)
+        serializer_reviews = UserFollowingReviewSerializer(reviews, many = True)
+        return Response({
+            'diaries' : serializer_diaries,
+            'review' : serializer_reviews
+        })

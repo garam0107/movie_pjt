@@ -4,7 +4,10 @@ from dj_rest_auth.serializers import UserDetailsSerializer
 from django.core.exceptions import ValidationError as DjangoValidationError
 from dj_rest_auth.registration.serializers import RegisterSerializer
 
+
 from .models import User
+from diaries.models import Diary
+from movies.models import Movie_review
 
 UserModel = get_user_model()
 
@@ -51,3 +54,34 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
         model = UserModel
         fields = ('pk', *extra_fields)
         read_only_fields = ('email',)
+
+class UserFollowingDiarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Diary
+        fields = ['id','autor', 'title', 'content']
+
+
+class UserFollowingReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie_review
+        fields= ['id','movie', 'title', 'content']
+
+
+
+class UserMovieSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Diary
+        fields = ['recommend_movie']
+
+class UserReviewSerializer(serializers.ModelSerializer):
+    movie_title = serializers.CharField(source = 'movie.title', read_only = True)
+    class Meta:
+        model = Movie_review
+        fields= ['title', 'content','movie_title']
+
+class UserSerializer(serializers.ModelSerializer):
+    my_review = UserReviewSerializer(source = 'moviereview_set', many = True, read_only = True)
+    recommed_movie = UserMovieSerializer(source = 'diaries', many = True, read_only = True)
+    class Meta:
+        model = User
+        fields = '__all__'

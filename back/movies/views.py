@@ -1,8 +1,12 @@
 from django.shortcuts import render,get_list_or_404,get_object_or_404
-from rest_framework.decorators import api_view
+
+
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
-from .serializers import GenreSerializer,ActorSerializer,MoiveSerializer
+
 from .models import Genre,Actor,Movie
+from .serializers import GenreSerializer,ActorSerializer,MoiveSerializer
 # Create your views here.
 @api_view(['GET'])
 def main(request):
