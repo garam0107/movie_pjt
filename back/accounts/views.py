@@ -14,7 +14,7 @@ from rest_framework.decorators import api_view,permission_classes
 
 from diaries.models import Diary
 from movies.models import Movie_review
-from .serializers import UserFollowingDiarySerializer,UserFollowingReviewSerializer,UserSerializer
+from .serializers import UserFollowingDiarySerializer,UserFollowingReviewSerializer,UserSerializer,UserUpdateSerializer
 # Create your views here.
 
 class RegisterView(CreateAPIView):
@@ -70,3 +70,15 @@ def follow(request, user_pk):
             'diaries' : serializer_diaries.data,
             'review' : serializer_reviews.data
         })
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update(request, user_pk):
+    User = get_user_model()
+    user = get_object_or_404(User, pk = user_pk)
+    serializer = UserUpdateSerializer(user, data = request.data, partial = True)
+    if serializer.is_valid(raise_exception=True):
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

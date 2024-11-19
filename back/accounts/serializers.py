@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from dj_rest_auth.registration.serializers import RegisterSerializer
 
 
-from .models import User
+
 from diaries.models import Diary
 from movies.models import Movie_review
 
@@ -67,7 +67,7 @@ class UserSerializer(serializers.ModelSerializer):
     followers_count = serializers.SerializerMethodField()
 
     class Meta:
-        model = User
+        model = UserModel
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'nickname', 'profile_image', 'visit_count'
                   'my_review','recommend_movie','followings','followers','followings_count','followers_count','stone']
         
@@ -112,3 +112,10 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
 
     def get_followers_count(self, obj):
         return obj.followers.count()
+    
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = ['profile_image', 'nickname']
+
