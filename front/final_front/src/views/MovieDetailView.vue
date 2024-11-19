@@ -8,6 +8,10 @@
         <p>개봉일: {{ store.detailMovie.release_date }}</p>
         <p>국가: {{ store.detailMovie.production_country || '정보 없음' }}</p>
       </div>
+      <div class="backdrop-info2">
+        <button @click="movieLike" class="action-button">❤</button>
+        <button class="action-button">📝</button>
+      </div>
     </div>
     <div class="movie-detail">
       <img :src="`https://image.tmdb.org/t/p/w500/${store.detailMovie.poster_path}`" alt="poster" class="poster">
@@ -48,6 +52,8 @@ onMounted(async () => {
   const movieId = route.params.movie_id;
   await store.getDetailMovie(movieId);
 });
+
+
 </script>
 
 <style scoped>
@@ -100,6 +106,24 @@ onMounted(async () => {
   color: #fff;
 }
 
+.backdrop-info2 {
+  position: absolute;
+  top: 380px;
+  right: 18px;
+  color: #fff;
+  display: flex;
+  gap: 10px; /* 버튼 간격 추가 */
+}
+.action-button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #ff007f; /* 버튼 기본 배경색 (핑크톤) */
+  color: #ffffff; /* 글자색 흰색 */
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 8px; 
+  cursor: pointer;
+}
 .backdrop-info h2 {
   font-size: 2.5rem;
   margin-bottom: 10px;
