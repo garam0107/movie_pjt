@@ -4,7 +4,7 @@ from django.shortcuts import render,get_list_or_404,get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.pagination import get_pagination_class
+# from rest_framework.pagination import get_pagination_class
 from rest_framework.decorators import api_view,permission_classes
 
 from .models import Genre,Actor,Movie,Movie_review,MovieReview_comment
@@ -125,3 +125,13 @@ def create_comment(request,review_pk):
             return Response({'message' : '작성한 댓글이 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
         comment.delete()
         return Response({'message' : '댓글이 삭제되었습니다.'}, status= status.HTTP_204_NO_CONTENT)
+    
+
+@api_view(['GET'])
+def search(request):
+    query = request.GET.get('q', '')
+    if query:
+        movies = Movie.objects.filter(title__icontains=query)
+        movie_list = list(movies.values()) 
+        return JsonResponse({'movies': movie_list}, safe=False)
+    return JsonResponse({'movies': []}, safe=False)

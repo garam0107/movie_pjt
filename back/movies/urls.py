@@ -7,4 +7,5 @@ urlpatterns = [
     path('detail/<int:movie_pk>/like/', views.movie_like), # 영화 좋아요
     path('<int:movie_pk>/detail_review/', views.detail_review), # 영화 리뷰 더보기
     path('<int:movie_pk>/create_comment/', views.create_comment), # 영화 리뷰에 댓글 작성
+    path('search/', views.search) # 영화 검색
 ]
