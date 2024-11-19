@@ -52,8 +52,6 @@ class MovieReview_comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     review = models.ForeignKey(Movie_review, on_delete=models.CASCADE)
     reviewuser = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-
-
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['review', 'reviewuser'], name='unique_review_user_comment')

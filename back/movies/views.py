@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view,permission_classes
 
-from .models import Genre,Actor,Movie,Movie_review
-from .serializers import GenreSerializer,ActorSerializer,MoiveSerializer,MovieReviewsSerializer
+from .models import Genre,Actor,Movie,Movie_review,MovieReview_comment
+from .serializers import GenreSerializer,ActorSerializer,MoiveSerializer,MovieReviewsSerializer,ReviewCommentSerializer
 # Create your views here.
 @api_view(['GET'])
 def main(request):
@@ -84,3 +84,33 @@ def detail_review(request, movie_pk):
     movie = get_object_or_404(Movie, pk = movie_pk)
     serializer = MovieReviewsSerializer(movie, many = True)
     return Response(serializer.data)
+
+@api_view(['POST','PUT','DELETE'])
+def create_comment(request,review_pk):
+    user = request.user
+    review = get_object_or_404(Movie_review, pk = review_pk)
+    
+    if request.method == 'POST':
+        serializer = ReviewCommentSerializer(data = request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(review = review, user = user)
+            return Response(serializer.data , status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'PUT':
+        comment = MovieReview_comment.objects.filter(review = review, user = user).first()
+        if not review:
+
+            return Response({'message' : '작성한 댓글이 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = MovieReviewsSerializer(comment, data = request.data, partial = True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+       
+    elif request.method == 'DELETE':
+        comment = MovieReview_comment.objects.filter(review = review, user = user).first()
+        if not review:   
+            return Response({'message' : '작성한 댓글이 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        comment.delete()
+        return Response({'message' : '댓글이 삭제되었습니다.'}, status= status.HTTP_204_NO_CONTENT)

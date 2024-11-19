@@ -81,7 +81,7 @@ class UserReviewSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     my_review = UserReviewSerializer(source = 'moviereview_set', many = True, read_only = True)
-    recommed_movie = UserMovieSerializer(source = 'diaries', many = True, read_only = True)
+    recommend_movie = UserMovieSerializer(source = 'diaries', many = True, read_only = True)
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'nickname', 'profile_image']
