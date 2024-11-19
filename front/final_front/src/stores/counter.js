@@ -111,27 +111,6 @@ export const useMovieStore = defineStore('movie', () => {
         console.error('로그아웃 실패:', err)
       })
   }
-
-  const getMyPage = function() {
-    if (!token.value) {
-      console.error('인증 토큰이 없습니다.');
-      return;
-    }
-    
-    axios({
-      method: 'get',
-      url: `${API_URL}accounts/${userId.value}/mypage/`,
-      headers: {
-        Authorization: `Token ${token.value}`
-      }
-    })
-    .then(res => {
-      console.log(res.data);
-    })
-    .catch(err => {
-      console.error(err);
-    });
-  };
   
   const checkAuthentication = function () {
     const storedToken = localStorage.getItem('token');
@@ -146,6 +125,6 @@ export const useMovieStore = defineStore('movie', () => {
 
 
   return { movies, API_URL, getMovies, getDetailMovie, detailMovie, login, token, signup
-          , getMyPage, userData, userId, checkAuthentication, isAuthenticated, logout
+          ,  userData, userId, checkAuthentication, isAuthenticated, logout
    }
 }, {persist:true})
