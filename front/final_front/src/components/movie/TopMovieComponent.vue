@@ -47,7 +47,7 @@ watch(() => store.movies, (newMovies) => {
 
 <style scoped>
 .top-movie-container {
-  padding: 20px;
+  padding: 5px;
 }
 
 .top-movie-container h2 {

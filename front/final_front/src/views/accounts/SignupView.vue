@@ -2,13 +2,9 @@
     <div class="signup-container">
 
       <h1>회원가입</h1>
-      <form @submit.prevent="submitForm" class="signup-form">
+      <form @submit.prevent="signup" class="signup-form">
         <div class="form-group">
           <input type="text" v-model="username" id="username" placeholder="사용자 이름" required class="form-input">
-        </div>
-        
-        <div class="form-group">
-          <input type="email" v-model="email" id="email" placeholder="이메일" required class="form-input">
         </div>
   
         <div class="form-group">
@@ -43,43 +39,27 @@
   </template>
   
   <script setup>
-  import axios from 'axios';
+  import { useMovieStore } from '@/stores/counter';
   import { ref } from 'vue';
-    const username = ref('');
-    const email = ref('');
-    const password1 = ref('');
-    const password2 = ref('');
-    const nickname = ref('');
-    const profile_image = ref('');
-  
-    const submitForm = () => {
-      const formData = {
-        username: username.value,
-        email: email.value,
-        password1: password1.value,
-        password2: password2.value,
-        nickname: nickname.value,
-        profile_image: profile_image.value,
-      };
-  
-      console.log("회원가입 데이터:", formData);
-      axios.post('http://127.0.0.1:8000/accounts/signup/', formData) // 백엔드 회원가입 API 엔드포인트
-      .then(response => {
-        // 요청이 성공한 경우
-        console.log('가입 성공:', response.data);
-        alert('회원가입에 성공하셨습니다! 로그인 페이지로 이동합니다.');
-      })
-      .catch(error => {
-        // 요청이 실패한 경우
-        console.error('가입 실패:', error.response);
-        if (error.response && error.response.data) {
-          // 서버에서 전달된 에러 메시지가 있을 경우 이를 출력합니다.
-          alert(`오류 발생: ${error.response.data.detail || '회원가입에 실패했습니다.'}`);
-        } else {
-          alert('회원가입에 실패했습니다. 다시 시도해주세요.');
-        }
-      });
-    };
+  const store = useMovieStore()
+    const username = ref(null);
+    // const email = ref(null);
+    const password1 = ref(null);
+    const password2 = ref(null);
+    const nickname = ref(null);
+    const profile_image = ref(null);
+
+  const signup = function() {
+    const payload = {
+      username: username.value,
+      // email: email.value,
+      password1: password1.value,
+      password2: password2.value,
+      nickname: nickname.value,
+      profile_image: profile_image.value
+    }
+    store.signup(payload)
+  }
   </script>
   
   <style scoped>

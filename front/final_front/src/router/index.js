@@ -3,6 +3,8 @@ import MovieMainView from '@/views/MovieMainView.vue'
 import MovieDetailView from '@/views/MovieDetailView.vue'
 import SignupView from '@/views/accounts/SignupView.vue'
 import LoginView from '@/views/accounts/LoginView.vue'
+import MyPageView from '@/views/mypage/MyPageView.vue'
+import { useMovieStore } from '@/stores/counter'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,7 +32,13 @@ const router = createRouter({
       path: '/login',
       name: 'LoginView',
       component: LoginView
-    }
+    },
+    // 마이페이지
+    // {
+    //   path: '/mypage/:user_id',
+    //   name: 'MyPageView',
+    //   component: MyPageView
+    // }
   ],
 })
 
