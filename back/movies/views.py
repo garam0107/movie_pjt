@@ -20,7 +20,8 @@ def main(request):
 def movie_detail(request, movie_pk):
     if request.method == 'GET':
         movie = get_object_or_404(Movie, pk = movie_pk)
-        serializer = MoiveSerializer(movie)
+        reviews = Movie_review.objects.filter(movie = movie)
+        serializer = MoiveSerializer(reviews, many = True)
         return Response(serializer.data)
     
 @api_view(['POST','PUT','DELETE'])
@@ -61,12 +62,19 @@ def create_review(request, movie_pk):
         return Response({'message' : '리뷰가 삭제되었습니다.'}, status= status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['POST'])
+@api_view(['GET','POST'])
 @permission_classes([IsAuthenticated])
 def movie_like(request, movie_pk):
-    if request.method == 'POST':
+    movie = get_object_or_404(Movie, pk = movie_pk)
+    if request.method == 'GET':
+        liked = request.user in movie.like_users.all()
+        like_count = movie.like_users.count()
+        return JsonResponse({
+            'liked': liked,
+            'like_count': like_count
+        })
+    elif request.method == 'POST':
         user = request.user
-        movie = get_object_or_404(Movie, pk = movie_pk)
         if user in movie.like_users.all():
             movie.like_users.remove(user)
             liked = False
