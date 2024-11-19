@@ -129,7 +129,7 @@ def create_comment(request,review_pk):
 
 @api_view(['GET'])
 def search(request):
-    query = request.GET.get('q', '')
+    query = request.GET.get('title', '')
     if query:
         movies = Movie.objects.filter(title__icontains=query)
         movie_list = list(movies.values()) 
