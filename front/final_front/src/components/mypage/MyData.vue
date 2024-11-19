@@ -8,20 +8,20 @@
       <div class="user-info">
         <h2>{{ props.userData.nickname }}</h2>
         <p>{{ props.userData.email }}</p>
-        <!-- <p>팔로워 {{ props.userData.followers }} | 팔로잉 {{ props.userData.following }}</p> -->
+        <p>팔로워 {{ props.userData.followers_count }} | 팔로잉 {{ props.userData.followings_count }}</p>
       </div>
     </div>
     <div class="user-stats">
       <div class="stat">
         <h3>28개</h3>
-        <p>평가</p>
+        <p>코멘트</p>
       </div>
 
     </div>
     <div class="actions">
+      <RouterLink to="/main"><button>회원정보 수정</button></RouterLink>
+      <RouterLink to="/main"><button>비밀번호 수정</button></RouterLink>
       <button>회원 탈퇴</button>
-      <RouterLink><button>회원정보 수정</button></RouterLink>
-      <RouterLink><button>비밀번호 수정</button></RouterLink>
     </div>
   </div>
 </template>
@@ -37,11 +37,12 @@ const props = defineProps ({
 <style scoped>
 .mydata-container {
   max-width: 400px;
+  
   margin: 20px auto;
-  padding: 20px;
+  padding: 30px;
   background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
 }
 
 .profile-header {

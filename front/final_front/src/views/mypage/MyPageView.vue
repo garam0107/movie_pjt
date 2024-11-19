@@ -1,6 +1,5 @@
 <template>
   <div class="mypage-container">
-    <h2>마이페이지</h2>
     <div class="top">
       <div class="mydata-container">
         <MyData :userData="userData" />
@@ -59,6 +58,7 @@ onMounted(async () => {
 .top {
   display: flex;
   gap: 20px;
+  height: 400px;
 }
 .mydata-container {
   flex: 3.5; /* MyData의 비율 */

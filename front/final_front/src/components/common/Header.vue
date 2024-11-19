@@ -42,7 +42,7 @@ const logout = () => {
     border-bottom: 1px solid #ddd;
     background-color: #fff;
     font-family: "Noto Sans KR", sans-serif;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     box-sizing: border-box;
     flex-wrap: nowrap;
@@ -54,7 +54,7 @@ const logout = () => {
   }
   
   .logo_img {
-    width: 150px; 
+    width: 170px; 
     max-width: 100%; 
     height: auto; 
   }
@@ -68,7 +68,7 @@ const logout = () => {
   .nav-link {
     text-decoration: none;
     color: #333;
-    font-size: 16px;
+    font-size: 19px;
   }
   
   .nav-link:hover {

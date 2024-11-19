@@ -124,6 +124,12 @@ export const useMovieStore = defineStore('movie', () => {
   const isAuthenticated = computed(() => token !== null && token !== undefined);
 
 
+  // 영화 찜
+  const movieLike = function() {
+    
+  }
+
+
   return { movies, API_URL, getMovies, getDetailMovie, detailMovie, login, token, signup
           ,  userData, userId, checkAuthentication, isAuthenticated, logout
    }
