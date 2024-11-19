@@ -1,5 +1,9 @@
 from django.db import models
 from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+
+
 class Actor(models.Model):
     name = models.CharField(max_length=50)
     poster_path = models.CharField(max_length=200, blank= True, null= True)
@@ -31,8 +35,9 @@ class Movie_review(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    likes_count = models.IntegerField()
-    rating = models.IntegerField()
+    likes_count = models.IntegerField(null= True, blank=True)
+    rating = models.IntegerField(validators=[MinValueValidator(1),
+                                             MaxValueValidator(5)])
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)   
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     class Meta:
