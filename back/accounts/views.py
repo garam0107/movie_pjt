@@ -25,9 +25,9 @@ class RegisterView(CreateAPIView):
 
 @api_view(['GET','POST','DELETE','PUT'])
 @permission_classes([IsAuthenticated])
-def mypage(request, user_pk):
+def mypage(request, user_username):
     User = get_user_model()
-    user = get_object_or_404(User, pk = user_pk)
+    user = get_object_or_404(User, username = user_username)
     if request.method == 'GET':
         user.visit_count += 1
         user.save()

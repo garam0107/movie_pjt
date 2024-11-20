@@ -1,6 +1,7 @@
 import re
 import json
 import datetime
+from pathlib import Path
 from openai import OpenAI
 
 from django.conf import settings
@@ -18,13 +19,15 @@ from .serializers import DiaryCreateSerializer, DiarySerializer,DiaryCommentSeri
 # Create your views here.
 
 
+
 OPENAI_API_KEY = settings.OPENAI_API_KEY
+json_file_path = Path(__file__).resolve().parent.parent / 'movies' / 'fixtures' / 'movies.json'
 
 def gpt_recommend(diary_text):
     client = OpenAI(
     api_key=OPENAI_API_KEY
     )
-    with open('movies.json', encoding='utf-8') as f: available_movies = json.load(f)
+    with open(json_file_path, encoding='utf-8') as f: available_movies = json.load(f)
     # DB안에 있는 영화에서 검색해서 추천
     available_movies_str = "\n".join([f"- {movie['title']}: {', '.join(movie['genres'])} - {movie['description']}" for movie in available_movies])
 
