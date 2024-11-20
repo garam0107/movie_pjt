@@ -74,4 +74,4 @@ from diaries.models import Diary
 diary = Diary.objects.get(id=18)  # 특정 다이어리 가져오기
 print(diary.recommend_reasons)  # JSONField 값 확인
 
-# 테스트용
+# 테스트용 111
