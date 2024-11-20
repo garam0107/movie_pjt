@@ -24,14 +24,28 @@ OPENAI_API_KEY = settings.OPENAI_API_KEY
 json_file_path = Path(__file__).resolve().parent.parent / 'movies' / 'fixtures' / 'movies.json'
 
 def gpt_recommend(diary_text):
-    client = OpenAI(
-    api_key=OPENAI_API_KEY
-    )
-    with open(json_file_path, encoding='utf-8') as f: available_movies = json.load(f)
-    # DB안에 있는 영화에서 검색해서 추천
-    available_movies_str = "\n".join([f"- {movie['title']}: {', '.join(movie['genres'])} - {movie['description']}" for movie in available_movies])
+    try:
+        client = OpenAI(
+        api_key=OPENAI_API_KEY
+        )
+    except Exception as e:
+        print(f'OpenAI API 호출 오류: {e}')
 
-    # 사용자가 작성한 일기 데이터 예시
+    try:
+        with open(json_file_path, encoding='utf-8') as f:
+            available_movies = json.load(f)
+            print("파일을 성공적으로 읽었습니다.")
+    except json.JSONDecodeError as e:
+        print(f"JSON 파일을 파싱하는 도중 오류가 발생했습니다: {e}")
+    except Exception as e:
+        print(f"파일을 여는 도중 예상치 못한 오류가 발생했습니다: {e}")
+    # DB안에 있는 영화에서 검색해서 추천
+    try:
+        available_movies_str = "\n".join([f"- {movie['fields']['title']}: {', '.join(movie['fields']['genres'])} - {movie['fields']['description']}" for movie in available_movies])
+    except KeyError as e:
+        print(f'Key 오류: {e}')
+    except Exception as e:
+        print(f'데이터 변환 중 오류 : {e}')
 
     # 프롬프트 작성
     messages = [
@@ -103,20 +117,20 @@ def make_json(answer):
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
-def user_diary(request, user_pk):
+def user_diary(request, user_username):
     if request.method == 'GET':
-        diary = Diary.objects.filter(author_id = user_pk)
+        diary = Diary.objects.filter(author__username = user_username)
         serializer = DiarySerializer(diary, many = True)
         return Response(serializer.data)
     elif request.method == 'POST':
-        existing_diary = Diary.objects.filter(author_id=user_pk, date=datetime.date.today()).first()
+        existing_diary = Diary.objects.filter(author__username = user_username, date=datetime.date.today()).first()
         if existing_diary:
             return Response({"message": "하루에 하나의 다이어리만 작성할 수 있습니다."}, status=status.HTTP_400_BAD_REQUEST)
         serializer = DiaryCreateSerializer(data = request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(author = request.user)
             User = get_user_model()
-            user = get_object_or_404(User, pk = user_pk)
+            user = get_object_or_404(User, username = user_username)
             user.stone += 5
             user.save()
             user_data = serializer.data['content'] # 사용자가 쓴 일기 내용
@@ -131,9 +145,9 @@ def user_diary(request, user_pk):
     
 @api_view(['PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
-def update_diary(request, user_pk, diary_pk):
+def update_diary(request, user_username, diary_pk):
     if request.method == 'PUT':
-        diary = get_object_or_404(Diary, id=diary_pk, author_id=user_pk)
+        diary = get_object_or_404(Diary, id=diary_pk, author__username = user_username)
         
         if request.user != diary.author:
             return Response({"message": "수정할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
@@ -145,7 +159,7 @@ def update_diary(request, user_pk, diary_pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        diary = get_object_or_404(Diary, id=diary_pk, author_id=user_pk)
+        diary = get_object_or_404(Diary, id=diary_pk, author__username = user_username)
 
         if request.user != diary.author:
             return Response({"message": "삭제할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
