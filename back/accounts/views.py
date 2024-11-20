@@ -29,7 +29,7 @@ def mypage(request, user_username):
     User = get_user_model()
     user = get_object_or_404(User, username = user_username)
     if request.method == 'GET':
-        user.visit_count += 1
+        user.visit_count += 0.5
         user.save()
         serializer = UserSerializer(user)
         return Response(serializer.data)
@@ -45,9 +45,9 @@ def mypage(request, user_username):
 
 @api_view(['POST','GET'])
 @permission_classes([IsAuthenticated])
-def follow(request, user_pk):
+def follow(request, user_username):
     User = get_user_model()
-    target_user = get_object_or_404(User, pk = user_pk)
+    target_user = get_object_or_404(User, username = user_username)
     if request.method =='POST':
         if User == target_user:
             return JsonResponse({'error' :'자기 자신을 팔로우할 수 없습니다.'}, status = status.HTTP_400_BAD_REQUEST)
@@ -73,9 +73,9 @@ def follow(request, user_pk):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update(request, user_pk):
+def update(request, user_username):
     User = get_user_model()
-    user = get_object_or_404(User, pk = user_pk)
+    user = get_object_or_404(User, username = user_username)
     serializer = UserUpdateSerializer(user, data = request.data, partial = True)
     if serializer.is_valid(raise_exception=True):
         serializer.save()
