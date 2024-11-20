@@ -5,6 +5,7 @@ from allauth.account.utils import user_email, user_field, user_username
 
 
 class User(AbstractUser):
+    name = models.CharField(max_length=25)
     nickname = models.CharField(max_length=100)
     stone = models.IntegerField(default=0)
     profile_image = models.CharField(max_length=255, choices=[
@@ -26,7 +27,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         username = data.get("username")
         nickname = data.get("nickname")
         profile_image = data.get("profile_image")
-
+        name = data.get("name")
 
         user_email(user, email)
         user_username(user, username)
@@ -38,6 +39,9 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             user_field(user, "nickname", nickname)
         if profile_image:
             user_field(user, "profile_image", profile_image)
+        if name:
+            user_field(user, "name", name)
+            
         if "password1" in data:
             user.set_password(data["password1"])
         else:
