@@ -17,6 +17,24 @@
         </div>
       </div>
     </div>
+    <div class="top-movie-container">
+      <p class="h2tag">사용자가 뽑은 최고의 영화</p>
+      <div class="wrapper" v-if="topMovies.length > 0">
+        <div v-for="(movie, index) in voteMovies" :key="movie.id" class="movie-item">
+          <div class="rank">{{ index + 1 }}</div>
+          <RouterLink :to="`/movie/${movie.id}`" class="movie-link">
+            <img :src="`https://image.tmdb.org/t/p/w500/${movie.poster_path}`" alt="poster" class="poster_img">
+            <div class="movie-info">
+              <p class="movie_title">{{ movie.title }}</p>
+              <p class="movie-details">
+                {{ movie.release_date.slice(0, 4) }} •  {{ store.detailMovie.production_country || '정보 없음' }}<br>
+                평점:  {{ movie.vote_average.toFixed(1) }} ★
+              </p>
+            </div>
+          </RouterLink>
+        </div>
+      </div>
+    </div>
 </template>
 
 <script setup>
@@ -26,22 +44,27 @@ import { useMovieStore } from '@/stores/counter';
 const movies = ref([]);
 const topMovies = ref([]);
 const store = useMovieStore();
-
+const voteMovies = ref([])
 onMounted(async () => {
-  await store.getMovies();
-  movies.value = store.movies;
+  await store.getMovies()
+  movies.value = store.movies
 
   topMovies.value = [...movies.value]
     .sort((a, b) => b.popularity - a.popularity)
-    .slice(0, 10);
+    .slice(0, 10)
+
+  voteMovies.value = [...movies.value]
+    .sort((a, b) => b.vote_count - a.vote_count)
+    .slice(0, 10)
+  console.log(voteMovies)
 });
 
 watch(() => store.movies, (newMovies) => {
-  movies.value = newMovies;
+  movies.value = newMovies
   
   topMovies.value = [...newMovies]
     .sort((a, b) => b.popularity - a.popularity)
-    .slice(0, 10);
+    .slice(0, 10)
 });
 </script>
 

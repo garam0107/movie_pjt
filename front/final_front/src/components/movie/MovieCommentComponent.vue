@@ -53,7 +53,7 @@
               @click="setRating(star)"
               :class="{'filled-star': star <= (tempRating || editReview.rating), 'empty-star': star > (tempRating || editReview.rating)}"
             >
-              ⭐
+            ★
             </span>
           </div>
         </div>
@@ -65,7 +65,6 @@
       </div>
     </div>
 
-
 </template>
 
 <script setup>
@@ -74,13 +73,14 @@ import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { useMovieStore } from '@/stores/counter';
  
-const reviews = ref([]);
-const route = useRoute();
+const reviews = ref([])
+const route = useRoute()
 const movieId = route.params.movie_id;
-const userData = ref({});
+const userData = ref({})
 const store = useMovieStore()
-const showModal = ref(false);
-const editReview = ref({ title: '', content: '', rating: 0 });
+const showModal = ref(false)
+const editReview = ref({ title: '', content: '', rating: 0 })
+const tempRating = ref(null)
 
 onMounted(() => {
   axios({
@@ -88,20 +88,19 @@ onMounted(() => {
     url: `http://127.0.0.1:8000/movies/${movieId}/detail_review/`,
   })
     .then((res) => {
-      reviews.value = res.data;
+      reviews.value = res.data
     })
     .catch((err) => {
-      console.error(err);
+      console.error(err)
     });
 });
 
 const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
-}
+  const date = new Date(dateString);
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+};
 
 onMounted(async () => {
-
   if (store.token) {
     axios({
       method: 'get',
@@ -111,16 +110,16 @@ onMounted(async () => {
       }
     })
       .then(res => {
-        console.log('유저 데이터:', res.data);
-        userData.value = res.data; 
+        console.log('유저 데이터:', res.data)
+        userData.value = res.data;
       })
       .catch(err => {
-        console.log('마이페이지 정보를 불러오는 중 오류:', err);
-      });
+        console.log('마이페이지 정보를 불러오는 중 오류:', err)
+      })
   } else {
-    console.error('토큰이 없습니다. 로그인 후 다시 시도해주세요.');
+    console.error('토큰이 없습니다. 로그인 후 다시 시도해주세요.')
   }
-});
+})
 
 const deleteComment = (reviewId) => {
   if(confirm("정말로 리뷰를 삭제하시겠습니까")){
@@ -132,14 +131,14 @@ const deleteComment = (reviewId) => {
       }
     })
     .then(res => {
-      console.log(res.data.message)
+      console.log(res.data.message);
       reviews.value = reviews.value.filter(review => review.id !== reviewId)
     })
     .catch(err => {
       console.log(err)
     })
   }
-}
+};
 
 // 모달 열기
 const openUpdateModal = (review) => {
@@ -177,6 +176,7 @@ const updateComment = () => {
       updatedReview.rating = editReview.value.rating;
     }
     closeUpdateModal(); // 모달 닫기
+    location.reload(); // 페이지 새로고침
   })
   .catch(err => {
     console.error('리뷰 수정 중 오류가 발생했습니다.', err);
