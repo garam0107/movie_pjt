@@ -1,3 +1,4 @@
+
 import re
 import json
 import datetime
@@ -8,20 +9,22 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, get_list_or_404, get_object_or_404
 
-
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view,permission_classes
 
 from .models import Diary
+from movies.models import Movie
 from .serializers import DiaryCreateSerializer, DiarySerializer,DiaryCommentSerializer
 # Create your views here.
 
 
 
 OPENAI_API_KEY = settings.OPENAI_API_KEY
-json_file_path = Path(__file__).resolve().parent.parent / 'movies' / 'fixtures' / 'movies.json'
+
+json_file_path = Path(__file__).resolve().parent/'updated_movies.json'
 
 def gpt_recommend(diary_text):
     try:
@@ -41,7 +44,7 @@ def gpt_recommend(diary_text):
         print(f"파일을 여는 도중 예상치 못한 오류가 발생했습니다: {e}")
     # DB안에 있는 영화에서 검색해서 추천
     try:
-        available_movies_str = "\n".join([f"- {movie['fields']['title']}: {', '.join(movie['fields']['genres'])} - {movie['fields']['description']}" for movie in available_movies])
+        available_movies_str = "\n".join([f"- {movie['fields']['title']}: {', '.join(movie['fields']['genres'])}" for movie in available_movies])
     except KeyError as e:
         print(f'Key 오류: {e}')
     except Exception as e:
@@ -94,7 +97,6 @@ def gpt_recommend(diary_text):
 
 
 
-
 def make_json(answer):
     parsed_data = {}
     # 감정 추출
@@ -103,11 +105,23 @@ def make_json(answer):
         parsed_data['detected_emotion'] = emotion_match.group(1).strip()
 
     # Movie 1과 Movie 2 정보 추출
-    movies = re.findall(r"- Movie \d+: \"(.+)\", \[(.+)\]", answer)
-    parsed_data['movies'] = [{'title': movie[0], 'reason': movie[1]} for movie in movies]
+    movies = re.findall(r"- Movie \d+: (.*?), \[(.*?)\]", answer)
+
+    # movies 리스트의 길이를 확인하여 안전하게 접근
+    if len(movies) >= 2:
+        parsed_data['movies'] = {
+            "title": [movies[0][0], movies[1][0]],
+            "reason": [movies[0][1], movies[1][1]]
+        }
+    else:
+        # 만약 movies 리스트의 길이가 충분하지 않다면 빈 값 또는 다른 처리를 추가
+        parsed_data['movies'] = {
+            "title": [movies[i][0] if i < len(movies) else "" for i in range(2)],
+            "reason": [movies[i][1] if i < len(movies) else "" for i in range(2)]
+        }
 
     # Diary Review 추출
-    review_match = re.search(r"- Diary Review: \[(.+)\]", answer)
+    review_match = re.search(r"- Diary Review: (.+)", answer)
     if review_match:
         parsed_data['diary_review'] = review_match.group(1).strip()
 
@@ -123,14 +137,14 @@ def user_diary(request, user_username):
         serializer = DiarySerializer(diary, many = True)
         return Response(serializer.data)
     elif request.method == 'POST':
-        existing_diary = Diary.objects.filter(author__username = user_username, date=datetime.date.today()).first()
+        User = get_user_model()
+        user = get_object_or_404(User, username = user_username)
+        existing_diary = Diary.objects.filter(author=user, date=datetime.date.today()).first()
         if existing_diary:
             return Response({"message": "하루에 하나의 다이어리만 작성할 수 있습니다."}, status=status.HTTP_400_BAD_REQUEST)
         serializer = DiaryCreateSerializer(data = request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(author = request.user)
-            User = get_user_model()
-            user = get_object_or_404(User, username = user_username)
             user.stone += 5
             user.save()
             user_data = serializer.data['content'] # 사용자가 쓴 일기 내용
@@ -140,6 +154,7 @@ def user_diary(request, user_username):
                 'create_diary' : serializer.data,
                 'gpt_json_answer' : gpt_json_answer
             }
+
             return Response(data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -176,3 +191,34 @@ def create_comment(request, diary_pk):
         serializer.save(user = user, diary = diary)
         return Response(serializer.data , status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+test_text = {'detected_emotion': '기쁨', 'movies': {'title': ['인사이드 아웃 2', '아카디안'], 'reason': ['기쁨을 느낀 내용과 관련하여 긍정적인 감정을 주는 애니메이션 영화로 추천합니다.', '반대 감정인 드라마와 스릴러 요소가 있는 영화로 기분 전환을 도와줄 수 있습니다.']}, 'diary_review': '오늘은 프로젝트를 하면서 성과를 느끼고 기분이 좋았지만, 건강에 대한 걱정도 드는 하루였네요. 피곤함 속에서도 긍정적인 감정이 잘 드러나는 일기입니다.'}
+reasons = {'today_diary_review1' : test_text['movies']['reason'][0],
+           'today_diary_review2' : test_text['movies']['reason'][1]}
+
+def test(request, user_username):
+    # 단일 객체 가져오기
+    diary = Diary.objects.filter(author__username=user_username).first()
+    if not diary:
+        return JsonResponse({'message': '해당 사용자의 다이어리를 찾을 수 없습니다.'}, status=404)
+
+    # gpt_comment 추가
+    diary.gpt_comment = test_text['diary_review']
+    
+    # Movie 객체 가져오기 (제목을 통해 검색한다고 가정)
+    movie_titles = test_text['movies']['title']
+    movies = Movie.objects.filter(title__in=movie_titles)
+
+    # 추천 영화 추가
+    for movie in movies:
+        diary.recommend_movie.add(movie)
+
+    # recommend_reasons 설정
+    diary.recommend_reasons = reasons
+
+    # 다이어리 저장
+    diary.save()
+
+    return JsonResponse({'message': '성공', 'recommend_reasons': reasons}, json_dumps_params={'ensure_ascii': False})   
+
