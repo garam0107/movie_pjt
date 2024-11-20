@@ -9,11 +9,11 @@
         <p>국가: {{ store.detailMovie.production_country || '정보 없음' }}</p>
       </div>
       <div class="backdrop-info2">
-        <p class="likecountnumber">좋아요 수 : {{ likeCount }}</p>
+        <p v-if="store.token" class="likecountnumber">좋아요 수 : {{ likeCount }}</p>
         <button @click="toggleLike" class="like-button">
           {{ isLiked ? '❤️' : '🤍' }}
         </button>
-        <button class="action-button">📝</button>
+        <button @click="openReviewModal" class="action-button">📝</button>
       </div>
     </div>
     <div class="movie-detail">
@@ -38,12 +38,41 @@
       <p>배우 정보가 없습니다.</p>
     </div>
     <div>
-      <h3>코멘트</h3>
+      <MovieCommentComponent/>
     </div>
+
+
+    <!-- 리뷰 작성 모달 -->
+    <div v-if="showReviewModal" class="modal">
+      <div class="modal-content">
+        <h3>리뷰 작성</h3>
+        <input type="text" v-model="reviewTitle" placeholder="제목" class="input-field"/>
+        <textarea v-model="reviewContent" placeholder="내용" class="textarea-field"></textarea>
+        <div class="rating-selection">
+          <p>별점 선택</p>
+          <div class="stars">
+            <span 
+              v-for="star in 5" 
+              :key="star" 
+              :class="['star', {'selected': star <= selectedRating}]" 
+              @click="selectedRating = star"
+            >⭐</span>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button @click="submitReview" class="save-button">저장</button>
+          <button @click="showReviewModal = false" class="close-button">닫기</button>
+        </div>
+      </div>
+    </div>
+
+
   </div>
 </template>
 
 <script setup>
+
+import MovieCommentComponent from '@/components/movie/MovieCommentComponent.vue';
 import router from '@/router';
 import { useMovieStore } from '@/stores/counter';
 import axios from 'axios';
@@ -55,6 +84,13 @@ const route = useRoute();
 const isLiked = ref(false)
 const likeCount = ref(0)
 const movieId = route.params.movie_id
+
+// 모달창.. 
+const showReviewModal = ref(false);
+const reviewTitle = ref('');
+const reviewContent = ref('');
+const selectedRating = ref(0);
+
 onMounted(async () => {
   await store.getDetailMovie(movieId);
   if(store.token) {
@@ -80,11 +116,11 @@ const toggleLike = () => {
     alert('로그인이 필요합니다.')
     router.push({ name: 'LoginView' })
   }
-  const requestUrl = `http://127.0.0.1:8000/movies/detail/${movieId}/like`
+  const requestUrl = `http://127.0.0.1:8000/movies/detail/${movieId}/like/`
   console.log('Request URL:', requestUrl)
   axios({
     method: 'post',
-    url: `http://127.0.0.1:8000/movies/detail/${movieId}/like`,
+    url: `http://127.0.0.1:8000/movies/detail/${movieId}/like/`,
     headers: {
       Authorization: `Token ${store.token}`,
     },
@@ -100,7 +136,52 @@ const toggleLike = () => {
 
 }
 
+// 모달 열기
+const openReviewModal = () => {
+  showReviewModal.value = true;
+};
 
+// 리뷰 제출
+const submitReview = () => {
+  if (!reviewTitle.value || !reviewContent.value || selectedRating.value === 0) {
+    alert('제목, 내용, 별점을 모두 입력해주세요.');
+    return;
+  }
+
+  axios.post(`http://127.0.0.1:8000/movies/detail/${movieId}/create_review/`, {
+    title: reviewTitle.value,
+    content: reviewContent.value,
+    rating: selectedRating.value
+  }, {
+    headers: {
+      Authorization: `Token ${store.token}`
+    }
+  })
+  .then((res) => {
+    console.log('리뷰 저장 성공:', res.data);
+    showReviewModal.value = false;
+    reviewTitle.value = '';
+    reviewContent.value = '';
+    selectedRating.value = 0;
+    alert('리뷰가 성공적으로 작성되었습니다!');
+  })
+  .catch((err) => {
+    console.error('리뷰 저장 실패:', err);
+  });
+};
+// 리뷰 바로바로 보이기
+const fetchReviews = () => {
+  axios({
+    method: 'get',
+    url: `http://127.0.0.1:8000/movies/${movieId}/detail_review/`,
+  })
+    .then((res) => {
+      reviews.value = res.data;
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+};
 </script>
 
 <style scoped>
@@ -208,7 +289,9 @@ const toggleLike = () => {
   font-size: 1.2rem;
   margin: 10px 0;
 }
-
+.actors:hover {
+  transform: translateY(-5px);
+}
 .actors {
   display: flex;
   gap: 20px;
@@ -281,5 +364,106 @@ const toggleLike = () => {
 
 .like-button:hover {
   transform: scale(1.1);
+}
+
+/* 모달 스타일링 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  width: 400px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.input-field, .textarea-field {
+  width: 80%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.input-field:focus, .textarea-field:focus {
+  border-color: #ff007f;
+  outline: none;
+}
+
+.stars {
+  display: flex;
+  gap: 5px;
+}
+
+.star {
+  font-size: 2rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.star.selected {
+  color: gold;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.save-button, .close-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.save-button {
+  background-color: #ff007f;
+  color: #ffffff;
+}
+
+.close-button {
+  background-color: #ccc;
+  color: #333;
+}
+
+.save-button:hover {
+  background-color: #e00070;
+  transform: translateY(-2px);
+}
+
+.close-button:hover {
+  background-color: #aaa;
+  transform: translateY(-2px);
+}
+
+.review-button {
+  background-color: #ff007f;
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.review-button:hover {
+  background-color: #e00070;
+  transform: translateY(-2px);
 }
 </style>
