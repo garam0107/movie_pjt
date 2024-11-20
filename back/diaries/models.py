@@ -18,8 +18,12 @@ class Diary(models.Model):
     content = models.TextField()
     gpt_comment = models.TextField(blank=True, null= True)
     recommend_movie = models.ManyToManyField(Movie, blank=True)
+    recommend_reasons = models.JSONField(blank=True, null=True)
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_diaries', blank=True)
-
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['author', 'date'], name='unique_author_daily_diary')
+        ]
 class Diary_comment(models.Model):
     content = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -51,15 +51,15 @@ def follow(request, user_pk):
     if request.method =='POST':
         if User == target_user:
             return JsonResponse({'error' :'자기 자신을 팔로우할 수 없습니다.'}, status = status.HTTP_400_BAD_REQUEST)
-        if target_user in request.user.following.all():
-            request.user.following.remove(target_user)
+        if target_user in request.user.followings.all():
+            request.user.followings.remove(target_user)
             return JsonResponse({'message': '언팔로우'})
         else:
-            request.user.following.add(target_user)
+            request.user.followings.add(target_user)
             return JsonResponse({'message': '팔로우'})
     elif request.method == 'GET':
         user = request.user
-        following_users = user.following.all()
+        following_users = user.followings.all()
 
         diaries = Diary.objects.filter(autor__in = following_users)
         reviews = Movie_review.objects.filter(user__in = following_users)
