@@ -21,9 +21,8 @@ def main(request):
 def movie_detail(request, movie_pk):
     if request.method == 'GET':
         movie = get_object_or_404(Movie, pk = movie_pk)
-        reviews = Movie_review.objects.filter(movie = movie)
-        serializer = MoiveSerializer(reviews, many = True)
-        return Response(serializer.data)
+        serialzier = MoiveSerializer(movie)
+        return Response(serialzier.data)
     
 @api_view(['POST','PUT','DELETE'])
 @permission_classes([IsAuthenticated])
@@ -142,7 +141,13 @@ def search(request):
 def category(request):
     query = request.GET.get('genre', '')
     if query:
-        categorymovies = Movie.objects(genres__icontains=query)
-        categorymovies_list = list(categorymovies.values())
-        return JsonResponse({'categorymovies' : categorymovies_list}, safe = False)
+        try:
+            genre = Genre.objects.get(id=query)
+            categorymovies = Movie.objects.filter(genre=genre)
+            categorymovies_list = list(categorymovies.values())
+            return JsonResponse({'categorymovies': categorymovies_list}, safe=False)
+        
+        except Genre.DoesNotExist:
+            return JsonResponse({'categorymovies': []}, safe=False)
     return JsonResponse({'categorymovies': []}, safe=False)
+    
