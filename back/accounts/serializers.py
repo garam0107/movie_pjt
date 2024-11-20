@@ -29,10 +29,16 @@ class CustomRegisterSerializer(RegisterSerializer):
         required=False,
         allow_blank=True
     )
+    name = serializers.CharField(
+        required = False,
+        allow_blank = True,
+        max_length = 25
+    )
     def get_cleaned_data(self):
         cleaned_data = super().get_cleaned_data()  # 기본 필드 가져오기
         cleaned_data['nickname'] = self.validated_data.get('nickname', '')  # nickname 추가
         cleaned_data['profile_image'] = self.validated_data.get('profile_image', '')
+        cleaned_data['name'] = self.validated_data.get('name', '')
         return cleaned_data
 
 
@@ -68,7 +74,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserModel
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'nickname', 'profile_image', 'visit_count',
+        fields = ['id','name', 'username', 'email', 'first_name', 'last_name', 'nickname', 'profile_image', 'visit_count',
                   'my_review','recommend_movie','followings','followers','followings_count','followers_count','stone']
         
     def get_followings_count(self, obj):
@@ -104,7 +110,7 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
         if hasattr(UserModel, 'visit_count'):
             extra_fields.append('visit_count')                
         model = UserModel
-        fields = ['pk','followers_count','followings_count','stone','my_review','recommend_movie', *extra_fields]
+        fields = ['pk','followers_count','followings_count','stone','my_review','recommend_movie','name', *extra_fields]
         read_only_fields = ('email',)
 
     def get_followings_count(self, obj):
@@ -117,5 +123,5 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
-        fields = ['profile_image', 'nickname']
+        fields = ['profile_image', 'nickname', 'name']
 
