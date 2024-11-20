@@ -11,6 +11,8 @@ from movies.models import Movie_review
 
 UserModel = get_user_model()
 
+
+# 회원가입시 필요한 정보 추가
 class CustomRegisterSerializer(RegisterSerializer):
     nickname = serializers.CharField(
       required=False,
@@ -41,31 +43,32 @@ class CustomRegisterSerializer(RegisterSerializer):
         cleaned_data['name'] = self.validated_data.get('name', '')
         return cleaned_data
 
-
+# 유저가 팔로우 한 사람들의 일기
 class UserFollowingDiarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Diary
         fields = ['id','autor', 'title', 'content']
 
-
+# 유저가 팔로우 한 사람들의 영화 리뷰
 class UserFollowingReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie_review
         fields= ['id','movie', 'title', 'content']
 
 
-
+# 유저가 챗봇에 추천 받은 영화들
 class UserMovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Diary
         fields = ['recommend_movie']
 
+# 유저의 영화 리뷰들
 class UserReviewSerializer(serializers.ModelSerializer):
     movie_title = serializers.CharField(source = 'movie.title', read_only = True)
     class Meta:
         model = Movie_review
         fields= ['title', 'content','movie_title']
-
+# 유저 정보
 class UserSerializer(serializers.ModelSerializer):
     my_review = UserReviewSerializer(source = 'moviereview_set', many = True, read_only = True)
     recommend_movie = UserMovieSerializer(source = 'diaries', many = True, read_only = True)
@@ -83,7 +86,7 @@ class UserSerializer(serializers.ModelSerializer):
     def get_followers_count(self, obj):
         return obj.followers.count()
     
-
+# 유저 정보 가져오기
 class CustomUserDetailsSerializer(UserDetailsSerializer):
     my_review = UserReviewSerializer(source='moviereview_set', many=True, read_only=True)
     recommend_movie = UserMovieSerializer(source='diaries', many=True, read_only=True)
@@ -119,7 +122,7 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
     def get_followers_count(self, obj):
         return obj.followers.count()
     
-
+# 유저 정보 수정
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
