@@ -4,22 +4,23 @@ import axios from 'axios'
 import router from '@/router'
 
 export const useMovieStore = defineStore('movie', () => {
-  const movies = ref([])
-  const API_URL = 'http://127.0.0.1:8000/'
-  const detailMovie = ref([])
-  const token = ref(null)
-  const userData = ref([])
-  const userId = ref(null)
+  const movies = ref([]);
+  const API_URL = 'http://127.0.0.1:8000/';
+  const detailMovie = ref([]);
+  const token = ref(localStorage.getItem('token') || null);
+  const userData = ref([]);
+  const userId = ref(localStorage.getItem('userId') || null);
+
   const getMovies = function() {
-    axios ({
+    axios({
       method: 'get',
       url: `${API_URL}movies/`
     })
       .then(res => {
-        movies.value = res.data
+        movies.value = res.data;
       })
-      .catch(err => console.log(err))
-  }
+      .catch(err => console.log(err));
+  };
 
   const getDetailMovie = (id) => {
     axios({
@@ -27,15 +28,14 @@ export const useMovieStore = defineStore('movie', () => {
       url: `${API_URL}movies/detail/${id}/`
     })
       .then(res => {
-        detailMovie.value = res.data
+        detailMovie.value = res.data;
       })
-      .catch(err => console.log(err))
-  }
+      .catch(err => console.log(err));
+  };
 
   // 로그인
   const login = function(payload) {
-    const username = payload.username
-    const password = payload.password
+    const { username, password } = payload;
     axios({
       method: 'post',
       url: `${API_URL}accounts/login/`,
@@ -44,11 +44,11 @@ export const useMovieStore = defineStore('movie', () => {
       }
     })
       .then(res => {
-        token.value = res.data.key
-        localStorage.setItem('token', res.data.key)
+        token.value = res.data.key;
+        localStorage.setItem('token', res.data.key);
 
         // 사용자 정보 요청
-        axios ({
+        axios({
           method: 'get',
           url: `${API_URL}accounts/user/`,
           headers: {
@@ -56,24 +56,22 @@ export const useMovieStore = defineStore('movie', () => {
           }
         })
         .then(userRes => {
-          console.log(userRes)
-          userId.value = userRes.data.username
-          localStorage.setItem('userId', userRes.data.username)
-          router.push({ name: 'main' })
+          userId.value = userRes.data.username;
+          localStorage.setItem('userId', userRes.data.username);
+          router.push({ name: 'main' });
         })
         .catch(err => {
-          console.log(err)
-        })
+          console.log(err);
+        });
       })
-
       .catch(err => {
-        console.log(err)
-      })
-  }
+        console.log(err);
+      });
+  };
 
   // 회원가입
   const signup = function(payload){
-    const { username, password1, password2, nickname, profile_image } = payload
+    const { username, password1, password2, nickname, profile_image } = payload;
     axios({
       method: 'post',
       url: `${API_URL}accounts/signup/`,
@@ -82,14 +80,13 @@ export const useMovieStore = defineStore('movie', () => {
       }
     })
       .then(res => {
-        console.log(res.data)
-        console.log('회원가입 완료')
-        router.push({name: 'LoginView'})
+        console.log('회원가입 완료');
+        router.push({name: 'LoginView'});
       })
       .catch(err => {
         console.error('Error:', err.response ? err.response.data : err.message);
-      })
-  }
+      });
+  };
 
   // 로그아웃
   const logout = function() {
@@ -103,14 +100,14 @@ export const useMovieStore = defineStore('movie', () => {
       .then(() => {
         token.value = null;
         userId.value = null;
-        localStorage.removeItem('token')
-        localStorage.removeItem('userId')
-        router.push({ name: 'LoginView' })
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        router.push({ name: 'LoginView' });
       })
       .catch(err => {
-        console.error('로그아웃 실패:', err)
-      })
-  }
+        console.error('로그아웃 실패:', err);
+      });
+  };
   
   const checkAuthentication = function () {
     const storedToken = localStorage.getItem('token');
@@ -121,16 +118,19 @@ export const useMovieStore = defineStore('movie', () => {
     }
   };
 
-  const isAuthenticated = computed(() => token !== null && token !== undefined);
+  const isAuthenticated = computed(() => !!token.value);
 
-
-  // 영화 찜
-  const movieLike = function() {
-    
-  }
-
-
-  return { movies, API_URL, getMovies, getDetailMovie, detailMovie, login, token, signup
-          ,  userData, userId, checkAuthentication, isAuthenticated, logout
-   }
-}, {persist:true})
+  return {
+    movies,
+    getMovies,
+    getDetailMovie,
+    detailMovie,
+    login,
+    signup,
+    logout,
+    checkAuthentication,
+    isAuthenticated,
+    token,
+    userId
+  };
+}, { persist: true });
