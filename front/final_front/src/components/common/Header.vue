@@ -46,6 +46,7 @@ const logout = () => {
     margin: 0 auto;
     box-sizing: border-box;
     flex-wrap: nowrap;
+    width: 80%;
   }
   
   .logo-nav-container {

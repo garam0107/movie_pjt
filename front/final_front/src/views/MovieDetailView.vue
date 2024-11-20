@@ -247,10 +247,10 @@ const fetchReviews = () => {
   gap: 10px; /* 버튼 간격 추가 */
 }
 .action-button {
-  padding: 10px 20px;
+  /* padding: 10px 20px; */
   border: none;
-  background-color: #ff007f; /* 버튼 기본 배경색 (핑크톤) */
-  color: #ffffff; /* 글자색 흰색 */
+  /* background-color: #ff007f;  */
+  color: #ffffff; 
   font-size: 1.5rem;
   font-weight: bold;
   border-radius: 8px; 
@@ -332,13 +332,12 @@ const fetchReviews = () => {
 }
 
 .rating {
-  display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .stars span {
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: gold;
 }
 
@@ -433,7 +432,7 @@ const fetchReviews = () => {
 }
 
 .save-button {
-  background-color: #ff007f;
+  background-color: gray;
   color: #ffffff;
 }
 
@@ -443,7 +442,7 @@ const fetchReviews = () => {
 }
 
 .save-button:hover {
-  background-color: #e00070;
+  background-color: #555;
   transform: translateY(-2px);
 }
 

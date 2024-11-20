@@ -15,7 +15,7 @@ import Header from './components/common/Header.vue';
 </template>
 
 <style scoped>
-*,
+*
 *::before,
 *::after {
   box-sizing: border-box; /* 모든 요소의 너비 계산을 border-box로 설정 */

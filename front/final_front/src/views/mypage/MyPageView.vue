@@ -50,7 +50,7 @@ onMounted(async () => {
 <style scoped>
 .mypage-container {
   max-width: 1200px; /* 페이지 전체 너비를 설정 */
-  width: 95%; /* 페이지 전체를 꽉 채우기 위해 비율 조정 */
+  width: 100%; /* 페이지 전체를 꽉 채우기 위해 비율 조정 */
   margin: 0 auto; /* 화면 중앙 정렬 */
   padding: 20px;
   }
