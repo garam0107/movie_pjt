@@ -1,24 +1,25 @@
 <template>
-    <div class="signup-container">
+  <div class="signup-container">
+    <h1>회원가입</h1>
+    <form @submit.prevent="signup" class="signup-form">
+      <div class="form-group">
+        <input type="text" v-model="username" id="username" placeholder="ID" required class="form-input">
+      </div>
 
-      <h1>회원가입</h1>
-      <form @submit.prevent="signup" class="signup-form">
-        <div class="form-group">
-          <input type="text" v-model="username" id="username" placeholder="ID" required class="form-input">
-        </div>
-  
-        <div class="form-group">
-          <input type="password" v-model="password1" id="password1" placeholder="비밀번호" required class="form-input">
-        </div>
-  
-        <div class="form-group">
-          <input type="password" v-model="password2" id="password2" placeholder="비밀번호 확인" required class="form-input">
-        </div>
-  
-        <div class="form-group">
-          <input type="text" v-model="nickname" id="nickname" placeholder="별명" required class="form-input">
-        </div>
-  
+      <div class="form-group">
+        <input type="password" v-model="password1" id="password1" placeholder="비밀번호" required class="form-input">
+      </div>
+
+      <div class="form-group">
+        <input type="password" v-model="password2" id="password2" placeholder="비밀번호 확인" required class="form-input">
+        <p v-if="passwordMatchStatus === 'match'" class="password-match">비밀번호가 일치합니다.</p>
+        <p v-else-if="passwordMatchStatus === 'not-match'" class="password-not-match">비밀번호가 일치하지 않습니다.</p>
+      </div>
+
+      <div class="form-group">
+        <input type="text" v-model="nickname" id="nickname" placeholder="닉네임" required class="form-input">
+      </div>
+
       <!-- 프로필 이미지 선택 -->
       <div class="form-group profile-selection">
         <p class="profile-label">프로필 이미지 선택</p>
@@ -44,17 +45,17 @@
         </div>
       </div>
 
-        <button type="submit" class="submit-button">회원가입</button>
-      </form>
-      <p class="already-member">이미 가입하셨나요? <a href="/login" class="login-link">로그인</a></p>
-    </div>
-  </template>
+      <button type="submit" class="submit-button">회원가입</button>
+    </form>
+    <p class="already-member">이미 가입하셨나요? <a href="/login" class="login-link">로그인</a></p>
+  </div>
+</template>
+
   
   <script setup>
   import { useMovieStore } from '@/stores/counter';
-  import { ref } from 'vue';
+  import { computed, ref } from 'vue';
   import defaultProfileImageUrl from '@/assets/default_profile.jpg';
-  
   const store = useMovieStore()
   const username = ref(null);
   // const email = ref(null);
@@ -71,6 +72,15 @@
   { value: "profile_images/profile5.jpg", src: new URL('@/assets/profile_images/profile5.jpg', import.meta.url).href, label: "Image 5" },
   { value: "profile_images/profile6.jpg", src: new URL('@/assets/profile_images/profile6.jpg', import.meta.url).href, label: "Image 6" }
 ];
+
+// 비밀번호 일치 여부 확인
+const passwordMatchStatus = computed(() => {
+  if (!password1.value || !password2.value) {
+    return ''
+  }
+  return password1.value === password2.value ? 'match' : 'not-match'
+})
+
   const signup = function() {
     const payload = {
       username: username.value,
@@ -232,5 +242,15 @@ input[type="radio"]:checked + .no-image {
 
 .login-link:hover {
   text-decoration: underline;
+}
+
+.password-not-match{
+  color: red;
+ 
+}
+
+.password-match{
+  color: blue;
+  margin-bottom: 0
 }
 </style>

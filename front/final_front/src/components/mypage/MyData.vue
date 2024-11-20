@@ -2,7 +2,7 @@
   <div class="mydata-container">
     <div class="profile-header">
       <div class="profile-image">
-        <img :src="getImagePath(userData.profile_image)" alt="프로필 이미지">
+        <img :src="`/src/assets/${userData.profile_image}`" alt="프로필 이미지">
       </div>
       <div class="user-info">
         <div style="display: flex;">
@@ -49,7 +49,7 @@ onMounted(() => {
     // 특정 사용자의 데이터 요청
     axios({
       method: 'get',
-      url: `http://127.0.0.1:8000/accounts/${userId}/`, // 특정 유저 정보 요청
+      url: `http://127.0.0.1:8000/accounts/${userId}/mypage/`, // 특정 유저 정보 요청
       headers: {
         Authorization: `Token ${store.token}`
       }
@@ -110,14 +110,14 @@ const toggleFollow = () => {
   });
 };
 
-// 프로필 이미지 경로 가져오기
-const getImagePath = (imageName) => {
-  if (imageName) {
-    return `/src/assets/profile_images/${imageName}`;
-  } else {
-    return '/src/assets/default_profile.jpg'; // 기본 프로필 이미지
-  }
-};
+// // 프로필 이미지 경로 가져오기
+// const getImagePath = (imageName) => {
+//   if (imageName) {
+//     return `/src/assets/profile_images/${imageName}`;
+//   } else {
+//     return '/src/assets/default_profile.jpg'; // 기본 프로필 이미지
+//   }
+// };
 </script>
 
 <style scoped>
