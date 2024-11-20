@@ -131,8 +131,8 @@ def search(request):
     query = request.GET.get('title', '')
     if query:
         movies = Movie.objects.filter(title__icontains=query)
-        movie_list = list(movies.values()) 
-        return JsonResponse({'movies': movie_list}, safe=False)
+        serializer = MoiveSerializer(movies, many = True)
+        return JsonResponse({'movies': serializer.data}, safe=False)
     return JsonResponse({'movies': []}, safe=False)
 
 
@@ -143,9 +143,9 @@ def category(request):
     if query:
         try:
             genre = Genre.objects.get(id=query)
-            categorymovies = Movie.objects.filter(genre=genre)
-            categorymovies_list = list(categorymovies.values())
-            return JsonResponse({'categorymovies': categorymovies_list}, safe=False)
+            categorymovies = Movie.objects.filter(genres=genre)
+            serializer = MoiveSerializer(categorymovies, many = True)
+            return JsonResponse({'categorymovies': serializer.data}, safe=False, json_dumps_params={'ensure_ascii': False})
         
         except Genre.DoesNotExist:
             return JsonResponse({'categorymovies': []}, safe=False)
