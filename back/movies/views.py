@@ -32,9 +32,10 @@ def create_review(request, movie_pk):
     
     rating = request.data.get('rating')
 
-    if not rating:
+  
+    if request.method == 'POST' and not rating:
         return Response({'message' : '별점을 선택해주세요.'}, status=status.HTTP_404_NOT_FOUND)
-    if request.method == 'POST':
+    elif request.method == 'POST':
         serializer = MovieReviewsSerializer(data = request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(user = user , movie = movie)
