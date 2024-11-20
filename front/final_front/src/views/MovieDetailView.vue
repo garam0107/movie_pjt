@@ -54,9 +54,11 @@
             <span 
               v-for="star in 5" 
               :key="star" 
-              :class="['star', {'selected': star <= selectedRating}]" 
+              :class="['star', {'selected': star <= selectedRating, 'hovered': star <= hoveredRating}]" 
               @click="selectedRating = star"
-            >⭐</span>
+              @mouseover="hoveredRating = star"
+              @mouseleave="hoveredRating = 0"
+            >★</span>
           </div>
         </div>
         <div class="modal-actions">
@@ -90,6 +92,7 @@ const showReviewModal = ref(false);
 const reviewTitle = ref('');
 const reviewContent = ref('');
 const selectedRating = ref(0);
+const hoveredRating = ref(0);
 
 onMounted(async () => {
   await store.getDetailMovie(movieId);
@@ -144,8 +147,8 @@ const openReviewModal = () => {
 // 리뷰 제출
 const submitReview = () => {
   if (!reviewTitle.value || !reviewContent.value || selectedRating.value === 0) {
-    alert('제목, 내용, 별점을 모두 입력해주세요.');
-    return;
+    alert('제목, 내용, 별점을 모두 입력해주세요.')
+    return
   }
 
   axios.post(`http://127.0.0.1:8000/movies/detail/${movieId}/create_review/`, {
@@ -158,30 +161,21 @@ const submitReview = () => {
     }
   })
   .then((res) => {
-    console.log('리뷰 저장 성공:', res.data);
-    showReviewModal.value = false;
-    reviewTitle.value = '';
-    reviewContent.value = '';
-    selectedRating.value = 0;
-    alert('리뷰가 성공적으로 작성되었습니다!');
+    console.log('리뷰 저장 성공:', res.data)
+    showReviewModal.value = false
+    reviewTitle.value = ''
+    reviewContent.value = ''
+    selectedRating.value = 0
+    alert('리뷰가 성공적으로 작성되었습니다!')
+    location.reload()
   })
   .catch((err) => {
-    console.error('리뷰 저장 실패:', err);
-  });
-};
-// 리뷰 바로바로 보이기
-const fetchReviews = () => {
-  axios({
-    method: 'get',
-    url: `http://127.0.0.1:8000/movies/${movieId}/detail_review/`,
+    console.error('리뷰 저장 실패:', err)
   })
-    .then((res) => {
-      reviews.value = res.data;
-    })
-    .catch((err) => {
-      console.error(err);
-    });
-};
+}
+
+
+
 </script>
 
 <style scoped>
@@ -338,6 +332,13 @@ const fetchReviews = () => {
 
 .stars span {
   font-size: 1.8rem;
+  color: lightgray;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.2s;
+}
+
+.stars span.hovered,
+.stars span.selected {
   color: gold;
 }
 
@@ -412,7 +413,8 @@ const fetchReviews = () => {
   transition: color 0.3s ease;
 }
 
-.star.selected {
+.star.selected,
+.star.hovered {
   color: gold;
 }
 

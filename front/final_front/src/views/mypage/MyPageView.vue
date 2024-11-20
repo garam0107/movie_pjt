@@ -24,12 +24,13 @@ const route = useRoute();
 const userData = ref({});
 
 onMounted(async () => {
-  const userId = route.params.user_id;
+  const userId = route.params.user_id; // URL에서 user_id를 가져옴
 
   if (store.token) {
+    // 특정 유저의 데이터를 불러오기 위해 userId 사용
     axios({
       method: 'get',
-      url: `http://127.0.0.1:8000/accounts/user/`,
+      url: `http://127.0.0.1:8000/accounts/${userId}/mypage/`, // 특정 사용자 데이터 요청
       headers: {
         Authorization: `Token ${store.token}`
       }
@@ -46,6 +47,7 @@ onMounted(async () => {
   }
 });
 </script>
+
 
 <style scoped>
 .mypage-container {
