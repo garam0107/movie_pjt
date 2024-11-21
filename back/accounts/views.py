@@ -92,6 +92,16 @@ def update(request, user_username):
 def top_users_by_stone(request):
     User = get_user_model()
     # 모든 유저를 stone 필드 기준으로 내림차순 정렬 후 상위 10명 선택
-    top_users = User.objects.all().order_by('-stone')[:10]
+    top_users = User.objects.all().order_by('-stone')[:4]
     serializer = AllUserSerializer(top_users, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def check_username(request):
+    username = request.query_params.get('username', None)
+    if username:
+        User = get_user_model()
+        if User.objects.filter(username=username).exists():
+            return Response({'available' : False, 'message': '이미 사용 중인 ID입니다.'})
+        return Response({'available' : True, 'message': '사용 가능한 ID입니다.'})
+    return Response({'error': 'username 파라미터가 필요합니다.'}, status=status.HTTP_400_BAD_REQUEST)

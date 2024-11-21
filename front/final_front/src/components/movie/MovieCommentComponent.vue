@@ -142,14 +142,14 @@ const deleteComment = (reviewId) => {
 
 // 모달 열기
 const openUpdateModal = (review) => {
-  editReview.value = { ...review }; // 기존 리뷰 데이터 복사
+  editReview.value = { ...review }; 
   showModal.value = true;
 };
 
 // 모달 닫기
 const closeUpdateModal = () => {
   showModal.value = false;
-  tempRating.value = null; // 모달 닫을 때 임시 별점 초기화
+  tempRating.value = null; 
 };
 
 // 리뷰 수정 함수

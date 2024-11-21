@@ -3,9 +3,18 @@
     <h1>회원가입</h1>
     <form @submit.prevent="signup" class="signup-form">
       <div class="form-group">
-        <input type="text" v-model="username" id="username" placeholder="ID" required class="form-input">
+        <input
+          type="text"
+          v-model="username"
+          id="username"
+          placeholder="ID"
+          required
+          class="form-input"
+          @blur="checkUsername"
+        >
+        <p v-if="usernameStatus === 'available'" class="username-available">사용 가능한 ID입니다.</p>
+        <p v-else-if="usernameStatus === 'unavailable'" class="username-unavailable">이미 사용 중인 ID입니다.</p>
       </div>
-
       <div class="form-group">
         <input type="password" v-model="password1" id="password1" placeholder="비밀번호" required class="form-input">
       </div>
@@ -50,27 +59,29 @@
     <p class="already-member">이미 가입하셨나요? <a href="/login" class="login-link">로그인</a></p>
   </div>
 </template>
-
   
-  <script setup>
-  import { useMovieStore } from '@/stores/counter';
-  import { computed, ref } from 'vue';
-  import defaultProfileImageUrl from '@/assets/default_profile.jpg';
-  const store = useMovieStore()
-  const username = ref(null);
-  // const email = ref(null);
-  const password1 = ref(null);
-  const password2 = ref(null);
-  const nickname = ref(null);
-  const profile_image = ref(null);
-  // 프로필 이미지 옵션들
-  const profileOptions = [
-  { value: "profile_images/profile1.jpg", src: new URL('@/assets/profile_images/profile1.jpg', import.meta.url).href, label: "Image 1" },
-  { value: "profile_images/profile2.jpg", src: new URL('@/assets/profile_images/profile2.jpg', import.meta.url).href, label: "Image 2" },
-  { value: "profile_images/profile3.jpg", src: new URL('@/assets/profile_images/profile3.jpg', import.meta.url).href, label: "Image 3" },
-  { value: "profile_images/profile4.jpg", src: new URL('@/assets/profile_images/profile4.jpg', import.meta.url).href, label: "Image 4" },
-  { value: "profile_images/profile5.jpg", src: new URL('@/assets/profile_images/profile5.jpg', import.meta.url).href, label: "Image 5" },
-  { value: "profile_images/profile6.jpg", src: new URL('@/assets/profile_images/profile6.jpg', import.meta.url).href, label: "Image 6" }
+<script setup>
+import { useMovieStore } from '@/stores/counter';
+import { computed, ref, watch } from 'vue';
+import defaultProfileImageUrl from '@/assets/default_profile.jpg';
+import axios from 'axios';
+const store = useMovieStore()
+const username = ref(null);
+const usernameStatus = ref('')
+// const email = ref(null);
+const password1 = ref(null);
+const password2 = ref(null);
+const nickname = ref(null);
+const profile_image = ref(null);
+
+// 프로필 이미지 옵션들
+const profileOptions = [
+{ value: "profile_images/profile1.jpg", src: new URL('@/assets/profile_images/profile1.jpg', import.meta.url).href, label: "Image 1" },
+{ value: "profile_images/profile2.jpg", src: new URL('@/assets/profile_images/profile2.jpg', import.meta.url).href, label: "Image 2" },
+{ value: "profile_images/profile3.jpg", src: new URL('@/assets/profile_images/profile3.jpg', import.meta.url).href, label: "Image 3" },
+{ value: "profile_images/profile4.jpg", src: new URL('@/assets/profile_images/profile4.jpg', import.meta.url).href, label: "Image 4" },
+{ value: "profile_images/profile5.jpg", src: new URL('@/assets/profile_images/profile5.jpg', import.meta.url).href, label: "Image 5" },
+{ value: "profile_images/profile6.jpg", src: new URL('@/assets/profile_images/profile6.jpg', import.meta.url).href, label: "Image 6" }
 ];
 
 // 비밀번호 일치 여부 확인
@@ -81,18 +92,41 @@ const passwordMatchStatus = computed(() => {
   return password1.value === password2.value ? 'match' : 'not-match'
 })
 
-  const signup = function() {
-    const payload = {
-      username: username.value,
-      // email: email.value,
-      password1: password1.value,
-      password2: password2.value,
-      nickname: nickname.value,
-      profile_image: profile_image.value
-    }
-    store.signup(payload)
+// 아이디 확인
+watch(username, (newVal) => {
+  if (newVal) checkUsername()
+})
+
+const checkUsername = () => {
+  if (username.value) {
+    axios.get('http://127.0.0.1:8000/accounts/check-username/', {
+      params: { username: username.value }
+    })
+    .then((response) => {
+      if (response.data.available) {
+        usernameStatus.value = 'available'
+      } else {
+        usernameStatus.value = 'unavailable'
+      }
+    })
+    .catch((error) => {
+      console.error('ID 중복 확인 실패:', error)
+      usernameStatus.value = null
+    })
   }
-  </script>
+}
+
+const signup = function() {
+  const payload = {
+    username: username.value,
+    password1: password1.value,
+    password2: password2.value,
+    nickname: nickname.value,
+    profile_image: profile_image.value
+  }
+  store.signup(payload)
+}
+</script>
   
 <style scoped>
 .signup-container {
@@ -252,5 +286,17 @@ input[type="radio"]:checked + .no-image {
 .password-match{
   color: blue;
   margin-bottom: 0
+}
+
+.username-available {
+  color: green;
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+.username-unavailable {
+  color: red;
+  font-size: 0.9rem;
+  margin-bottom: 0;
 }
 </style>
