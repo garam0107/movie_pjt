@@ -17,7 +17,7 @@ class User(AbstractUser):
     ('profile_images/profile6.jpg', 'profile 6'),
 ], default='profile_images/default_profile.jpg')
     followings = models.ManyToManyField('self', symmetrical=False, related_name='followers', blank=True)
-    visit_count = models.IntegerField(default=0)
+    visit_count = models.FloatField(default=0)
 class CustomAccountAdapter(DefaultAccountAdapter):
     def save_user(self, request, user, form, commit=True):
         data = form.cleaned_data
