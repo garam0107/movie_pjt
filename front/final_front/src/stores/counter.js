@@ -98,27 +98,27 @@ export const useMovieStore = defineStore('movie', () => {
       }
     })
       .then(() => {
-        token.value = null;
-        userId.value = null;
-        localStorage.removeItem('token');
-        localStorage.removeItem('userId');
-        router.push({ name: 'LoginView' });
+        token.value = null
+        userId.value = null
+        localStorage.removeItem('token')
+        localStorage.removeItem('userId')
+        router.push({ name: 'LoginView' })
       })
       .catch(err => {
-        console.error('로그아웃 실패:', err);
-      });
-  };
+        console.error('로그아웃 실패:', err)
+      })
+  }
   
   const checkAuthentication = function () {
-    const storedToken = localStorage.getItem('token');
-    const storedUserId = localStorage.getItem('userId');
+    const storedToken = localStorage.getItem('token')
+    const storedUserId = localStorage.getItem('userId')
     if (storedToken) {
-      token.value = storedToken;
-      userId.value = storedUserId;
+      token.value = storedToken
+      userId.value = storedUserId
     }
-  };
+  }
 
-  const isAuthenticated = computed(() => !!token.value);
+  const isAuthenticated = computed(() => !!token.value)
 
   return {
     movies,
@@ -132,5 +132,5 @@ export const useMovieStore = defineStore('movie', () => {
     isAuthenticated,
     token,
     userId
-  };
-}, { persist: true });
+  }
+}, { persist: true })
