@@ -5,7 +5,7 @@
           <img src="@/assets/movie_logo.png" alt="logo_img" class="logo_img">
         </div>
         <nav class="nav-links">
-          <RouterLink to="/main"class="nav-link">홈</RouterLink>
+          <RouterLink to="/"class="nav-link">홈</RouterLink>
           <RouterLink to="/main"class="nav-link">영화</RouterLink>
           <RouterLink v-if="userId" :to="{ name: 'MyPageView', params: { user_id: userId } }" class="nav-link">마이페이지</RouterLink>
         </nav>

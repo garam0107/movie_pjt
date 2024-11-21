@@ -5,6 +5,7 @@ import SignupView from '@/views/accounts/SignupView.vue'
 import LoginView from '@/views/accounts/LoginView.vue'
 import MyPageView from '@/views/mypage/MyPageView.vue'
 import { useMovieStore } from '@/stores/counter'
+import MainDolDamView from '@/views/main/MainDolDamView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -38,6 +39,12 @@ const router = createRouter({
       path: '/mypage/:user_id',
       name: 'MyPageView',
       component: MyPageView
+    },
+    // 찐 메인
+    {
+      path: '/',
+      name: 'MainDolDam',
+      component: MainDolDamView
     },
 
   ],
