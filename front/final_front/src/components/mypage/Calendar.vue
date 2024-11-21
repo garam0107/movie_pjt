@@ -31,6 +31,7 @@
     </div>
 
     <!-- 다이어리 작성 모달 -->
+
     <div v-if="showDiaryModal" class="modal">
       <div class="modal-content">
         <h3>다이어리 작성</h3>
@@ -48,6 +49,14 @@
         </div>
       </div>
     </div>
+
+  <div v-if="detailDiaryModal" class="modal">
+  <!-- 상세 모달 내용 -->
+    <h3>{{ diaryTitle }}</h3>
+    <p>{{ diaryContent }}</p>
+    <img :src="selectedEmoji" alt="감정 이모지" />
+  </div>
+
   </div>
 </template>
 
@@ -91,6 +100,7 @@ const year = ref(today.getFullYear());
 const month = ref(today.getMonth());
 const days = ['일', '월', '화', '수', '목', '금', '토'];
 const showDiaryModal = ref(false);
+const detailDiaryModal = ref(false)
 const selectedDate = ref(null);
 const emojis = [happy, sad, angry, sleepy, excited, calm];
 const dates = ref([]);
@@ -98,7 +108,7 @@ const diaryTitle = ref('');
 const diaryContent = ref('');
 const selectedEmoji = ref(null);
 const Diary_today = new Date().toISOString().split('T')[0]
-
+const token = localStorage.getItem('token');
 
 const emojiMap = {
   '/src/assets/images/angry.jpg': 'emotions/angry.jpg',
@@ -179,13 +189,58 @@ const isToday = (date) => {
   );
 };
 
-// 다이어리 작성 모달 열기
-const openDiaryModal = (date) => {
- 
-    selectedDate.value = date;
-    showDiaryModal.value = true;
-  
+
+const fetchDiaryByDate = (username, date) => {
+  axios
+    .get(`http://127.0.0.1:8000/diaries/${username}/by-date/`, {
+      params: { date: date },
+      headers: { Authorization: `Token ${token}` },
+    })
+    .then((response) => {
+      if (response.data.exists === false) {
+        console.log("다이어리가 없습니다.");
+      } else {
+        console.log("다이어리 상세 정보:", response.data);
+      }
+    })
+    .catch((error) => {
+      console.error("API 호출 중 오류 발생:", error);
+    });
 };
+
+
+
+
+// 다이어리 작성 모달 열기
+// const openDiaryModal = (date) => {
+ 
+//     selectedDate.value = date;
+//     showDiaryModal.value = true;
+// };
+const openDiaryModal = (date) => {
+  selectedDate.value = date; // 선택한 날짜 저장
+
+  fetchDiaryByDate(props.userData.username, selectedDate.value.dateKey)
+    .then((response) => {
+      if (response.data.exists === false) {
+        // 다이어리가 없는 경우: 작성 모달 열기
+        showDiaryModal.value = true; // 작성 모달 열기
+        detailDiaryModal.value = false; // 상세 모달 닫기
+      } else {
+        // 다이어리가 있는 경우: 상세 모달 열기
+        diaryTitle.value = response.data.title;
+        diaryContent.value = response.data.content;
+        selectedEmoji.value = response.data.mood_emoji; // 이모지 데이터 설정
+        detailDiaryModal.value = true; // 상세 모달 열기
+        showDiaryModal.value = false; // 작성 모달 닫기
+      }
+    })
+    .catch((error) => {
+      console.error("다이어리 확인 실패:", error);
+      console.log(err.response.data)
+    });
+};
+
 
 
 const closeModal = () => {
@@ -234,7 +289,7 @@ const submitDiary = () => {
   // }
 
   // 인증 토큰이 있는지 확인
-  const token = localStorage.getItem('token');
+  
   if (!token) {
     alert('로그인이 필요합니다.');
     return;

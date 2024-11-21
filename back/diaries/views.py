@@ -18,7 +18,7 @@ from rest_framework.decorators import api_view,permission_classes
 
 from .models import Diary
 from movies.models import Movie
-from .serializers import DiaryCreateSerializer, DiarySerializer,DiaryCommentSerializer
+from .serializers import DiaryCreateSerializer, DiarySerializer,DiaryCommentSerializer,DiaryDetailSerializer
 # Create your views here.
 
 
@@ -176,7 +176,7 @@ def user_diary(request, user_username):
                 movies = Movie.objects.filter(title__in = movie_titles)
 
                 for movie in movies:
-                    diary.recommend_movie.add(movie)
+                    diary.recommend_movie.add(movie.title)
 
                 # diary에 추천 이유 저장
                 diary.recommend_reasons = reasons
@@ -224,3 +224,20 @@ def create_comment(request, diary_pk):
 
 
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def diary_by_date(request, user_username):
+    """
+    특정 날짜의 다이어리 확인
+    """
+    date = request.query_params.get('date')
+    if not date:
+        return Response({"message": "날짜가 제공되지 않았습니다."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    diary = Diary.objects.filter(author__username=user_username, date=date).first()
+    if diary:
+        serializer = DiaryDetailSerializer(diary)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response({"exists": False}, status=status.HTTP_404_NOT_FOUND)

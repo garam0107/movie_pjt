@@ -24,3 +24,10 @@ class DiaryCommentSerializer(serializers.ModelSerializer):
         model = Diary_comment
         fields = ['username', 'content', 'created_at', 'user', 'diary']
         read_only_fields = ['user', 'diary']
+
+
+# 다이어리 상세 정보 조회
+class DiaryDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Diary
+        fields = '__all__'
