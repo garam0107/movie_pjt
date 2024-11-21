@@ -39,4 +39,4 @@ class ReviewCommentSerializer(serializers.ModelSerializer):
 class MovieSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fiedls = ['title']
+        fields = ['title','id']
