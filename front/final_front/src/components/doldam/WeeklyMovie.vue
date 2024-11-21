@@ -1,10 +1,9 @@
 <template>
   <div>
     <div class="top-movie-container">
-      <p class="h2tag">Weekly HOT 랭킹</p>
+      <p class="h2tag">Weekly HOT Movie</p>
       <div class="wrapper" v-if="weelyMovies.length > 0">
         <div v-for="(movie, index) in weelyMovies" :key="movie.id" class="movie-item">
-          <div class="rank">{{ index + 1 }}</div>
           <RouterLink :to="`/movie/${movie.id}`" class="movie-link">
             <img :src="`https://image.tmdb.org/t/p/w500/${movie.poster_path}`" alt="poster" class="poster_img">
             <div class="movie-info">
@@ -31,18 +30,23 @@ onMounted(async() => {
   movies.value = store.movies
   weelyMovies.value = [...movies.value]
     .sort((a, b) => b.vote_average - a.vote_average)
-    .slice(0, 10)
+    .slice(0, 6)
 })
 
 watch(() => store.movies, (newMovies) => {
   movies.value = newMovies
   weelyMovies.value = [...newMovies]
     .sort((a, b) => b.vote_average - a.vote_average)
-    .slice(0, 10)
+    .slice(0, 6)
 })
 </script>
 
 <style scoped>
+.h2tag {
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 20px;
+}
+
 .top-movie-container {
   padding: 5px;
 }
@@ -54,7 +58,7 @@ watch(() => store.movies, (newMovies) => {
 
 .wrapper {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 20px;
 }
 
@@ -65,21 +69,6 @@ watch(() => store.movies, (newMovies) => {
 
 .movie-item:hover {
   transform: scale(1.05);
-}
-
-.rank {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  color: white;
-  border-radius: 10%;
-  width: 15px;
-  height: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .poster_img {
@@ -100,11 +89,14 @@ watch(() => store.movies, (newMovies) => {
   text-align: left;
   font-size: 0.9rem;
   color: #333;
+  font-family: "Noto Sans KR", sans-serif;
 }
 
 .movie_title {
   margin-bottom: 5px;
-  font-size: 0.7rem;
+  font-size: 1rem;
+  margin-top: 0;
+  font-family: "Noto Sans KR", sans-serif;
 }
 
 .movie-details {

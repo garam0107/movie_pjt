@@ -227,7 +227,7 @@ const submitReview = () => {
 
 .backdrop-info {
   position: absolute;
-  top: 250px;
+  top: 240px;
   left: 30px;
   color: #fff;
 }
