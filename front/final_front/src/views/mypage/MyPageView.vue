@@ -8,6 +8,14 @@
         <Calendar :userData="userData"/>
       </div>
     </div>
+    <div class="bottom">
+      <div class="my-movie">
+        <MyMovie/>
+      </div>
+      <div class="my-comment">
+        <MyComment/>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -18,7 +26,8 @@ import { onMounted, ref } from 'vue';
 import axios from 'axios';
 import { useRoute } from 'vue-router';
 import Calendar from '@/components/mypage/Calendar.vue';
-
+import MyMovie from '@/components/mypage/MyMovie.vue';
+import MyComment from '@/components/mypage/MyComment.vue';
 const store = useMovieStore();
 const route = useRoute();
 const userData = ref({});
@@ -63,10 +72,23 @@ onMounted(async () => {
   height: 400px;
 }
 .mydata-container {
-  flex: 3.5; /* MyData의 비율 */
+  flex: 3.5;
 }
 
 .calendar-container {
-  flex: 6.5; /* Calendar의 비율 */
+  flex: 6.5; 
+}
+
+.bottom {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.my-movie {
+  flex: 3.5;
+}
+.my-comment {
+  flex: 6.5;
 }
 </style>

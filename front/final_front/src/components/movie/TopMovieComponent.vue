@@ -65,6 +65,10 @@ watch(() => store.movies, (newMovies) => {
   topMovies.value = [...newMovies]
     .sort((a, b) => b.popularity - a.popularity)
     .slice(0, 10)
+
+    voteMovies.value = [...movies.value]
+    .sort((a, b) => b.vote_count - a.vote_count)
+    .slice(0, 10)
 });
 </script>
 

@@ -7,9 +7,9 @@
       <div class="user-info">
         <div style="display: flex;">
           <h2>{{ userData.nickname }}</h2>
-          <form @submit.prevent="follow">
-            <button v-if="isFollowing" @click="toggleFollow" class="followBtn unfollowBtn">언팔로우</button>
-            <button v-else @click="toggleFollow" class="followBtn">팔로우</button>
+          <form v-if="isNotMyPage" @submit.prevent="toggleFollow">
+            <button v-if="isFollowing" class="followBtn unfollowBtn">언팔로우</button>
+            <button v-else class="followBtn">팔로우</button>
           </form>
         </div>
         <p>{{ userData.email }}</p>
@@ -33,15 +33,18 @@
 <script setup>
 import { useMovieStore } from '@/stores/counter';
 import axios from 'axios';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { RouterLink } from 'vue-router';
 
 const route = useRoute();
 const userId = route.params.user_id; // URL에서 user_id를 가져옴
 const store = useMovieStore();
-const userData = ref({}); // 유저 정보를 담을 변수
+const userData = ref({});
 const isFollowing = ref(false);
+
+// 내 페이지인지 확인
+const isNotMyPage = computed(() => store.userId !== userId);
 
 // 마운트될 때 사용자 정보 불러오기
 onMounted(() => {
@@ -49,24 +52,19 @@ onMounted(() => {
     // 특정 사용자의 데이터 요청
     axios({
       method: 'get',
-      url: `http://127.0.0.1:8000/accounts/${userId}/mypage/`, // 특정 유저 정보 요청
+      url: `http://127.0.0.1:8000/accounts/${userId}/mypage/`,
       headers: {
         Authorization: `Token ${store.token}`
       }
     })
     .then((res) => {
-      console.log('유저 데이터:', res.data);
-      userData.value = res.data; // 유저 데이터를 상태에 저장
+      userData.value = res.data;
     })
     .catch((err) => {
       console.error('유저 정보를 불러오는 중 오류 발생:', err);
     });
-  } else {
-    console.error('토큰이 없습니다. 로그인 후 다시 시도해주세요.');
-  }
 
-  // 팔로우 상태 확인
-  if (store.token) {
+    // 팔로우 상태 확인
     axios({
       method: 'get',
       url: `http://127.0.0.1:8000/accounts/${userId}/follow/`,
@@ -75,7 +73,7 @@ onMounted(() => {
       }
     })
     .then((res) => {
-      isFollowing.value = res.data.following.some(user => user.id === userId);
+      isFollowing.value = res.data.is_following;
     })
     .catch((err) => {
       console.error('팔로우 상태를 확인하는 중 오류 발생:', err);
@@ -100,8 +98,10 @@ const toggleFollow = () => {
   .then((res) => {
     if (res.data.message === '팔로우') {
       isFollowing.value = true;
+      userData.value.followers_count += 1;
     } else if (res.data.message === '언팔로우') {
       isFollowing.value = false;
+      userData.value.followers_count -= 1;
     }
     console.log(res.data.message);
   })
@@ -109,27 +109,29 @@ const toggleFollow = () => {
     console.error('팔로우/언팔로우 요청 중 오류 발생:', err);
   });
 };
-
-// // 프로필 이미지 경로 가져오기
-// const getImagePath = (imageName) => {
-//   if (imageName) {
-//     return `/src/assets/profile_images/${imageName}`;
-//   } else {
-//     return '/src/assets/default_profile.jpg'; // 기본 프로필 이미지
-//   }
-// };
 </script>
+
 
 <style scoped>
 .followBtn {
-  padding: 5px;
-  border-radius: 30%;
-  background-color: dodgerblue;
+  margin-left: 15px;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  background-color: #28a745;
 }
 
 .followBtn:hover {
-  background-color: blue;
+  background-color: #218838;
 }
+
+.followBtn.unfollowBtn {
+  background-color: #dc3545;
+}
+
+.followBtn.unfollowBtn:hover {
+  background-color: #c82333;
+}
+
 
 .mydata-container {
   max-width: 400px;
