@@ -49,14 +49,19 @@ def follow(request, user_username):
     User = get_user_model()
     target_user = get_object_or_404(User, username = user_username)
     if request.method =='POST':
-        if User == target_user:
+        if request.user == target_user:
             return JsonResponse({'error' :'자기 자신을 팔로우할 수 없습니다.'}, status = status.HTTP_400_BAD_REQUEST)
+       
         if target_user in request.user.followings.all():
             request.user.followings.remove(target_user)
-            return JsonResponse({'message': '언팔로우'})
+            is_following = False
+            return JsonResponse({'message': '언팔로우',
+                                 'is_following': is_following})
         else:
             request.user.followings.add(target_user)
-            return JsonResponse({'message': '팔로우'})
+            is_following = True
+            return JsonResponse({'message': '팔로우',
+                                 'is_following' : is_following})
     elif request.method == 'GET':
         user = request.user
         following_users = user.followings.all()

@@ -154,6 +154,29 @@ def user_diary(request, user_username):
                 'create_diary' : serializer.data,
                 'gpt_json_answer' : gpt_json_answer
             }
+            # gpt가 영화를 추천한 이유를 딕셔너리 형태로 저장
+            reasons = {'today_diary_review1' : gpt_json_answer['movies']['reason'][0],
+                       'today_diary_review2' : gpt_json_answer['movies']['reason'][1]
+                       }
+            my_diary = Diary.objects.filter(author__username = user_username).first()
+            if not my_diary:
+                return JsonResponse({'message': '해당 사용자의 다이어리를 찾을 수 없습니다.'}, status= status.HTTP_404_NOT_FOUND)
+            # diary에 gpt_comment 추가
+            my_diary.gpt_comment = gpt_json_answer['diary_review']
+
+            # recommend_movie와 Moive가 M:N 관계이기 때문에 Movie 객체를 가져와야 한다.
+            # 제목을 통해 Moive 객체 가져오기
+
+            movie_titles = gpt_json_answer['movies']['title']
+            movies = Movie.objects.filter(title__in = movie_titles)
+
+            for movie in movies:
+                my_diary.recommend_movie.add(movie)
+
+            # diary에 추천 이유 저장
+            my_diary.recommend_reasons = reasons
+
+            my_diary.save()
 
             return Response(data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -193,32 +216,4 @@ def create_comment(request, diary_pk):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-test_text = {'detected_emotion': '기쁨', 'movies': {'title': ['인사이드 아웃 2', '아카디안'], 'reason': ['기쁨을 느낀 내용과 관련하여 긍정적인 감정을 주는 애니메이션 영화로 추천합니다.', '반대 감정인 드라마와 스릴러 요소가 있는 영화로 기분 전환을 도와줄 수 있습니다.']}, 'diary_review': '오늘은 프로젝트를 하면서 성과를 느끼고 기분이 좋았지만, 건강에 대한 걱정도 드는 하루였네요. 피곤함 속에서도 긍정적인 감정이 잘 드러나는 일기입니다.'}
-reasons = {'today_diary_review1' : test_text['movies']['reason'][0],
-           'today_diary_review2' : test_text['movies']['reason'][1]}
-
-def test(request, user_username):
-    # 단일 객체 가져오기
-    diary = Diary.objects.filter(author__username=user_username).first()
-    if not diary:
-        return JsonResponse({'message': '해당 사용자의 다이어리를 찾을 수 없습니다.'}, status=404)
-
-    # gpt_comment 추가
-    diary.gpt_comment = test_text['diary_review']
-    
-    # Movie 객체 가져오기 (제목을 통해 검색한다고 가정)
-    movie_titles = test_text['movies']['title']
-    movies = Movie.objects.filter(title__in=movie_titles)
-
-    # 추천 영화 추가
-    for movie in movies:
-        diary.recommend_movie.add(movie)
-
-    # recommend_reasons 설정
-    diary.recommend_reasons = reasons
-
-    # 다이어리 저장
-    diary.save()
-
-    return JsonResponse({'message': '성공', 'recommend_reasons': reasons}, json_dumps_params={'ensure_ascii': False})   
 
