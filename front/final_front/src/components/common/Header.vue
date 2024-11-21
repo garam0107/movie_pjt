@@ -81,13 +81,6 @@ const searchMovie = () => {
   }
 
 
-  onBeforeRouteUpdate((to, from) => {
-    if (to.params.id !== this.params.id) {
-      goDetail(thie.params.id)
-  }
-})
-
-
   const goDetail = (id) => {
     router.push({ name: "detail", params: { movie_id: id } })
 }

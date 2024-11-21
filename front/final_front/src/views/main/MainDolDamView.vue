@@ -1,8 +1,12 @@
 <template>
   <WhatisDolDam/>
   <div v-if="userId" class="only-user">
-    <FollowComment :userId="userId"/>
-    <TopUser/>
+    <div class="follow">
+      <FollowComment :userId="userId"/>
+    </div>
+    <div class="top">
+      <TopUser/>
+    </div>
   </div>
   <WeeklyMovie/>
 </template>
@@ -22,5 +26,13 @@ const userId = computed(() => store.userId)
 .only-user {
   display: flex;
   gap: 20px;
+  align-items: stretch;
+}
+
+.follow {
+  flex: 8;
+}
+.top {
+  flex: 2;
 }
 </style>

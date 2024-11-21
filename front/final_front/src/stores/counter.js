@@ -58,7 +58,7 @@ export const useMovieStore = defineStore('movie', () => {
         .then(userRes => {
           userId.value = userRes.data.username;
           localStorage.setItem('userId', userRes.data.username);
-          router.push({ name: 'mainDolDam' });
+          router.push({ name: 'MainDolDam' });
         })
         .catch(err => {
           console.log(err);
