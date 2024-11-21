@@ -47,7 +47,7 @@ class CustomRegisterSerializer(RegisterSerializer):
 class UserFollowingDiarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Diary
-        fields = ['id','autor', 'title', 'content']
+        fields = ['id','author', 'title', 'content']
 
 # 유저가 팔로우 한 사람들의 영화 리뷰
 class UserFollowingReviewSerializer(serializers.ModelSerializer):

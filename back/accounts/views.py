@@ -66,7 +66,7 @@ def follow(request, user_username):
         user = request.user
         following_users = user.followings.all()
 
-        diaries = Diary.objects.filter(autor__in = following_users)
+        diaries = Diary.objects.filter(author__in = following_users)
         reviews = Movie_review.objects.filter(user__in = following_users)
 
         serializer_diaries = UserFollowingDiarySerializer(diaries, many = True)

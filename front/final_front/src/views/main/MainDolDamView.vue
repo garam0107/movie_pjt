@@ -1,7 +1,7 @@
 <template>
   <WhatisDolDam/>
   <div v-if="userId" class="only-user">
-    <FollowComment/>
+    <FollowComment :userId="userId"/>
     <TopUser/>
   </div>
   <WeeklyMovie/>
