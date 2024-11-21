@@ -8,6 +8,7 @@ export const useMovieStore = defineStore('movie', () => {
   const API_URL = 'http://127.0.0.1:8000/';
   const detailMovie = ref([]);
   const token = ref(localStorage.getItem('token') || null);
+  
   const userData = ref([]);
   const userId = ref(localStorage.getItem('userId') || null);
 
@@ -90,34 +91,51 @@ export const useMovieStore = defineStore('movie', () => {
 
   // 로그아웃
   const logout = function() {
+    const storedToken = localStorage.getItem('token') || token.value;
+  
+    if (!storedToken) {
+      console.warn("로그아웃 실패: 저장된 토큰이 없습니다.")
+      clearAuthState(); // 클라이언트 상태 초기화
+      return
+    }
+  
     axios({
       method: 'post',
       url: `${API_URL}accounts/logout/`,
       headers: {
-        Authorization: `Token ${token.value}`
+        Authorization: `Token ${storedToken}`
       }
     })
       .then(() => {
-        token.value = null
-        userId.value = null
-        localStorage.removeItem('token')
-        localStorage.removeItem('userId')
-        router.push({ name: 'LoginView' })
+        console.log("로그아웃 성공")
+        clearAuthState() // 로그아웃 성공 시 상태 초기화
       })
       .catch(err => {
-        console.error('로그아웃 실패:', err)
+        console.error("로그아웃 실패:", err)
+        clearAuthState()// 실패해도 클라이언트 상태 초기화
       })
   }
   
-  const checkAuthentication = function () {
+  // 클라이언트 상태 초기화 함수
+  const clearAuthState = function() {
+    token.value = null
+    userId.value = null
+    localStorage.removeItem('token')
+    localStorage.removeItem('userId')
+    router.push({ name: 'LoginView' })
+  }
+  
+  const checkAuthentication = function() {
     const storedToken = localStorage.getItem('token')
     const storedUserId = localStorage.getItem('userId')
-    if (storedToken) {
+  
+    if (storedToken && storedUserId) {
       token.value = storedToken
       userId.value = storedUserId
+    } else {
+      clearAuthState() // 유효하지 않으면 상태 초기화
     }
   }
-
   const isAuthenticated = computed(() => !!token.value)
 
   return {

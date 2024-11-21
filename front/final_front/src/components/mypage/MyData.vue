@@ -18,8 +18,11 @@
     </div>
     <div class="user-stats">
       <div class="stat">
-        <p>방문자 수: {{ userData.visit_count }}</p>
-        <p>모은 조약돌 수: {{ userData.stone }}</p>
+        <p class="userstatus">방문자 수: {{ userData.visit_count }}</p>
+        <div style="display: flex; justify-content: center;">
+          <p class="userstatus">모은 조약돌 수: {{ userData.stone }}</p>
+          <img src="@/assets/stone_icon.png" alt="stone icon" class="stone-icon" />
+        </div>
       </div>
     </div>
     <div class="actions" v-if="userId == store.userId">
@@ -49,7 +52,9 @@ import axios from 'axios';
 import { onMounted, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { RouterLink } from 'vue-router';
-
+defineProps({
+  userData: Object
+})
 const route = useRoute();
 const userId = route.params.user_id // URL에서 user_id를 가져옴
 const store = useMovieStore()
@@ -214,5 +219,14 @@ button:hover {
 
 button:active {
   transform: scale(0.98);
+}
+
+.userstatus {
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+.stone-icon {
+  width: 5%;
+  margin-left: 5px
 }
 </style>

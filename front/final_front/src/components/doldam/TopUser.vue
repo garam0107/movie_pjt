@@ -10,7 +10,9 @@
           >
             {{ index + 1 }}
           </div>
-          <p class="username">{{ user.username }}</p>
+          <RouterLink :to="`/mypage/${user.username}/`" class="movie-link">
+            <p class="username">{{ user.nickname }}</p>
+          </RouterLink>
           <div class="stone-display">
             <img src="@/assets/stone_icon.png" alt="stone icon" class="stone-icon" />
             <span>{{ user.stone }}</span>
@@ -134,6 +136,7 @@ onMounted(() => {
   font-size: 0.9rem; /* 이름 크기 축소 */
   font-weight: bold;
   color: #333;
+  font-family: "Noto Sans KR", sans-serif;
 }
 
 .stone-display {
@@ -151,5 +154,9 @@ onMounted(() => {
   font-size: 0.9rem; /* 글자 크기 축소 */
   font-weight: bold;
   color: #555;
+}
+
+.movie-link {
+  text-decoration: none;
 }
 </style>
