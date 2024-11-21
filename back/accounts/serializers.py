@@ -51,9 +51,13 @@ class UserFollowingDiarySerializer(serializers.ModelSerializer):
 
 # 유저가 팔로우 한 사람들의 영화 리뷰
 class UserFollowingReviewSerializer(serializers.ModelSerializer):
+    movie_title = serializers.CharField(source = 'movie.title', read_only = True)
+    poster_path = serializers.CharField(source = 'movie.poster_path', read_only = True)
+    review_user_id = serializers.CharField(source = 'user.username', read_only = True)
+    profile_image = serializers.CharField(source = 'user.profile_image', read_only = True)
     class Meta:
         model = Movie_review
-        fields= ['id','movie', 'title', 'content']
+        fields= ['id','movie', 'title', 'content','movie_title','poster_path','review_user_id','rating','profile_image']
 
 
 # 유저가 챗봇에 추천 받은 영화들
@@ -128,3 +132,8 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         model = UserModel
         fields = ['profile_image', 'nickname', 'name']
 
+# 모든 유저 정보 들고오기
+class AllUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = ['username', 'stone']

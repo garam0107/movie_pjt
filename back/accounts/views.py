@@ -14,7 +14,7 @@ from rest_framework.decorators import api_view,permission_classes
 
 from diaries.models import Diary
 from movies.models import Movie_review
-from .serializers import UserFollowingDiarySerializer,UserFollowingReviewSerializer,UserSerializer,UserUpdateSerializer
+from .serializers import UserFollowingDiarySerializer,UserFollowingReviewSerializer,UserSerializer,UserUpdateSerializer,AllUserSerializer
 # Create your views here.
 
 class RegisterView(CreateAPIView):
@@ -65,7 +65,7 @@ def follow(request, user_username):
     elif request.method == 'GET':
         user = request.user
         following_users = user.followings.all()
-
+        is_following = target_user in request.user.followings.all()
         diaries = Diary.objects.filter(author__in = following_users)
         reviews = Movie_review.objects.filter(user__in = following_users)
 
@@ -73,7 +73,8 @@ def follow(request, user_username):
         serializer_reviews = UserFollowingReviewSerializer(reviews, many = True)
         return Response({
             'diaries' : serializer_diaries.data,
-            'review' : serializer_reviews.data
+            'review' : serializer_reviews.data,
+            'is_following': is_following
         })
 
 @api_view(['PUT'])
@@ -87,3 +88,10 @@ def update(request, user_username):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def top_users_by_stone(request):
+    User = get_user_model()
+    # 모든 유저를 stone 필드 기준으로 내림차순 정렬 후 상위 10명 선택
+    top_users = User.objects.all().order_by('-stone')[:10]
+    serializer = AllUserSerializer(top_users, many=True)
+    return Response(serializer.data)
