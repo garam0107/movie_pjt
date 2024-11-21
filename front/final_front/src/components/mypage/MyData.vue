@@ -22,12 +22,25 @@
         <p>모은 조약돌 수: {{ userData.stone }}</p>
       </div>
     </div>
-    <div class="actions">
+    <div class="actions" v-if="userId == store.userId">
       <RouterLink to="/main"><button>회원정보 수정</button></RouterLink>
       <RouterLink to="/main"><button>비밀번호 수정</button></RouterLink>
       <button>회원 탈퇴</button>
     </div>
   </div>
+
+
+  <!-- 회원정보수정 Modal -->
+  <div v-if="showModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>회원 정보 수정</h3>
+      <div class="input-group">
+        <label for=""></label>
+      </div>
+    </div>
+  </div>
+
+
 </template>
 
 <script setup>
@@ -38,13 +51,13 @@ import { useRoute } from 'vue-router';
 import { RouterLink } from 'vue-router';
 
 const route = useRoute();
-const userId = route.params.user_id; // URL에서 user_id를 가져옴
-const store = useMovieStore();
-const userData = ref({});
-const isFollowing = ref(false);
+const userId = route.params.user_id // URL에서 user_id를 가져옴
+const store = useMovieStore()
+const userData = ref({})
+const isFollowing = ref(false)
 
 // 내 페이지인지 확인
-const isNotMyPage = computed(() => store.userId !== userId);
+const isNotMyPage = computed(() => store.userId !== userId)
 
 // 마운트될 때 사용자 정보 불러오기
 onMounted(() => {
@@ -58,10 +71,10 @@ onMounted(() => {
       }
     })
     .then((res) => {
-      userData.value = res.data;
+      userData.value = res.data
     })
     .catch((err) => {
-      console.error('유저 정보를 불러오는 중 오류 발생:', err);
+      console.error('유저 정보를 불러오는 중 오류 발생:', err)
     });
 
     // 팔로우 상태 확인
@@ -73,11 +86,11 @@ onMounted(() => {
       }
     })
     .then((res) => {
-      isFollowing.value = res.data.is_following;
+      isFollowing.value = res.data.is_following
       console.log(res.data.is_following)
     })
     .catch((err) => {
-      console.error('팔로우 상태를 확인하는 중 오류 발생:', err);
+      console.error('팔로우 상태를 확인하는 중 오류 발생:', err)
     });
   }
 });
@@ -85,7 +98,7 @@ onMounted(() => {
 // 팔로우/언팔로우 기능
 const toggleFollow = () => {
   if (!store.token) {
-    alert('로그인이 필요합니다.');
+    alert('로그인이 필요합니다.')
     return;
   }
 
@@ -98,18 +111,18 @@ const toggleFollow = () => {
   })
   .then((res) => {
     if (res.data.message === '팔로우') {
-      isFollowing.value = true;
+      isFollowing.value = true
       userData.value.followers_count += 1;
     } else if (res.data.message === '언팔로우') {
-      isFollowing.value = false;
+      isFollowing.value = false
       userData.value.followers_count -= 1;
     }
-    console.log(res.data.message);
+    console.log(res.data.message)
   })
   .catch((err) => {
-    console.error('팔로우/언팔로우 요청 중 오류 발생:', err);
-  });
-};
+    console.error('팔로우/언팔로우 요청 중 오류 발생:', err)
+  })
+}
 </script>
 
 

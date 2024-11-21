@@ -137,3 +137,4 @@ class AllUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ['username', 'stone']
+
