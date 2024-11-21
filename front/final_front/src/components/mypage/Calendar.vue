@@ -43,7 +43,7 @@
           </button>
         </div>
         <div class="modal-actions">
-          <button @click="submitDiary()">저장</button>
+          <button @click="submitDiary">저장</button>
           <button @click="showDiaryModal = false">닫기</button>
         </div>
       </div>
@@ -97,6 +97,20 @@ const dates = ref([]);
 const diaryTitle = ref('');
 const diaryContent = ref('');
 const selectedEmoji = ref(null);
+
+
+const emojiMap = {
+  '/src/assets/images/angry.jpg': 'emotions/angry.jpg',
+  '/src/assets/images/calm.jpg': 'emotions/calm.jpg',
+  '/src/assets/images/excited.jpg': 'emotions/excited.jpg',
+  '/src/assets/images/happy.jpg': 'emotions/happy.jpg',
+  '/src/assets/images/sad.jpg': 'emotions/sad.jpg',
+  '/src/assets/images/sleepy.jpg': 'emotions/sleepy.jpg',
+};
+
+
+
+
 
 // 달력 생성
 const createCalendar = () => {
@@ -172,19 +186,35 @@ const openDiaryModal = (date) => {
 
 // 이모지 선택
 const selectEmoji = (emoji) => {
-  selectedEmoji.value = emoji;
+  selectedEmoji.value = emojiMap[emoji] || null; // 매핑해서 경로 바꿔주기 
   console.log(selectedEmoji.value)
 };
 
 
-const userId = ref(null)
+
+
+const Diary_today = new Date().toISOString().split('T')[0]
+
 // 다이어리 저장
-const submitDiary = (user_id) => {
+const submitDiary = () => {
+  if (selectedDate !== Diary_today) {
+    alert('당일에만 다이어를 작성할 수 있습니다.')
+    return
+  }
+
+
   if (!diaryTitle.value || !diaryContent.value || !selectedEmoji.value) {
     alert('제목, 내용, 이모지를 모두 입력해주세요.');
     return;
   }
 
+
+
+  console.log({
+    title: diaryTitle.value,
+    content: diaryContent.value,
+    mood_emoji: selectedEmoji.value,
+  });
   // if (!user_pk.value) {
   //   console.error('사용자 ID가 존재하지 않습니다.');
   //   return;
@@ -193,14 +223,13 @@ const submitDiary = (user_id) => {
   // 인증 토큰이 있는지 확인
   const token = localStorage.getItem('token');
   if (!token) {
-    console.log(user_id)
     alert('로그인이 필요합니다.');
     return;
   }
 
   // 다이어리 작성 API 호출
   axios.post(
-    `http://127.0.0.1:8000/diaries/${user_id}/`,
+    `http://127.0.0.1:8000/diaries/${props.userData.username}/`,
     {
       title: diaryTitle.value,
       content: diaryContent.value,
@@ -226,14 +255,13 @@ const submitDiary = (user_id) => {
       console.log(selectEmoji.value)
       console.log(token)
       console.error('다이어리 저장 실패:', error);
+      console.log(error.response.data)
     });
 };
 
 // 컴포넌트가 마운트될 때 달력 생성
 onMounted(() => {
   createCalendar();
-  console.log(route)
- 
 });
 </script>
 
