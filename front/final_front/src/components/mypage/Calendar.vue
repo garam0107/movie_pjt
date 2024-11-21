@@ -198,6 +198,8 @@ const Diary_today = new Date().toISOString().split('T')[0]
 // 다이어리 저장
 const submitDiary = () => {
   if (selectedDate !== Diary_today) {
+    console.log('오늘날짜' ,selectedDate.value.dateKey)
+    console.log(Diary_today)
     alert('당일에만 다이어를 작성할 수 있습니다.')
     return
   }
