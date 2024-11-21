@@ -37,14 +37,14 @@
           <input type="text" v-model="editReview.title" id="title" class="input-field">
         </div>
         
-        <div class="input-group">
+        <div class="input-group" style="display: flex;">
           <label for="content">내용:</label>
           <textarea v-model="editReview.content" id="content" class="input-field"></textarea>
         </div>
 
-        <div class="input-group">
+        <div class="input-group" style="display: flex;">
           <label>별점:</label>
-          <div class="rating-container">
+          <div class="rating-container" style="margin-left: 6px;">
             <span 
               v-for="star in 5" 
               :key="star" 
@@ -297,8 +297,9 @@ const setRating = (rating) => {
 }
 
 .input-field {
-  width: 100%;
+  width: 80%;
   padding: 10px;
+  margin-left: 6px;
   margin-top: 5px;
   border: 1px solid #ccc;
   border-radius: 5px;
