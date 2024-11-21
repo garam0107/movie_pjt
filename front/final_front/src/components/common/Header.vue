@@ -11,21 +11,23 @@
         </nav>
       </div>
       <div class="header-right">
-        
         <div class = "search-container">
           <input type="text" v-model.trim="search" @input="debouncedFetchSuggestions"
           placeholder="콘텐츠, 인물, 컬렉션, 유저를 검색해보세요" class="search-input" >
           <div v-if = "results.length > 0" class = "suggestions-list">
-            <ul>
-              <li
+           <p
               v-for = "(result,index) in results"
               :key = "index"
-              @click = "selectSuggestion(result)"
+              @click="goDetail(result.id)"
               class = "suggestion-item"
-              >
-                {{result.title}}
-              </li>
-            </ul>
+           >
+
+           {{result.title}}
+
+           </p>
+ 
+              
+           
           </div>
         </div>
         <RouterLink v-if="!userId" :to="{name: 'LoginView'}"><button class="signup-button">로그인</button></RouterLink>
@@ -38,9 +40,11 @@
   <script setup>
 import { useMovieStore } from '@/stores/counter';
 import { computed, onMounted, ref } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router';
 import axios from 'axios';
-import vueDebounce from 'vue-debounce';
+import { debounce } from 'vue-debounce';
+
+const router = useRouter()  
 const store = useMovieStore()
 const userId = computed(() => store.userId)
 const logout = () => {
@@ -48,7 +52,7 @@ const logout = () => {
 }
 
 const results = ref([])
-const search = ref(null)
+const search = ref('')
 
 const searchMovie = () => {
     if (search.value.length > 0) {
@@ -60,8 +64,9 @@ const searchMovie = () => {
         }
       }).then((res) => {  
           console.log('검색 성공')
-          console.log(res.data)
-          results.value = res.data
+          // console.log(res.data)
+        results.value = res.data
+          // console.log(results.value)
       }).catch((err) => {
           console.log(err)
           results.value = []
@@ -72,13 +77,19 @@ const searchMovie = () => {
     }
   }
 
-  const selectSuggestion = (result) => {
-    this.search.value = result.title
-    this.results = []
-    this.searchMovie()
-  }
+  const goDetail = (id) => {
+    router.push({ name: "detail", params: { movie_id: id } })
+}
 
 
+
+  // const selectSuggestion = (result) => {
+  //   search.value = result.title
+  //   results = []
+  //   searchMovie()
+  // }
+
+const debouncedFetchSuggestions = debounce(searchMovie, 200);
   </script>
   
   <style scoped>
@@ -162,6 +173,24 @@ const searchMovie = () => {
     border: 1px solid lightgrey;
   }
   
+  .search-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 5px;
+}
+
+
   /* 반응형 스타일 */
   @media (max-width: 768px) {
     .search-input {
