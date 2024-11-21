@@ -11,7 +11,23 @@
         </nav>
       </div>
       <div class="header-right">
-        <input type="text" placeholder="콘텐츠, 인물, 컬렉션, 유저를 검색해보세요" class="search-input" />
+        
+        <div class = "search-container">
+          <input type="text" v-model.trim="search" @input="debouncedFetchSuggestions"
+          placeholder="콘텐츠, 인물, 컬렉션, 유저를 검색해보세요" class="search-input" >
+          <div v-if = "results.length > 0" class = "suggestions-list">
+            <ul>
+              <li
+              v-for = "(result,index) in results"
+              :key = "index"
+              @click = "selectSuggestion(result)"
+              class = "suggestion-item"
+              >
+                {{result.title}}
+              </li>
+            </ul>
+          </div>
+        </div>
         <RouterLink v-if="!userId" :to="{name: 'LoginView'}"><button class="signup-button">로그인</button></RouterLink>
         <RouterLink v-if="!userId" :to="{name: 'SignupView'}"><button class="signup-button">회원가입</button></RouterLink>
         <button  v-if="userId" @click="logout" class="signup-button">로그아웃</button>
@@ -23,11 +39,45 @@
 import { useMovieStore } from '@/stores/counter';
 import { computed, onMounted, ref } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
+import axios from 'axios';
+import vueDebounce from 'vue-debounce';
 const store = useMovieStore()
 const userId = computed(() => store.userId)
 const logout = () => {
   store.logout()
 }
+
+const results = ref([])
+const search = ref(null)
+
+const searchMovie = () => {
+    if (search.value.length > 0) {
+      axios({
+        method: 'get',
+        url: 'http://127.0.0.1:8000/movies/search/',
+        params: {
+          title: search.value
+        }
+      }).then((res) => {  
+          console.log('검색 성공')
+          console.log(res.data)
+          results.value = res.data
+      }).catch((err) => {
+          console.log(err)
+          results.value = []
+    })
+    
+    } else {
+      results.value = []
+    }
+  }
+
+  const selectSuggestion = (result) => {
+    this.search.value = result.title
+    this.results = []
+    this.searchMovie()
+  }
+
 
   </script>
   

@@ -34,3 +34,9 @@ class ReviewCommentSerializer(serializers.ModelSerializer):
         model = MovieReview_comment
         fields = ['content']
         read_only_fields = ['review','reviewuser']
+
+
+class MovieSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fiedls = ['title']
