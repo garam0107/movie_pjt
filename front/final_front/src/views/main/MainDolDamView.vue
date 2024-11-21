@@ -1,8 +1,12 @@
 <template>
-  <h1>돌담 뮤비디비아</h1>
+  <WhatisDolDam/>
+  <WeeklyMovie/>
 </template>
 
 <script setup>
+import WeeklyMovie from '@/components/doldam/WeeklyMovie.vue';
+import WhatisDolDam from '@/components/doldam/WhatisDolDam.vue';
+
 </script>
  
 <style scope>
