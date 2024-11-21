@@ -38,12 +38,14 @@
   </template>
   
   <script setup>
-import { useMovieStore } from '@/stores/counter';
-import { computed, onMounted, ref } from 'vue';
-import { RouterLink, useRouter } from 'vue-router';
+  import { useMovieStore } from '@/stores/counter';
+
+import { computed, onMounted, ref,watch } from 'vue';
+import { RouterLink, useRouter, useRoute, onBeforeRouteUpdate} from 'vue-router';
 import axios from 'axios';
 import { debounce } from 'vue-debounce';
 
+const route = useRoute()
 const router = useRouter()  
 const store = useMovieStore()
 const userId = computed(() => store.userId)
@@ -53,6 +55,7 @@ const logout = () => {
 
 const results = ref([])
 const search = ref('')
+const movieData = ref(null)
 
 const searchMovie = () => {
     if (search.value.length > 0) {
@@ -76,6 +79,14 @@ const searchMovie = () => {
       results.value = []
     }
   }
+
+
+  onBeforeRouteUpdate((to, from) => {
+    if (to.params.id !== this.params.id) {
+      goDetail(thie.params.id)
+  }
+})
+
 
   const goDetail = (id) => {
     router.push({ name: "detail", params: { movie_id: id } })
