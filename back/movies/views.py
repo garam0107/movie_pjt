@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view,permission_classes
 
 from .models import Genre,Actor,Movie,Movie_review,MovieReview_comment
-from .serializers import GenreSerializer,ActorSerializer,MoiveSerializer,MovieReviewsSerializer,ReviewCommentSerializer
+from .serializers import GenreSerializer,ActorSerializer,MoiveSerializer,MovieReviewsSerializer,ReviewCommentSerializer,MovieSearchSerializer
 # Create your views here.
 @api_view(['GET'])
 def main(request):
@@ -132,9 +132,11 @@ def search(request):
     query = request.GET.get('title', '')
     if query:
         movies = Movie.objects.filter(title__icontains=query)
-        serializer = MoiveSerializer(movies, many = True)
-        return JsonResponse({'movies': serializer.data}, safe=False)
-    return JsonResponse({'movies': []}, safe=False)
+        serializer = MovieSearchSerializer(movies, many = True)
+        return Response(serializer.data)
+    return JsonResponse({'movies': []}, safe=False, json_dumps_params={'ensure_ascii' : False})
+    #     return JsonResponse({'movies': serializer.data}, safe=False, json_dumps_params={'ensure_ascii' : False})
+    # return JsonResponse({'movies': []}, safe=False, json_dumps_params={'ensure_ascii' : False})
 
 
 
