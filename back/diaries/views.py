@@ -5,6 +5,7 @@ import datetime
 from pathlib import Path
 from openai import OpenAI
 
+from django.db import transaction
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, get_list_or_404, get_object_or_404
@@ -22,7 +23,7 @@ from .serializers import DiaryCreateSerializer, DiarySerializer,DiaryCommentSeri
 
 
 
-OPENAI_API_KEY = settings.OPENAI_API_KEY
+OPENAI_API_KEY = "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"
 
 json_file_path = Path(__file__).resolve().parent/'updated_movies.json'
 
@@ -139,48 +140,54 @@ def user_diary(request, user_username):
     elif request.method == 'POST':
         User = get_user_model()
         user = get_object_or_404(User, username = user_username)
+
+        today = datetime.date.today()
         existing_diary = Diary.objects.filter(author=user, date=datetime.date.today()).first()
         if existing_diary:
             return Response({"message": "하루에 하나의 다이어리만 작성할 수 있습니다."}, status=status.HTTP_400_BAD_REQUEST)
+        requested_data = request.data.get('date')
+        if requested_data and requested_data != str(today):
+            return Response({"message" : "당일에만 다이어리를 작성할 수 있습니다."})
         serializer = DiaryCreateSerializer(data = request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(author = request.user)
-            user.stone += 5
-            user.save()
-            user_data = serializer.data['content'] # 사용자가 쓴 일기 내용
-            gpt_answer = gpt_recommend(user_data) # gpt의 답변
-            gpt_json_answer = make_json(gpt_answer) # gpt 답변 json으로 가공
-            data = {
-                'create_diary' : serializer.data,
-                'gpt_json_answer' : gpt_json_answer
-            }
-            # gpt가 영화를 추천한 이유를 딕셔너리 형태로 저장
-            reasons = {'today_diary_review1' : gpt_json_answer['movies']['reason'][0],
-                       'today_diary_review2' : gpt_json_answer['movies']['reason'][1]
-                       }
-            my_diary = Diary.objects.filter(author__username = user_username).first()
-            if not my_diary:
-                return JsonResponse({'message': '해당 사용자의 다이어리를 찾을 수 없습니다.'}, status= status.HTTP_404_NOT_FOUND)
-            # diary에 gpt_comment 추가
-            my_diary.gpt_comment = gpt_json_answer['diary_review']
+        if not serializer.is_valid(raise_exception=True):
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+        try:
+            with transaction.atomic():
 
-            # recommend_movie와 Moive가 M:N 관계이기 때문에 Movie 객체를 가져와야 한다.
-            # 제목을 통해 Moive 객체 가져오기
+                diary = serializer.save(author = request.user, date = today)
+                user.stone += 5
+                user.save()
+                user_data = serializer.data['content'] # 사용자가 쓴 일기 내용
+                gpt_answer = gpt_recommend(user_data) # gpt의 답변
+                gpt_json_answer = make_json(gpt_answer) # gpt 답변 json으로 가공
+             
+                # gpt가 영화를 추천한 이유를 딕셔너리 형태로 저장
+                reasons = {'today_diary_review1' : gpt_json_answer['movies']['reason'][0],
+                        'today_diary_review2' : gpt_json_answer['movies']['reason'][1]
+                        }
 
-            movie_titles = gpt_json_answer['movies']['title']
-            movies = Movie.objects.filter(title__in = movie_titles)
+                # diary에 gpt_comment 추가
+                diary.gpt_comment = gpt_json_answer['diary_review']
 
-            for movie in movies:
-                my_diary.recommend_movie.add(movie)
+                # recommend_movie와 Moive가 M:N 관계이기 때문에 Movie 객체를 가져와야 한다.
+                # 제목을 통해 Moive 객체 가져오기
 
-            # diary에 추천 이유 저장
-            my_diary.recommend_reasons = reasons
+                movie_titles = gpt_json_answer['movies']['title']
+                movies = Movie.objects.filter(title__in = movie_titles)
 
-            my_diary.save()
+                for movie in movies:
+                    diary.recommend_movie.add(movie)
 
-            return Response(data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+                # diary에 추천 이유 저장
+                diary.recommend_reasons = reasons
+                diary.save()
+                data = {
+                    'create_diary': serializer.data,
+                    'gpt_json_answer': gpt_json_answer,
+                    }
+                return Response(data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"message": "다이어리 작성 중 문제가 발생했습니다.", "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
 @api_view(['PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def update_diary(request, user_username, diary_pk):
