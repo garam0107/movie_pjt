@@ -21,6 +21,6 @@ const userId = computed(() => store.userId)
 <style scope>
 .only-user {
   display: flex;
-  gap: 100px;
+  gap: 20px;
 }
 </style>

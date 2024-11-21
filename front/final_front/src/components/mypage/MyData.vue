@@ -74,6 +74,7 @@ onMounted(() => {
     })
     .then((res) => {
       isFollowing.value = res.data.is_following;
+      console.log(isFollowing.value)
     })
     .catch((err) => {
       console.error('팔로우 상태를 확인하는 중 오류 발생:', err);
