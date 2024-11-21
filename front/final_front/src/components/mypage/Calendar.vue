@@ -44,7 +44,7 @@
         </div>
         <div class="modal-actions">
           <button @click="submitDiary">저장</button>
-          <button @click="showDiaryModal = false">닫기</button>
+          <button @click="closeModal">닫기</button>
         </div>
       </div>
     </div>
@@ -97,6 +97,7 @@ const dates = ref([]);
 const diaryTitle = ref('');
 const diaryContent = ref('');
 const selectedEmoji = ref(null);
+const Diary_today = new Date().toISOString().split('T')[0]
 
 
 const emojiMap = {
@@ -125,7 +126,7 @@ const createCalendar = () => {
       date: lastDatePrevMonth - i,
       isCurrentMonth: false,
       emoji: null,
-      dateKey: `${year.value}-${month.value - 1}-${lastDatePrevMonth - i}`,
+      dateKey: `${year.value}-${month.value === 0 ? 12 : month.value}-${lastDatePrevMonth - i}`,
     });
   }
   // 현재 달의 날짜 추가
@@ -134,7 +135,7 @@ const createCalendar = () => {
       date: i,
       isCurrentMonth: true,
       emoji: null,
-      dateKey: `${year.value}-${month.value}-${i}`,
+      dateKey: `${year.value}-${month.value+1}-${i}`,
     });
   }
 };
@@ -173,16 +174,27 @@ const isToday = (date) => {
   return (
     date.isCurrentMonth &&
     date.date === today.getDate() &&
-    month.value === today.getMonth() &&
+    month.value +1 === today.getMonth() +1 &&
     year.value === today.getFullYear()
   );
 };
 
 // 다이어리 작성 모달 열기
 const openDiaryModal = (date) => {
-  selectedDate.value = date;
-  showDiaryModal.value = true;
+ 
+    selectedDate.value = date;
+    showDiaryModal.value = true;
+  
 };
+
+
+const closeModal = () => {
+  diaryTitle.value = ''
+  diaryContent.value = ''
+  selectedEmoji.value = null
+  showDiaryModal.value = false
+}
+
 
 // 이모지 선택
 const selectEmoji = (emoji) => {
@@ -193,14 +205,13 @@ const selectEmoji = (emoji) => {
 
 
 
-const Diary_today = new Date().toISOString().split('T')[0]
 
 // 다이어리 저장
 const submitDiary = () => {
-  if (selectedDate !== Diary_today) {
-    console.log('오늘날짜' ,selectedDate.value.dateKey)
-    console.log(Diary_today)
-    alert('당일에만 다이어를 작성할 수 있습니다.')
+  if (selectedDate.value.dateKey !== Diary_today) {
+    // console.log('오늘날짜' ,selectedDate.value.dateKey)
+    // console.log(Diary_today)
+    alert('당일에만 다이어리를 작성할 수 있습니다.')
     return
   }
 
@@ -243,10 +254,10 @@ const submitDiary = () => {
       },
     }
   )
-    .then(() => {
+    .then((res) => {
       // 선택한 날짜에 이모지 표시
       selectedDate.value.emoji = selectedEmoji.value;
-
+      console.log(res.data)
       // 모달 초기화 및 닫기
       diaryTitle.value = '';
       diaryContent.value = '';
