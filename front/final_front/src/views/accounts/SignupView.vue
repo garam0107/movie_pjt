@@ -49,7 +49,7 @@
               v-model="profile_image"
               name="profile_image"
             >
-            <img :src="defaultProfileImageUrl" alt="기본 이미지" class="profile-img default-img" title="기본 이미지 (선택 안함)">
+            <!-- <img :src="defaultProfileImageUrl" alt="기본 이미지" class="profile-img default-img" title="기본 이미지 (선택 안함)"> -->
           </label>
         </div>
       </div>
@@ -63,7 +63,7 @@
 <script setup>
 import { useMovieStore } from '@/stores/counter';
 import { computed, ref, watch } from 'vue';
-import defaultProfileImageUrl from '@/assets/default_profile.jpg';
+// import defaultProfileImageUrl from '@/assets/default_profile.jpg';
 import axios from 'axios';
 const store = useMovieStore()
 const username = ref(null);
@@ -81,7 +81,8 @@ const profileOptions = [
 { value: "profile_images/profile3.jpg", src: new URL('@/assets/profile_images/profile3.jpg', import.meta.url).href, label: "Image 3" },
 { value: "profile_images/profile4.jpg", src: new URL('@/assets/profile_images/profile4.jpg', import.meta.url).href, label: "Image 4" },
 { value: "profile_images/profile5.jpg", src: new URL('@/assets/profile_images/profile5.jpg', import.meta.url).href, label: "Image 5" },
-{ value: "profile_images/profile6.jpg", src: new URL('@/assets/profile_images/profile6.jpg', import.meta.url).href, label: "Image 6" }
+{ value: "profile_images/profile6.jpg", src: new URL('@/assets/profile_images/profile6.jpg', import.meta.url).href, label: "Image 6" },
+{ value: "profile_images/default_profile.jpg", src: new URL('@/assets/profile_images/default_profile.jpg', import.meta.url).href, label: "Image 7"}
 ];
 
 // 비밀번호 일치 여부 확인

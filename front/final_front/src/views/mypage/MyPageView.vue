@@ -45,14 +45,14 @@ onMounted(async () => {
       }
     })
       .then(res => {
-        console.log('유저 데이터:', res.data);
+        console.log('유저 데이터:', res.data)
         userData.value = res.data; // 유저 데이터 저장
       })
       .catch(err => {
-        console.log('마이페이지 정보를 불러오는 중 오류:', err);
+        console.log('마이페이지 정보를 불러오는 중 오류:', err)
       });
   } else {
-    console.error('토큰이 없습니다. 로그인 후 다시 시도해주세요.');
+    console.error('토큰이 없습니다. 로그인 후 다시 시도해주세요.')
   }
 });
 </script>
