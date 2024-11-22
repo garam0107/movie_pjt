@@ -28,7 +28,7 @@
     <div class="actions" v-if="userId == store.userId">
       <button @click="showModal = true">회원정보 수정</button>
       <button @click="showPasswordChange = true">비밀번호 수정</button>
-      <button>회원 탈퇴</button>
+      <button @click="userDelete">회원 탈퇴</button>
     </div>
   </div>
 
@@ -80,7 +80,7 @@
 import { useMovieStore } from '@/stores/counter';
 import axios from 'axios';
 import { onMounted, ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute,useRouter} from 'vue-router';
 import { RouterLink } from 'vue-router';
 defineProps({
   userData: Object
@@ -99,6 +99,7 @@ const profile_image = ref('')
 const showModal = ref('')
 const nickname = ref('')
 const route = useRoute();
+const router = useRouter()
 const userId = route.params.user_id // URL에서 user_id를 가져옴
 const store = useMovieStore()
 const userData = ref({})
@@ -204,6 +205,23 @@ const toggleFollow = () => {
   })
 }
 
+
+// 회원탈퇴
+const userDelete = () => {
+  axios({
+    method: 'delete',
+    url: `http://127.0.0.1:8000/accounts/delete/`,
+    headers: {
+      Authorization: `Token ${store.token}`
+    }
+  })
+    .then(() => {
+    router.push({name:'main'})
+    }).catch((err) => {
+      console.log(err)
+      console.log(err.response.data)
+  })
+}
 
 </script>
 
