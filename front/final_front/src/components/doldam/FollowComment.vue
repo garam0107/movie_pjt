@@ -13,7 +13,7 @@
             <img :src="`https://image.tmdb.org/t/p/w500/${comment.poster_path}`" alt="영화 포스터" class="poster" />
             </RouterLink>
             <div class="movie-details">
-              <h5 class="movie-title">{{ comment.movie_title }}</h5>
+              <h5 class="movie-title">{{ comment.title }}</h5>
               <p class="movie-content">{{ comment.content }}</p>
               <div class="rating">
                 <span
@@ -100,10 +100,10 @@ h2 {
   display: flex;
   flex-direction: column;
   border-radius: 10px;
-  padding: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   background-color: #fff;
   height: auto; /* 카드 높이를 내용에 따라 조정 */
+
 }
 
 .comment-card:hover {
@@ -111,16 +111,15 @@ h2 {
 }
 
 .profile-section {
+  margin-left: 5px;
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
 }
 
 .profile-image {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  margin-right: 10px;
 }
 
 .movie-link {
@@ -139,6 +138,10 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  background: #fffdfa; /* 종이 같은 배경 */
+  border: 1px dashed #ddd; /* 종이 느낌 테두리 */
+  margin: 5px;
+  border-radius: 5%;
 }
 
 .poster {
@@ -146,10 +149,11 @@ h2 {
   height: 150px; /* 일정한 높이로 고정 */
   object-fit: cover; /* 이미지 비율 유지하며 크기 조정 */
   border-radius: 8px;
-  margin-bottom: 10px;
+  margin: 5px;
 }
 
 .movie-details {
+  margin: 5px;
   flex: 1;
   display: flex;
   flex-direction: column;
