@@ -91,7 +91,7 @@
       <p>{{ gpt_comment }}</p>
     </div>
     <div class="modal-actions">
-      <button @click="detailDiaryModal = false" class="close-button">닫기</button>
+      <button @click="closeDiaryModal" class="close-button">닫기</button>
     </div>
   </div>
 </div>
@@ -292,7 +292,12 @@ const closeModal = () => {
   selectedEmoji.value = null
   showDiaryModal.value = false
 }
-
+const closeDiaryModal = () => {
+  diaryTitle.value = ''
+  diaryContent.value = ''
+  selectedEmoji.value = null
+  detailDiaryModal.value = false
+}
 
 const selectEmoji = (emoji) => {
   selectedEmoji.value = emojiMap[emoji] || null; // 매핑된 경로로 저장
