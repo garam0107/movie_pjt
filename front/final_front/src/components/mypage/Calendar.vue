@@ -197,7 +197,7 @@ const selectedEmoji = ref('');
 const Diary_today = new Date().toISOString().split('T')[0]
 const token = localStorage.getItem('token');
 
-
+const currentuser = store.userId
 const emojiMap = {
   '/src/assets/images/angry.jpg': 'emotions/angry.jpg',
   '/src/assets/images/calm.jpg': 'emotions/calm.jpg',
@@ -293,6 +293,8 @@ const gpt_emotion = ref('')
 const my_diary_pk = ref(null)
 
 const openDiaryModal = (date) => {
+
+
   const clickedDate = new Date(year.value, month.value, date.date,12);
 
   const formattedClickedDate = clickedDate.toISOString().split('T')[0];
@@ -310,9 +312,14 @@ const openDiaryModal = (date) => {
         alert('당일에만 다이어리를 작성할 수 있습니다.')
         return
       }else if(response.data.exists === false && formattedClickedDate === Diary_today){
+        if(props.userData.username !== currentuser){
+          alert('본인 페이지에서만 다이어리를 작성할 수 있습니다.')
+          return
+        }
         showDiaryModal.value = true; // 작성 모달 열기
         detailDiaryModal.value = false; // 상세 모달 닫기
       }
+
       else {
         // 다이어리가 있는 경우: 상세 모달 열기
         diaryTitle.value = response.data.title;
