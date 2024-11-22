@@ -95,6 +95,7 @@ class UserSerializer(serializers.ModelSerializer):
     def get_followers_count(self, obj):
         return obj.followers.count()
     
+    
 # 유저 정보 가져오기
 class CustomUserDetailsSerializer(UserDetailsSerializer):
     my_review = UserReviewSerializer(source='moviereview_set', many=True, read_only=True)
