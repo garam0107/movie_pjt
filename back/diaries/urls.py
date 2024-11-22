@@ -5,4 +5,5 @@ urlpatterns = [
     path('<str:user_username>/<int:diary_pk>/', views.update_diary), # 사용자 다이어리 페이지(수정, 삭제)
     path('<str:user_username>/comment/', views.create_comment), # 다이어리 댓글
     path('<str:user_username>/by_date/', views.diary_by_date), # 특정 날짜 다이어리 상세 내용 조회
+    # path('<str:user_username>/all/', views.all_diaries), # 유저 날짜 이모지 들고오기
 ]

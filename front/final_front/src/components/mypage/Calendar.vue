@@ -61,32 +61,41 @@
     </div>
   </div>
 
-  <!-- 상세모달 -->
   <div v-if="detailDiaryModal" class="detail-modal">
-    <div class="detail-modal-content">
-      <h3 class="modal-date">{{ selectedDate.dateKey }}</h3>
-      <h1 class="modal-title">{{ diaryTitle }}</h1>
-      <h3 class="detail-modal-content">{{ diaryContent }}</h3>
-      <h4 class="modal-emotion">당신의 감정은? <span class="emotion-highlight">{{ gpt_emotion }}</span></h4>
-      
-      <div class="movie-recommendations">
-        <RouterLink :to="{ name: 'detail', params: { movie_id: recommend_movieID1 } }" class="recommend-link">
-          <p>첫번째 추천 영화: <span class="recommend-title">{{ recommend_movies[0] }}</span></p>
+  <div class="detail-modal-content">
+    <div class="diary-header">
+      <h3 class="diary-date">{{ selectedDate.dateKey }}</h3>
+      <h1 class="diary-title">{{ diaryTitle }}</h1>
+    </div>
+    <div class="diary-content">
+      <p>{{ diaryContent }}</p>
+    </div>
+    <div class="movie-recommendations">
+      <h4>영화 추천</h4>
+      <p style="font-style: bold;">오늘의 감정분석 : {{ gpt_emotion }}</p>
+      <div class="recommendation">
+        <RouterLink :to="{ name: 'detail', params: { movie_id: recommend_movieID2 } }" class="movie-title">
+          <p>🎬 {{ recommend_movies[0] }}</p>
         </RouterLink>
-        <RouterLink :to="{ name: 'detail', params: { movie_id: recommend_movieID2 } }" class="recommend-link">
-          <p>두번째 추천 영화: <span class="recommend-title">{{ recommend_movies[1] }}</span></p>
-        </RouterLink>
+        <p class="reason">{{ recommend_reasons1 }}</p>
       </div>
-
-      <p class="recommend-reason">첫 번째 영화 추천 이유: {{ recommend_reasons1 }}</p>
-      <p class="recommend-reason">두 번째 영화 추천 이유: {{ recommend_reasons2 }}</p>
-      <p class="gpt-comment">{{ gpt_comment }}</p>
-      
-      <div class="modal-actions">
-        <button @click="detailDiaryModal = false" class="close-button">닫기</button>
+      <div class="recommendation">
+        <RouterLink :to="{ name: 'detail', params: { movie_id: recommend_movieID1 } }" class="movie-title">
+          <p>🎬 {{ recommend_movies[1] }}</p>
+        </RouterLink>
+        <p class="reason">{{ recommend_reasons2 }}</p>
       </div>
     </div>
+    <div class="gpt-comment">
+      <h4>AI의 한마디</h4>
+      <p>{{ gpt_comment }}</p>
+    </div>
+    <div class="modal-actions">
+      <button @click="detailDiaryModal = false" class="close-button">닫기</button>
+    </div>
   </div>
+</div>
+
 
   </div>
 </template>
@@ -128,12 +137,12 @@ const month = ref(today.getMonth());
 const days = ['일', '월', '화', '수', '목', '금', '토'];
 const showDiaryModal = ref(false);
 const detailDiaryModal = ref(false)
-const selectedDate = ref(null);
+const selectedDate = ref('');
 const emojis = [happy, sad, angry, sleepy, excited, calm];
 const dates = ref([]);
 const diaryTitle = ref('');
 const diaryContent = ref('');
-const selectedEmoji = ref(null);
+const selectedEmoji = ref('');
 const Diary_today = new Date().toISOString().split('T')[0]
 const token = localStorage.getItem('token');
 
@@ -624,116 +633,125 @@ h3 {
 .cancel-button:hover {
   background-color: #c82333;
 }
+/* 다이어리 모달 전체 */
 .detail-modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6); /* 반투명 배경 */
+  background-color: rgba(0, 0, 0, 0.6); /* 배경 어둡게 */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
+/* 다이어리 본문 */
 .detail-modal-content {
-  background: #ffffff; /* 화이트 배경 */
+  background: #fffdfa; /* 종이 같은 기본 색 */
   padding: 30px;
   border-radius: 15px;
-  width: 600px;
-  max-width: 90%; /* 반응형 크기 조정 */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  font-family: 'Noto Sans KR', sans-serif;
+  width: 500px;
+  max-width: 90%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  font-family: 'Noto Serif KR', serif; /* 다이어리 느낌 나는 폰트 */
+  line-height: 1.6;
   text-align: left;
-  font-size: 1.3rem;
-  font-weight: 500;
+  position: relative;
+  background-image: url('https://www.transparenttextures.com/patterns/linen-white.png'); /* 종이 질감 배경 */
+  background-size: cover;
+  background-repeat: repeat;
 }
 
-.modal-date {
-  font-size: 1.1rem;
-  color: #666;
-  margin-bottom: 10px;
+/* 다이어리 헤더 */
+.diary-header {
   text-align: center;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+  /* padding-bottom: 10px; */
 }
 
-.modal-title {
+.diary-date {
+  font-size: 1rem;
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.diary-title {
   font-size: 1.8rem;
   color: #333;
   font-weight: bold;
-  margin-bottom: 20px;
-  text-align: center;
 }
 
-.modal-content {
+/* 다이어리 본문 내용 */
+.diary-content {
   font-size: 1.2rem;
   color: #444;
-  line-height: 1.6;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  white-space: pre-line; /* 줄 바꿈 적용 */
 }
 
-.modal-emotion {
-  font-size: 1.2rem;
-  color: #555;
-  margin: 20px 0;
-}
-
-.emotion-highlight {
-  color: #ff007f; /* 강조 색상 */
-  font-weight: bold;
-}
-
-.movie-recommendations {
-  margin: 20px 0;
-}
-
-.recommend-link {
-  display: block;
+/* 영화 추천 섹션 */
+.movie-recommendations h4 {
+  font-size: 1.4rem;
+  color: #333;
   margin-bottom: 10px;
-  font-size: 1.1rem;
+}
+
+.recommendation {
+  margin-bottom: 15px;
+  padding: 7px;
+  background: #fffcf2; /* 약간 어두운 종이 느낌 */
+  border: 1px dashed #ddd;
+  border-radius: 8px;
+}
+
+.movie-title {
+  font-size: 1.2rem;
   color: #007bff;
   text-decoration: none;
-  transition: color 0.3s ease;
 }
 
-.recommend-link:hover {
+.movie-title:hover {
   color: #0056b3;
   text-decoration: underline;
 }
 
-.recommend-title {
-  color: #333;
-  font-weight: bold;
-}
-
-.recommend-reason {
+.reason {
   font-size: 1rem;
   color: #555;
-  margin: 10px 0;
-  line-height: 1.4;
-}
-
-.gpt-comment {
-  font-size: 1rem;
-  color: #777;
-  margin: 20px 0;
+  margin-top: 5px;
   font-style: italic;
 }
 
-.modal-actions {
-  text-align: center;
-  margin-top: 20px;
+/* AI 코멘트 */
+.gpt-comment h4 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 10px;
 }
 
+.gpt-comment p {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.5;
+  background: #fdfdfd;
+  border-left: 4px solid #ff007f; /* 강조 */
+  padding: 10px;
+  margin: 0;
+}
+
+/* 닫기 버튼 */
 .close-button {
+  /* margin-top: 20px; */
   padding: 10px 20px;
   font-size: 1rem;
   border: none;
   border-radius: 8px;
   background-color: #dc3545;
-  color: #fff;
+  color: white;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s;
 }
 
 .close-button:hover {
@@ -743,5 +761,6 @@ h3 {
 .close-button:active {
   transform: scale(0.98);
 }
+
  </style>
  
