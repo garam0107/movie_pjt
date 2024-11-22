@@ -31,7 +31,7 @@ import Header from './components/common/Header.vue';
 .container {
   flex: 1;
   width: 120%; /* 너비를 전체 차지하도록 설정 */
-  max-width: 1200px; /* 최대 너비를 설정해서 콘텐츠가 지나치게 넓어지지 않도록 */
+  max-width: 1200px; /*최대 너비를 설정해서 콘텐츠가 지나치게 넓어지지 않도록 */
   margin: 0 auto;
   padding: 20px; /* 여백 추가 */
   box-sizing: border-box; /* padding과 border를 포함해서 너비를 계산 */
