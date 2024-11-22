@@ -130,7 +130,7 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
-        fields = ['profile_image', 'nickname', 'name']
+        fields = ['profile_image', 'nickname']
 
 # 모든 유저 정보 들고오기
 class AllUserSerializer(serializers.ModelSerializer):
