@@ -91,7 +91,6 @@ def update(request, user_username):
 @api_view(['GET'])
 def top_users_by_stone(request):
     User = get_user_model()
-    # 모든 유저를 stone 필드 기준으로 내림차순 정렬 후 상위 10명 선택
     top_users = User.objects.all().order_by('-stone')[:4]
     serializer = AllUserSerializer(top_users, many=True)
     return Response(serializer.data)
