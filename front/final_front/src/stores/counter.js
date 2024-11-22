@@ -116,14 +116,42 @@ export const useMovieStore = defineStore('movie', () => {
       })
   }
   // 다이어리 수정
-  const updateDiary = () => {
-    pass
-  }
+  const updateDiary = (user_username, diary_pk, updateData) => {
+    return axios({
+      method: 'put',
+      url: `${API_URL}diaries/${user_username}/${diary_pk}/`,
+      headers: {
+        Authorization: `Token ${token.value}`
+      },
+      data: updateData
+    })
+    .then((res) => {
+      console.log('성공', res.data);
+      return res; // 응답을 반환해서 이후에 사용할 수 있도록 합니다.
+    })
+    .catch((err) => {
+      console.log('실패', err);
+      throw err; // 오류를 다시 던져서 호출자에서 이를 처리할 수 있게 합니다.
+    });
+  };
+  
   
 
   // 다이어리 삭제
-  const deleteDiary = () => {
-    pass
+  const deleteDiary = (user_username,diary_pk) => {
+    console.log(token.value)
+    axios({
+      method : 'delete',
+      url: `${API_URL}diaries/${user_username}/${diary_pk}/`,
+      headers :{
+        Authorization : `Token ${token.value}`
+      }
+    }).then((res) => {
+      console.log('성공',res.data)
+    }).catch((err) => {
+      console.log('실패', err)
+      console.log(err.response.data)
+    })
   }
 
 
@@ -162,6 +190,6 @@ export const useMovieStore = defineStore('movie', () => {
     token,
     userId,
     updateDiary,
-    deleteDiary
+    deleteDiary,
   }
 }, { persist: true })

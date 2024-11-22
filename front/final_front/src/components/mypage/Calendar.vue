@@ -21,6 +21,7 @@
             class="date"
             v-for="date in dates"
             :key="date.dateKey"
+            :data-date-key="date.dateKey"
             :class="{ today: isToday(date), otherMonth: !date.isCurrentMonth }"
             @click="openDiaryModal(date)"
           >
@@ -95,15 +96,58 @@
     </div>
     
     <div class="modal-actions">
-      <button class="my-button">수정</button>
-      <button class="my-button">삭제</button>      
+      <button @click="openEditModal" class="my-button">수정</button>
+      <button @click="openDeleteModal" class="my-button">삭제</button>      
       <button @click="closeDiaryModal" class="close-button">닫기</button>
     </div>
   </div>
 </div>
 
-
+<!-- 다이어리 수정 모달 -->
+<div v-if="showEditDiaryModal" class="modal">
+  <div class="modal-content">
+    <h3>다이어리 수정</h3>
+    <div class="form-group">
+      <input type="text" v-model="editDiaryTitle" placeholder="제목" class="form-input" />
+    </div>
+    <div class="form-group">
+      <textarea v-model="editDiaryContent" placeholder="내용" class="form-textarea"></textarea>
+    </div>
+    <div class="emoji-selection">
+      <h4>이모지 선택</h4>
+      <div class="emoji-container">
+        <button
+          v-for="emoji in emojis"
+          :key="emoji"
+          @click="selectEmoji2(emoji)"
+          :class="{ 'emoji-selected': editSelectedEmoji === emoji }"
+          class="emoji-button"
+        >
+          <img :src="emoji" alt="emoji" class="emoji-select-image" />
+        </button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button @click="updateDiary(props.userData.username, my_diary_pk)" class="submit-button">저장</button>
+      <button @click="closeEditModal" class="cancel-button">닫기</button>
+    </div>
   </div>
+</div>
+
+
+
+
+<!-- 다이어리 삭제 모달 -->
+<div v-if="showDeleteConfirmModal" class="modal">
+  <div class="modal-content">
+    <h3>정말 삭제하시겠습니까?</h3>
+    <div class="modal-actions">
+      <button @click="confirmDelete" class="submit-button">네</button>
+      <button @click="closeDeleteModal" class="cancel-button">아니오</button>
+    </div>
+  </div>
+</div>
+</div>
 </template>
 
  
@@ -111,7 +155,7 @@
 import { ref, watch, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-
+import { useMovieStore } from '@/stores/counter';
 // 이미지 파일 import
 import happy from '@/assets/images/happy.jpg';
 import sad from '@/assets/images/sad.jpg';
@@ -119,6 +163,7 @@ import angry from '@/assets/images/angry.jpg';
 import sleepy from '@/assets/images/sleepy.jpg';
 import excited from '@/assets/images/excited.jpg';
 import calm from '@/assets/images/calm.jpg';
+import router from '@/router';
 
 // defineProps는 setup 함수 바깥에서 선언
 const props = defineProps({
@@ -136,7 +181,7 @@ const props = defineProps({
 //   },
 //   { immediate: true }
 // );
-
+const store = useMovieStore()
 const today = new Date();
 const year = ref(today.getFullYear());
 const month = ref(today.getMonth());
@@ -245,28 +290,30 @@ const recommend_reasons2 = ref('')
 const recommend_movieID1 = ref('')
 const recommend_movieID2 = ref('')
 const gpt_emotion = ref('')
+const my_diary_pk = ref(null)
 
 const openDiaryModal = (date) => {
   const clickedDate = new Date(year.value, month.value, date.date,12);
-  console.log(clickedDate)
+
   const formattedClickedDate = clickedDate.toISOString().split('T')[0];
-  console.log(formattedClickedDate)
-  if (formattedClickedDate !== Diary_today) {
-    alert('다이어리가 없습니다');
-    return;
-  }
-  selectedDate.value = date; // 선택한 날짜 저장
-  console.log('선택날짜:', selectedDate.value)
-  console.log(selectedDate.value.dateKey)
   
+ 
+  selectedDate.value = date; // 선택한 날짜 저장
+
+
   fetchDiaryByDate(props.userData.username, selectedDate.value.dateKey)
     .then((response) => {
-      console.log(response.data)
-      if (response.data.exists === false) {
+      my_diary_pk.value = response.data.id
+      if (response.data.exists === false && formattedClickedDate !== Diary_today) {
         // 다이어리가 없는 경우: 작성 모달 열기
+
+        alert('당일에만 다이어리를 작성할 수 있습니다.')
+        return
+      }else if(response.data.exists === false && formattedClickedDate === Diary_today){
         showDiaryModal.value = true; // 작성 모달 열기
         detailDiaryModal.value = false; // 상세 모달 닫기
-      } else {
+      }
+      else {
         // 다이어리가 있는 경우: 상세 모달 열기
         diaryTitle.value = response.data.title;
         diaryContent.value = response.data.content;
@@ -331,6 +378,24 @@ const selectEmoji = (emoji) => {
   }
 };
 
+const selectEmoji2 = (emoji) => {
+  editSelectedEmoji.value = emojiMap[emoji] || null; // 매핑된 경로로 저장
+
+  // 모든 버튼 초기화 후 선택된 버튼에만 클래스 추가
+  const emojiButtons = document.querySelectorAll('.emoji-button');
+  emojiButtons.forEach((btn) => {
+    btn.classList.remove('emoji-selected');
+  });
+
+  const selectedButton = Array.from(emojiButtons).find(
+    (btn) => btn.querySelector('img').getAttribute('src') === emoji
+  );
+
+  if (selectedButton) {
+    selectedButton.classList.add('emoji-selected');
+  }
+};
+
 
 
 // 다이어리 저장
@@ -350,11 +415,6 @@ const submitDiary = () => {
 
 
 
-  console.log({
-    title: diaryTitle.value,
-    content: diaryContent.value,
-    mood_emoji: selectedEmoji.value,
-  });
 
   
   if (!token) {
@@ -394,12 +454,111 @@ const submitDiary = () => {
     });
 };
 
+// 하이라이트 표시
+const highlightDate = (dateKey) => {
+  // 달력에 있는 모든 날짜 요소를 찾습니다.
+  const dateElements = document.querySelectorAll('.date');
+
+  // 각 날짜 요소를 반복하며 우리가 찾는 날짜와 일치하는 요소를 찾습니다.
+  dateElements.forEach((dateElement) => {
+    if (dateElement.dataset.dateKey === dateKey) {
+      // 찾은 날짜 요소에 하이라이트 클래스를 추가합니다.
+      dateElement.classList.add('highlight');
+    } else {
+      // 나머지 날짜 요소에서는 하이라이트를 제거합니다.
+      dateElement.classList.remove('highlight');
+    }
+  });
+};
+
+
 // 다이어리 수정
+
+const showEditDiaryModal = ref(false);
+const editDiaryTitle = ref('');
+const editDiaryContent = ref('');
+const editSelectedEmoji = ref('');
+
+
+
+const updateDiary = (user_username, diary_pk) => {
+  // 수정된 데이터 정의
+  const updatedData = {
+    title: editDiaryTitle.value,        // 사용자가 입력한 제목
+    content: editDiaryContent.value,    // 사용자가 입력한 내용
+    mood_emoji: editSelectedEmoji.value // 사용자가 선택한 감정 이모지
+  };
+  console.log('수정할 데이터:', updatedData);
+  // 수정 함수 호출
+  store.updateDiary(user_username, diary_pk, updatedData)
+  .then((res) => {
+    console.log('다이어리 수정 성공:', res.data);
+    alert('다이어리가 성공적으로 수정되었습니다.');
+
+    // 모달 닫기
+    showEditDiaryModal.value = false;
+    detailDiaryModal.value = false;
+
+    // 달력 데이터 새로고침
+    createCalendar();
+
+    // 수정된 날짜 하이라이트
+    const updatedDateKey = selectedDate.value.dateKey; // 수정된 날짜의 dateKey 사용
+    highlightDate(updatedDateKey);
+  })
+  .catch((err) => {
+    console.log(err.data)
+    console.log(err.response.data)
+    console.error('다이어리 수정 실패:', err);
+    alert('다이어리 수정 중 문제가 발생했습니다.');
+  });
+
+};
+
+const openEditModal = () => {
+  // 수정하려는 다이어리의 기존 데이터를 수정 모달로 전달
+  editDiaryTitle.value = diaryTitle.value;      // 기존 제목
+  editDiaryContent.value = diaryContent.value;  // 기존 내용
+  editSelectedEmoji.value = selectedEmoji.value; // 기존 선택된 이모지
+
+  // 수정 모달을 열기
+  showEditDiaryModal.value = true;
+};
+
+
+const closeEditModal = () => {
+  editDiaryTitle.value = '';
+  editDiaryContent.value = '';
+  editSelectedEmoji.value = '';
+  showEditDiaryModal.value = false;
+};
+
 
 
 // 다이어리 삭제
+const showDeleteConfirmModal = ref(false)
+
+const openDeleteModal = () => {
+  showDeleteConfirmModal.value = true
+}
+const closeDeleteModal = () => {
+  showDeleteConfirmModal.value = false
+}
 
 
+const deleteDiary = (username,pk) =>{
+  store.deleteDiary(username,pk)
+  alert('다이어리가 삭제되었습니다.')
+  detailDiaryModal.value = false
+  router.go(0)
+}
+
+const confirmDelete = () => {
+  console.log(props.userData.username,my_diary_pk.value)
+  deleteDiary(props.userData.username, my_diary_pk.value)
+
+  closeDeleteModal()
+}
 
 // 컴포넌트가 마운트될 때 달력 생성
 onMounted(() => {
@@ -412,6 +571,7 @@ onMounted(() => {
 
  
  <style scoped>
+
  .calendar {
    max-width: 900px;
    margin: 20px auto;
@@ -797,5 +957,14 @@ h3 {
   cursor: pointer;
   margin-right: 10px;
 }
+.highlight {
+  border: 2px solid #ff007f; /* 핑크색 테두리 */
+  background-color: rgba(255, 0, 127, 0.1); /* 연한 배경색 */
+  transform: scale(1.05); /* 살짝 확대 */
+  transition: all 0.2s ease-in-out; /* 부드러운 효과 */
+}
+
+
+
  </style>
  

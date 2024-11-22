@@ -198,16 +198,69 @@ def user_diary(request, user_username):
 @api_view(['PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def update_diary(request, user_username, diary_pk):
-    if request.method == 'PUT':
-        diary = get_object_or_404(Diary, id=diary_pk, author__username = user_username)
+    # if request.method == 'PUT':
+    #     diary = get_object_or_404(Diary, id=diary_pk, author__username = user_username)
         
-        if request.user != diary.author:
-            return Response({"message": "수정할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+    #     if request.user != diary.author:
+    #         return Response({"message": "수정할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
 
+    #     serializer = DiarySerializer(diary, data=request.data, partial=True)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_200_OK)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    diary = get_object_or_404(Diary, id=diary_pk, author__username=user_username)
+
+    # 권한 확인
+    if request.user != diary.author:
+        return Response({"message": "수정할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+
+    if request.method == 'PUT':
         serializer = DiarySerializer(diary, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            with transaction.atomic():
+                # 다이어리 내용 업데이트
+                serializer.save()
+
+                # GPT 추천 재실행
+                try:
+                    updated_content = serializer.validated_data.get('content', diary.content)
+                    gpt_answer = gpt_recommend(updated_content)  # GPT 추천 호출
+                    print(gpt_answer)
+                    gpt_json_answer = make_json(gpt_answer)  # 응답 JSON으로 가공
+
+                    # 감정 및 추천 업데이트
+                    diary.analysis_emotion = gpt_json_answer['detected_emotion']
+                    reasons = {
+                        'today_diary_review1': gpt_json_answer['movies']['reason'][0],
+                        'today_diary_review2': gpt_json_answer['movies']['reason'][1],
+                    }
+                    diary.gpt_comment = gpt_json_answer.get('diary_review', diary.gpt_comment)
+
+                    # 기존 추천 영화 제거
+                    diary.recommend_movie.clear()
+
+                    # 새로운 추천 영화 추가
+                    movie_titles = gpt_json_answer['movies']['title']
+                    movies = Movie.objects.filter(title__in=movie_titles)
+                    for movie in movies:
+                        diary.recommend_movie.add(movie)
+
+                    # 추천 데이터 업데이트
+                    diary.recommend_movie_titles = gpt_json_answer['movies']['title']
+                    diary.recommend_reasons = reasons
+                    diary.save()
+
+                except Exception as e:
+                    return Response(
+                        {"message": "GPT 추천 업데이트 중 문제가 발생했습니다.", "error": str(e)},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    )
+
+                # 성공 응답
+                updated_data = DiaryDetailSerializer(diary).data
+                return Response(updated_data, status=status.HTTP_200_OK)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
