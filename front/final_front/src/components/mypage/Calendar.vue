@@ -83,7 +83,7 @@
       <p class="gpt-comment">{{ gpt_comment }}</p>
       
       <div class="modal-actions">
-        <button @click="detailDiaryModal = false" class="close-button">닫기</button>
+        <button @click="closeDiaryModal" class="close-button">닫기</button>
       </div>
     </div>
   </div>
