@@ -78,28 +78,27 @@ import MovieCommentComponent from '@/components/movie/MovieCommentComponent.vue'
 import router from '@/router';
 import { useMovieStore } from '@/stores/counter';
 import axios from 'axios';
-import { onMounted, ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { onMounted, ref, computed, onBeforeMount } from 'vue';
+import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 
 const store = useMovieStore();
 const route = useRoute();
+
 const isLiked = ref(false)
 const likeCount = ref(0)
-const movieId = route.params.movie_id
-
+const movieId = ref(route.params.movie_id)
 // 모달창.. 
 const showReviewModal = ref(false);
 const reviewTitle = ref('');
 const reviewContent = ref('');
 const selectedRating = ref(0);
 const hoveredRating = ref(0);
-
-onMounted(async () => {
-  await store.getDetailMovie(movieId);
+const fetchMovieDetails = () => {
+  store.getDetailMovie(movieId.value);
   if(store.token) {
     axios ({
       method: 'get',
-      url: `http://127.0.0.1:8000/movies/detail/${movieId}/like/`,
+      url: `http://127.0.0.1:8000/movies/detail/${movieId.value}/like/`,
       headers: {
         Authorization: `Token ${store.token}`,
       },
@@ -113,7 +112,19 @@ onMounted(async () => {
       console.log(err)
     })
   }
+};
+
+// 컴포넌트가 처음 마운트될 때 데이터 가져오기
+onMounted(() => {
+  fetchMovieDetails();
 });
+
+// 라우트 변경 감지하여 데이터 갱신
+onBeforeRouteUpdate((to) => {
+  movieId.value = to.params.movie_id; // 새 라우트의 movie_id
+  fetchMovieDetails(); // 새 데이터를 가져옴
+});
+
 const toggleLike = () => {
   if(!store.token){
     alert('로그인이 필요합니다.')

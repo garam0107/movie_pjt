@@ -6,13 +6,13 @@
         <div v-for="(movie, index) in weelyMovies" :key="movie.id" class="movie-item">
           <RouterLink :to="`/movie/${movie.id}`" class="movie-link">
             <img :src="`https://image.tmdb.org/t/p/w500/${movie.poster_path}`" alt="poster" class="poster_img">
+          </RouterLink>
             <div class="movie-info">
               <p class="movie_title">{{ movie.title }}</p>
               <p class="movie-details">
                 평점:  {{ movie.vote_average.toFixed(1) }} ★
               </p>
             </div>
-          </RouterLink>
         </div>
       </div>
     </div>
