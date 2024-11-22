@@ -72,6 +72,7 @@ class UserReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie_review
         fields= ['title', 'content','movie_title']
+        
 # 유저 정보
 class UserSerializer(serializers.ModelSerializer):
     my_review = UserReviewSerializer(source = 'moviereview_set', many = True, read_only = True)
