@@ -18,13 +18,15 @@ from rest_framework.decorators import api_view,permission_classes
 
 from .models import Diary
 from movies.models import Movie
-from .serializers import DiaryCreateSerializer, DiarySerializer,DiaryCommentSerializer,DiaryDetailSerializer
+from .serializers import DiaryCreateSerializer, DiarySerializer,DiaryCommentSerializer,DiaryDetailSerializer,GptAnswerSerializer
 # Create your views here.
 
 
 
-OPENAI_API_KEY = settings.OPENAI_API_KEY
 
+# OPENAI_API_KEY = "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"
+
+OPENAI_API_KEY = settings.OPENAI_API_KEY
 json_file_path = Path(__file__).resolve().parent/'updated_movies.json'
 
 def gpt_recommend(diary_text):
@@ -167,24 +169,25 @@ def user_diary(request, user_username):
                         }
 
                 # diary에 gpt_comment 추가
-                diary.gpt_comment = gpt_json_answer['diary_review']
-
+                if gpt_json_answer['diary_review']:
+                    diary.gpt_comment = gpt_json_answer['diary_review']
+                else:
+                    pass
                 # recommend_movie와 Moive가 M:N 관계이기 때문에 Movie 객체를 가져와야 한다.
                 # 제목을 통해 Moive 객체 가져오기
 
                 movie_titles = gpt_json_answer['movies']['title']
                 movies = Movie.objects.filter(title__in = movie_titles)
-
+                
                 for movie in movies:
-                    diary.recommend_movie.add(movie.title)
-
+                    diary.recommend_movie.add(movie)
+                # 추천 영화 제목 저장
+                diary.recommend_movie_titles = gpt_json_answer['movies']['title']
                 # diary에 추천 이유 저장
+               
                 diary.recommend_reasons = reasons
                 diary.save()
-                data = {
-                    'create_diary': serializer.data,
-                    'gpt_json_answer': gpt_json_answer,
-                    }
+                data = GptAnswerSerializer(diary).data
                 return Response(data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"message": "다이어리 작성 중 문제가 발생했습니다.", "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
@@ -240,4 +243,4 @@ def diary_by_date(request, user_username):
         serializer = DiaryDetailSerializer(diary)
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
-        return Response({"exists": False}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"exists": False}, status=status.HTTP_200_OK)
