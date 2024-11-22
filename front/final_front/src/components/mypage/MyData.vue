@@ -31,21 +31,21 @@
       <button @click="showModal = true">회원정보 수정</button>
 
       <button @click="showPasswordChange = true">비밀번호 수정</button>
-      <div v-if ="showPasswordChange" class = "modal">
+      <div v-if ="showPasswordChange" class = "modal-overlay">
         <div class="modal-content">
           <h2>비밀번호 수정</h2>
-          <input type="password" v-model="oldPassword" placeholder="현재 비밀번호" />
-          <input type="password" v-model="newPassword1" placeholder="새 비밀번호" />
-          <input type="password" v-model="newPassword2" placeholder="새 비밀번호 확인" />
+          <input type="password" v-model="oldPassword" placeholder="현재 비밀번호" class = "new-form-input">
+          <input type="password" v-model="newPassword1" placeholder="새 비밀번호" class = "new-form-input">
+          <input type="password" v-model="newPassword2" placeholder="새 비밀번호 확인" class = "new-form-input">
           <div class="modal-actions">
-            <button @click="changePassword">비밀번호 변경</button>
-            <button @click="closePasswordModal = false">취소</button>
+            <button @click="changePassword" class="submit-button">비밀번호 변경</button>
+            <button @click="closePasswordModal" class="cancel-button">취소</button>
           </div>
         </div>
       </div>
 
       <button @click="openDeleteModal">회원 탈퇴</button>
-      <div v-if = "showDeleteModal" class = "modal">
+      <div v-if = "showDeleteModal" class = "modal-overlay">
         <div class = "modal-content">
           <h2>회원 탈퇴</h2>
           <p>비밀번호를 입력해주세요.</p>
@@ -54,10 +54,11 @@
           v-model="password" 
           placeholder="비밀번호" 
           @keyup.enter="userDelete"
-           />
+          class = "form-input" 
+          >
         <div class="modal-actions">
-          <button @click="userDelete">탈퇴하기</button>
-          <button @click="closeDeleteModal">취소</button>
+          <button @click="userDelete" class="submit-button">탈퇴하기</button>
+          <button @click="closeDeleteModal" class="cancel-button">취소</button>
         </div>
         </div>
       </div>
@@ -255,13 +256,31 @@ const newPassword1 = ref('')
 const newPassword2 = ref('')
 const showPasswordChange = ref(false)
 const closePasswordModal = () => {
-  showPasswordChange.value = true
+  showPasswordChange.value = false
   oldPassword.value = ''
   newPassword1.value = ''
   newPassword2.value = ''
 }
 
-
+const changePassword = () => {
+  axios({
+    method: 'put',
+    url: `http://127.0.0.1:8000/accounts/password/change/`,
+    headers: {
+        Authorization: `Token ${store.token}`
+    },
+    data: {
+      oldPassword : oldPassword.value,
+      newPassword1 : newPassword1.value,
+      newPassword2 : newPassword2.value
+      }
+  }).then((res) => {
+    console.log(res)
+    alert('비밀번호가 성공적으로 변경되었습니다.')
+  }).catch((err) => {
+    console.log(err)
+  })
+}
 
 // 회원탈퇴
 const userDelete = () => {
@@ -444,7 +463,6 @@ button:active {
 .submit-button {
   background-color: #666;
   color: #fff;
-  margin-top: 5px;
   font-family: "Noto Sans KR", sans-serif;
 }
 
@@ -515,6 +533,18 @@ input[type="radio"]:checked + .profile-img {
   width: 80%;
   padding: 15px;
   font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: #fafafa;
+}
+
+.new-form-input {
+  width: 80%;
+  padding: 15px;
+  font-size: 1rem;
+  margin-bottom: 10px;
   border: 1px solid #ddd;
   border-radius: 10px;
   outline: none;

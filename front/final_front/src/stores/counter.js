@@ -115,7 +115,18 @@ export const useMovieStore = defineStore('movie', () => {
         clearAuthState()// 실패해도 클라이언트 상태 초기화
       })
   }
+  // 다이어리 수정
+  const updateDiary = () => {
+    pass
+  }
   
+
+  // 다이어리 삭제
+  const deleteDiary = () => {
+    pass
+  }
+
+
   // 클라이언트 상태 초기화 함수
   const clearAuthState = function() {
     token.value = null
@@ -149,6 +160,8 @@ export const useMovieStore = defineStore('movie', () => {
     checkAuthentication,
     isAuthenticated,
     token,
-    userId
+    userId,
+    updateDiary,
+    deleteDiary
   }
 }, { persist: true })

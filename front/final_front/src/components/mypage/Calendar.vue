@@ -14,6 +14,9 @@
           <div class="day" v-for="day in days" :key="day">{{ day }}</div>
         </div>
         <div class="dates">
+          <template>
+
+          </template>
           <div
             class="date"
             v-for="date in dates"
@@ -60,7 +63,7 @@
       </div>
     </div>
   </div>
-
+  <!-- 다이어리 상세 내용 모달 -->
   <div v-if="detailDiaryModal" class="detail-modal">
   <div class="detail-modal-content">
     <div class="diary-header">
@@ -90,7 +93,10 @@
       <h4>AI의 한마디</h4>
       <p>{{ gpt_comment }}</p>
     </div>
+    
     <div class="modal-actions">
+      <button class="my-button">수정</button>
+      <button class="my-button">삭제</button>      
       <button @click="closeDiaryModal" class="close-button">닫기</button>
     </div>
   </div>
@@ -241,6 +247,14 @@ const recommend_movieID2 = ref('')
 const gpt_emotion = ref('')
 
 const openDiaryModal = (date) => {
+  const clickedDate = new Date(year.value, month.value, date.date,12);
+  console.log(clickedDate)
+  const formattedClickedDate = clickedDate.toISOString().split('T')[0];
+  console.log(formattedClickedDate)
+  if (formattedClickedDate !== Diary_today) {
+    alert('다이어리가 없습니다');
+    return;
+  }
   selectedDate.value = date; // 선택한 날짜 저장
   console.log('선택날짜:', selectedDate.value)
   console.log(selectedDate.value.dateKey)
@@ -379,6 +393,13 @@ const submitDiary = () => {
       console.log(error.response.data)
     });
 };
+
+// 다이어리 수정
+
+
+// 다이어리 삭제
+
+
 
 // 컴포넌트가 마운트될 때 달력 생성
 onMounted(() => {
@@ -607,7 +628,7 @@ h3 {
 .modal-actions {
   margin-top: 20px;
   display: flex;
-  justify-content: space-between;
+
 }
 
 .submit-button,
@@ -657,7 +678,7 @@ h3 {
   background: #fffdfa; /* 종이 같은 기본 색 */
   padding: 30px;
   border-radius: 15px;
-  width: 500px;
+  width: 650px;
   max-width: 90%;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   font-family: 'Noto Serif KR', serif; /* 다이어리 느낌 나는 폰트 */
@@ -766,6 +787,15 @@ h3 {
 .close-button:active {
   transform: scale(0.98);
 }
-
+.my-button{
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #35b5dc;
+  color: white;
+  cursor: pointer;
+  margin-right: 10px;
+}
  </style>
  
