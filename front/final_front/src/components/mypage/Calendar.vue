@@ -52,9 +52,24 @@
 
   <div v-if="detailDiaryModal" class="modal">
   <!-- 상세 모달 내용 -->
-    <h3>{{ diaryTitle }}</h3>
-    <p>{{ diaryContent }}</p>
-    <img :src="selectedEmoji" alt="감정 이모지" />
+   <div class="modal-content">
+     <h3> {{selectedDate.dateKey}}</h3>
+     <h1>{{ diaryTitle }}</h1>
+     <h3>{{ diaryContent }}</h3>
+     <RouterLink  :to="{ name: 'detail', params: { movie_id: recommend_movieID1 } }">
+       <p >첫번째 추천 영화: {{ recommend_movies[0] }}</p>
+    </RouterLink>
+    <RouterLink  :to="{ name: 'detail', params: { movie_id: recommend_movieID2 } }">
+      <p>두번째 추천 영화: {{ recommend_movies[1] }}</p>
+    </RouterLink>
+     <p>{{recommend_reasons1}}</p>
+     <p>{{ recommend_reasons2 }}</p>
+     <p>{{ gpt_comment }}</p>
+     <div class="modal-actions">
+       <button @click="detailDiaryModal = false">닫기</button>
+     </div>
+     <h1></h1>
+   </div>
   </div>
 
   </div>
@@ -64,7 +79,7 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import axios from 'axios';
-import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 // 이미지 파일 import
 import happy from '@/assets/images/happy.jpg';
@@ -79,7 +94,7 @@ const props = defineProps({
   userData: Object,
 });
 
-const route = useRoute();
+
 
 
 // watch(
@@ -109,6 +124,7 @@ const diaryContent = ref('');
 const selectedEmoji = ref(null);
 const Diary_today = new Date().toISOString().split('T')[0]
 const token = localStorage.getItem('token');
+
 
 const emojiMap = {
   '/src/assets/images/angry.jpg': 'emotions/angry.jpg',
@@ -191,37 +207,38 @@ const isToday = (date) => {
 
 
 const fetchDiaryByDate = (username, date) => {
-  axios
-    .get(`http://127.0.0.1:8000/diaries/${username}/by-date/`, {
-      params: { date: date },
-      headers: { Authorization: `Token ${token}` },
-    })
-    .then((response) => {
-      if (response.data.exists === false) {
-        console.log("다이어리가 없습니다.");
-      } else {
-        console.log("다이어리 상세 정보:", response.data);
-      }
-    })
-    .catch((error) => {
-      console.error("API 호출 중 오류 발생:", error);
-    });
-};
+  return axios({
+    method: 'get',
+    url: `http://127.0.0.1:8000/diaries/${username}/by_date/`,
+    params: { date: date },
+    headers: { Authorization: `Token ${token}` }
+  })
+}
 
 
 
 
 // 다이어리 작성 모달 열기
 // const openDiaryModal = (date) => {
- 
+
 //     selectedDate.value = date;
 //     showDiaryModal.value = true;
 // };
+const gpt_comment = ref('')
+const recommend_movies = ref([])
+const recommend_reasons1 = ref('')
+const recommend_reasons2 = ref('')
+const recommend_movieID1 = ref('')
+const recommend_movieID2 = ref('')
+
 const openDiaryModal = (date) => {
   selectedDate.value = date; // 선택한 날짜 저장
-
+  console.log('선택날짜:', selectedDate.value)
+  console.log(selectedDate.value.dateKey)
+  
   fetchDiaryByDate(props.userData.username, selectedDate.value.dateKey)
     .then((response) => {
+      console.log(response.data)
       if (response.data.exists === false) {
         // 다이어리가 없는 경우: 작성 모달 열기
         showDiaryModal.value = true; // 작성 모달 열기
@@ -230,15 +247,32 @@ const openDiaryModal = (date) => {
         // 다이어리가 있는 경우: 상세 모달 열기
         diaryTitle.value = response.data.title;
         diaryContent.value = response.data.content;
-        selectedEmoji.value = response.data.mood_emoji; // 이모지 데이터 설정
+        selectedEmoji.value = response.data.mood_emoji;
+        gpt_comment.value = response.data.gpt_comment
+     
+        recommend_movies.value = response.data.recommend_movie_titles
+        recommend_reasons1.value = response.data.recommend_reasons['today_diary_review1']
+        recommend_reasons2.value = response.data.recommend_reasons['today_diary_review2']   
+        recommend_movieID1.value = response.data.recommend_movie[0]
+        recommend_movieID2.value = response.data.recommend_movie[1]
+     
         detailDiaryModal.value = true; // 상세 모달 열기
         showDiaryModal.value = false; // 작성 모달 닫기
       }
     })
-    .catch((error) => {
-      console.error("다이어리 확인 실패:", error);
-      console.log(err.response.data)
-    });
+   .catch((error) => {
+  console.error("다이어리 확인 실패:", error);
+  if (error.response) {
+    // 서버에서의 응답 오류 (4xx, 5xx)
+    console.log("서버 응답 오류:", error.response.data);
+  } else if (error.request) {
+    // 요청이 전송되었지만 응답이 없는 경우
+    console.log("서버로부터 응답이 없습니다. 네트워크 문제일 수 있습니다.", error.request);
+  } else {
+    // 요청 설정 오류 등 기타 오류
+    console.log("오류가 발생했습니다:", error.message);
+  }
+});
 };
 
 
@@ -249,6 +283,7 @@ const closeModal = () => {
   selectedEmoji.value = null
   showDiaryModal.value = false
 }
+
 
 
 // 이모지 선택

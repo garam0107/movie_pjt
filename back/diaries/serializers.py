@@ -31,3 +31,14 @@ class DiaryDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Diary
         fields = '__all__'
+
+class GptAnswerSerializer(serializers.ModelSerializer):
+    recommend_movie_titles = serializers.SerializerMethodField()
+    class Meta:
+        model = Diary
+        fields = [  'id', 'date', 'mood_emoji', 'title', 'content',
+            'gpt_comment', 'recommend_reasons', 'author',
+            'recommend_movie_titles', 'like_users','recommend_movie']
+        
+    def get_recommend_movie_titles(self, obj):
+        return [movie.title for movie in obj.recommend_movie.all()]
