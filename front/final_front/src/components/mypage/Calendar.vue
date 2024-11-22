@@ -390,7 +390,7 @@ onMounted(() => {
 
 
  
- <style>
+ <style scoped>
  .calendar {
    max-width: 900px;
    margin: 20px auto;
