@@ -28,7 +28,24 @@
     <div class="actions" v-if="userId == store.userId">
       <button @click="showModal = true">회원정보 수정</button>
       <button @click="showPasswordChange = true">비밀번호 수정</button>
-      <button @click="userDelete">회원 탈퇴</button>
+
+      <button @click="openDeleteModal">회원 탈퇴</button>
+      <div v-if = "showDeleteModal" class = "modal">
+        <div class = "modal-content">
+          <h3>회원 탈퇴</h3>
+          <p>비밀번호를 입력해주세요.</p>
+          <input 
+          type="password" 
+          v-model="password" 
+          placeholder="비밀번호" 
+          @keyup.enter="userDelete"
+           />
+        <div class="modal-actions">
+          <button @click="userDelete">탈퇴하기</button>
+          <button @click="closeDeleteModal">취소</button>
+        </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -206,6 +223,19 @@ const toggleFollow = () => {
 }
 
 
+
+const showDeleteModal = ref(false)
+const password = ref('')
+
+const openDeleteModal = () => {
+  showDeleteModal.value = true
+}
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  password.value = ''
+}
+
+
 // 회원탈퇴
 const userDelete = () => {
   axios({
@@ -213,13 +243,17 @@ const userDelete = () => {
     url: `http://127.0.0.1:8000/accounts/delete/`,
     headers: {
       Authorization: `Token ${store.token}`
+    },
+    data: {
+      password : password.value
     }
   })
     .then(() => {
+      alert('회원탈퇴가 완료되었습니다.')
     router.push({name:'main'})
-    }).catch((err) => {
+    })
+    .catch((err) => {
       console.log(err)
-      console.log(err.response.data)
   })
 }
 
@@ -337,6 +371,19 @@ button:active {
   z-index: 1000;
 }
 
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
 .modal-content {
   font-family: "Noto Sans KR", sans-serif;
   background: #fff;
@@ -345,6 +392,16 @@ button:active {
   width: 380px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   text-align: center;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-actions button {
+  padding: 8px 12px;
 }
 
 .submit-button,
