@@ -31,28 +31,39 @@
     </div>
 
     <!-- 다이어리 작성 모달 -->
-
     <div v-if="showDiaryModal" class="modal">
-      <div class="modal-content">
-        <h3>다이어리 작성</h3>
-        <input type="text" v-model="diaryTitle" placeholder="제목" />
-        <textarea v-model="diaryContent" placeholder="내용"></textarea>
-        <div class="emoji-selection">
-          <h4>이모지 선택</h4>
-          <button v-for="emoji in emojis" :key="emoji" @click="selectEmoji(emoji)">
-            <img :src="emoji" alt="emoji" class="emoji-select-image" />
-          </button>
-        </div>
-        <div class="modal-actions">
-          <button @click="submitDiary">저장</button>
-          <button @click="closeModal">닫기</button>
-        </div>
+  <div class="modal-content">
+    <h3>다이어리 작성</h3>
+    <div class="form-group">
+      <input type="text" v-model="diaryTitle" placeholder="제목" class="form-input" />
+    </div>
+    <div class="form-group">
+      <textarea v-model="diaryContent" placeholder="내용" class="form-textarea"></textarea>
+    </div>
+    <div class="emoji-selection">
+      <h4>이모지 선택</h4>
+      <div class="emoji-container">
+        <button
+          v-for="emoji in emojis"
+          :key="emoji"
+          @click="selectEmoji(emoji)"
+          :class="{ 'emoji-selected': selectedEmoji === emoji }"
+          class="emoji-button"
+        >
+          <img :src="emoji" alt="emoji" class="emoji-select-image" />
+        </button>
       </div>
     </div>
+    <div class="modal-actions">
+      <button @click="submitDiary" class="submit-button">저장</button>
+      <button @click="closeModal" class="cancel-button">닫기</button>
+    </div>
+  </div>
+</div>
 
-  <div v-if="detailDiaryModal" class="modal">
+  <div v-if="detailDiaryModal" class="detail-modal">
   <!-- 상세 모달 내용 -->
-   <div class="modal-content">
+   <div class="detail-modal-content">
      <h3> {{selectedDate.dateKey}}</h3>
      <h1>{{ diaryTitle }}</h1>
      <h3>{{ diaryContent }}</h3>
@@ -62,8 +73,8 @@
     <RouterLink  :to="{ name: 'detail', params: { movie_id: recommend_movieID2 } }">
       <p>두번째 추천 영화: {{ recommend_movies[1] }}</p>
     </RouterLink>
-     <p>{{recommend_reasons1}}</p>
-     <p>{{ recommend_reasons2 }}</p>
+     <p> 첫 번째 영화 추천 이유 :{{recommend_reasons1}}</p>
+     <p> 두 번째 영화 추천 이유 :{{ recommend_reasons2 }}</p>
      <p>{{ gpt_comment }}</p>
      <div class="modal-actions">
        <button @click="detailDiaryModal = false">닫기</button>
@@ -93,10 +104,6 @@ import calm from '@/assets/images/calm.jpg';
 const props = defineProps({
   userData: Object,
 });
-
-
-
-
 // watch(
 //   () => props.userData,
 //   (newUserData) => {
@@ -134,10 +141,6 @@ const emojiMap = {
   '/src/assets/images/sad.jpg': 'emotions/sad.jpg',
   '/src/assets/images/sleepy.jpg': 'emotions/sleepy.jpg',
 };
-
-
-
-
 
 // 달력 생성
 const createCalendar = () => {
@@ -215,15 +218,6 @@ const fetchDiaryByDate = (username, date) => {
   })
 }
 
-
-
-
-// 다이어리 작성 모달 열기
-// const openDiaryModal = (date) => {
-
-//     selectedDate.value = date;
-//     showDiaryModal.value = true;
-// };
 const gpt_comment = ref('')
 const recommend_movies = ref([])
 const recommend_reasons1 = ref('')
@@ -285,14 +279,23 @@ const closeModal = () => {
 }
 
 
-
-// 이모지 선택
 const selectEmoji = (emoji) => {
-  selectedEmoji.value = emojiMap[emoji] || null; // 매핑해서 경로 바꿔주기 
-  console.log(selectedEmoji.value)
+  selectedEmoji.value = emojiMap[emoji] || null; // 매핑된 경로로 저장
+
+  // 모든 버튼 초기화 후 선택된 버튼에만 클래스 추가
+  const emojiButtons = document.querySelectorAll('.emoji-button');
+  emojiButtons.forEach((btn) => {
+    btn.classList.remove('emoji-selected');
+  });
+
+  const selectedButton = Array.from(emojiButtons).find(
+    (btn) => btn.querySelector('img').getAttribute('src') === emoji
+  );
+
+  if (selectedButton) {
+    selectedButton.classList.add('emoji-selected');
+  }
 };
-
-
 
 
 
@@ -318,12 +321,7 @@ const submitDiary = () => {
     content: diaryContent.value,
     mood_emoji: selectedEmoji.value,
   });
-  // if (!user_pk.value) {
-  //   console.error('사용자 ID가 존재하지 않습니다.');
-  //   return;
-  // }
 
-  // 인증 토큰이 있는지 확인
   
   if (!token) {
     alert('로그인이 필요합니다.');
@@ -457,7 +455,7 @@ onMounted(() => {
    display: flex;
    align-items: center;
    justify-content: center;
- }
+ } 
  
  .modal-content {
    background: white;
@@ -470,6 +468,156 @@ onMounted(() => {
    width: 30px;
    height: 30px;
    margin: 5px;
- }
+ } 
+
+ .modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  font-family: 'Noto Sans KR', sans-serif;
+  text-align: center;
+}
+
+h3 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-input {
+  width: 80%;
+  padding: 15px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: #fafafa;
+}
+
+.form-input:focus {
+  border-color: #ff007f;
+  box-shadow: 0 0 5px rgba(255, 0, 127, 0.3);
+}
+
+.form-textarea {
+  width: 80%;
+  height: 150px;
+  padding: 15px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  resize: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: #fafafa;
+}
+
+.form-textarea:focus {
+  border-color: #ff007f;
+  box-shadow: 0 0 5px rgba(255, 0, 127, 0.3);
+}
+
+.emoji-selection {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.emoji-selection h4 {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.emoji-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 윗줄에 4개 배치 */
+  gap: 10px; /* 이모지 간격 */
+  justify-content: center;
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+
+.emoji-button {
+  border: none;
+  background: none;
+  padding: 5px;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.3s;
+  display: inline-block;
+}
+
+.emoji-button:hover {
+  transform: scale(1.1);
+}
+
+.emoji-button img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid transparent; /* 기본 테두리 없음 */
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.emoji-button.emoji-selected img {
+  border-color: #ff007f; /* 핑크색 테두리 */
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.3); /* 부드러운 그림자 */
+  transform: scale(1.15); /* 살짝 확대 */
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.submit-button,
+.cancel-button {
+  width: 48%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.submit-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.submit-button:hover {
+  background-color: #218838;
+}
+
+.cancel-button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #c82333;
+}
+
  </style>
  
