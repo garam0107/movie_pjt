@@ -32,7 +32,7 @@
 
     <!-- 다이어리 작성 모달 -->
     <div v-if="showDiaryModal" class="modal">
-  <div class="modal-content">
+    <div class="modal-content">
     <h3>다이어리 작성</h3>
     <div class="form-group">
       <input type="text" v-model="diaryTitle" placeholder="제목" class="form-input" />
@@ -54,34 +54,38 @@
         </button>
       </div>
     </div>
-    <div class="modal-actions">
-      <button @click="submitDiary" class="submit-button">저장</button>
-      <button @click="closeModal" class="cancel-button">닫기</button>
+      <div class="modal-actions">
+        <button @click="submitDiary" class="submit-button">저장</button>
+        <button @click="closeModal" class="cancel-button">닫기</button>
+      </div>
     </div>
   </div>
-</div>
 
+  <!-- 상세모달 -->
   <div v-if="detailDiaryModal" class="detail-modal">
-  <!-- 상세 모달 내용 -->
-   <div class="detail-modal-content">
-     <h3> {{selectedDate.dateKey}}</h3>
-     <h1>{{ diaryTitle }}</h1>
-     <h3>{{ diaryContent }}</h3>
-     <h3>당신의 감정은? {{gpt_emotion}}</h3>
-     <RouterLink  :to="{ name: 'detail', params: { movie_id: recommend_movieID1 } }">
-       <p >첫번째 추천 영화: {{ recommend_movies[0] }}</p>
-    </RouterLink>
-    <RouterLink  :to="{ name: 'detail', params: { movie_id: recommend_movieID2 } }">
-      <p>두번째 추천 영화: {{ recommend_movies[1] }}</p>
-    </RouterLink>
-     <p> 첫 번째 영화 추천 이유 :{{recommend_reasons1}}</p>
-     <p> 두 번째 영화 추천 이유 :{{ recommend_reasons2 }}</p>
-     <p>{{ gpt_comment }}</p>
-     <div class="modal-actions">
-       <button @click="detailDiaryModal = false">닫기</button>
-     </div>
-     <h1></h1>
-   </div>
+    <div class="detail-modal-content">
+      <h3 class="modal-date">{{ selectedDate.dateKey }}</h3>
+      <h1 class="modal-title">{{ diaryTitle }}</h1>
+      <h3 class="detail-modal-content">{{ diaryContent }}</h3>
+      <h4 class="modal-emotion">당신의 감정은? <span class="emotion-highlight">{{ gpt_emotion }}</span></h4>
+      
+      <div class="movie-recommendations">
+        <RouterLink :to="{ name: 'detail', params: { movie_id: recommend_movieID1 } }" class="recommend-link">
+          <p>첫번째 추천 영화: <span class="recommend-title">{{ recommend_movies[0] }}</span></p>
+        </RouterLink>
+        <RouterLink :to="{ name: 'detail', params: { movie_id: recommend_movieID2 } }" class="recommend-link">
+          <p>두번째 추천 영화: <span class="recommend-title">{{ recommend_movies[1] }}</span></p>
+        </RouterLink>
+      </div>
+
+      <p class="recommend-reason">첫 번째 영화 추천 이유: {{ recommend_reasons1 }}</p>
+      <p class="recommend-reason">두 번째 영화 추천 이유: {{ recommend_reasons2 }}</p>
+      <p class="gpt-comment">{{ gpt_comment }}</p>
+      
+      <div class="modal-actions">
+        <button @click="detailDiaryModal = false" class="close-button">닫기</button>
+      </div>
+    </div>
   </div>
 
   </div>
@@ -620,6 +624,124 @@ h3 {
 .cancel-button:hover {
   background-color: #c82333;
 }
+.detail-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* 반투명 배경 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
+.detail-modal-content {
+  background: #ffffff; /* 화이트 배경 */
+  padding: 30px;
+  border-radius: 15px;
+  width: 600px;
+  max-width: 90%; /* 반응형 크기 조정 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  font-family: 'Noto Sans KR', sans-serif;
+  text-align: left;
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.modal-date {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.modal-title {
+  font-size: 1.8rem;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.modal-content {
+  font-size: 1.2rem;
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.modal-emotion {
+  font-size: 1.2rem;
+  color: #555;
+  margin: 20px 0;
+}
+
+.emotion-highlight {
+  color: #ff007f; /* 강조 색상 */
+  font-weight: bold;
+}
+
+.movie-recommendations {
+  margin: 20px 0;
+}
+
+.recommend-link {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.recommend-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.recommend-title {
+  color: #333;
+  font-weight: bold;
+}
+
+.recommend-reason {
+  font-size: 1rem;
+  color: #555;
+  margin: 10px 0;
+  line-height: 1.4;
+}
+
+.gpt-comment {
+  font-size: 1rem;
+  color: #777;
+  margin: 20px 0;
+  font-style: italic;
+}
+
+.modal-actions {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.close-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #dc3545;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.close-button:hover {
+  background-color: #c82333;
+}
+
+.close-button:active {
+  transform: scale(0.98);
+}
  </style>
  
