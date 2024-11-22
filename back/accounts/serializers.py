@@ -79,17 +79,22 @@ class UserSerializer(serializers.ModelSerializer):
     recommend_movie = UserMovieSerializer(source = 'diaries', many = True, read_only = True)
     followings_count = serializers.SerializerMethodField()
     followers_count = serializers.SerializerMethodField()
-
+    class RecommendMovieSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Diary
+            fields = ['recommend_movie_titles']
+    movies_titles = RecommendMovieSerializer(source='diaries', many=True, read_only=True)  
     class Meta:
         model = UserModel
         fields = ['id','name', 'username', 'email', 'first_name', 'last_name', 'nickname', 'profile_image', 'visit_count',
-                  'my_review','recommend_movie','followings','followers','followings_count','followers_count','stone']
+                  'my_review','recommend_movie','followings','followers','followings_count','followers_count','stone','movies_titles']
         
     def get_followings_count(self, obj):
         return obj.followings.count()
 
     def get_followers_count(self, obj):
         return obj.followers.count()
+    
     
 # 유저 정보 가져오기
 class CustomUserDetailsSerializer(UserDetailsSerializer):
