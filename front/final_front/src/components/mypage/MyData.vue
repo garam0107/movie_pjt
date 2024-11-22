@@ -26,13 +26,28 @@
       </div>
     </div>
     <div class="actions" v-if="userId == store.userId">
+
+
       <button @click="showModal = true">회원정보 수정</button>
+
       <button @click="showPasswordChange = true">비밀번호 수정</button>
+      <div v-if ="showPasswordChange" class = "modal">
+        <div class="modal-content">
+          <h2>비밀번호 수정</h2>
+          <input type="password" v-model="oldPassword" placeholder="현재 비밀번호" />
+          <input type="password" v-model="newPassword1" placeholder="새 비밀번호" />
+          <input type="password" v-model="newPassword2" placeholder="새 비밀번호 확인" />
+          <div class="modal-actions">
+            <button @click="changePassword">비밀번호 변경</button>
+            <button @click="closePasswordModal = false">취소</button>
+          </div>
+        </div>
+      </div>
 
       <button @click="openDeleteModal">회원 탈퇴</button>
       <div v-if = "showDeleteModal" class = "modal">
         <div class = "modal-content">
-          <h3>회원 탈퇴</h3>
+          <h2>회원 탈퇴</h2>
           <p>비밀번호를 입력해주세요.</p>
           <input 
           type="password" 
@@ -86,8 +101,7 @@
   </div>
 
 
-  <!-- 비밀번호 수정 모달 -->
-  
+
 
 
 
@@ -234,6 +248,19 @@ const closeDeleteModal = () => {
   showDeleteModal.value = false
   password.value = ''
 }
+
+// 비밀번호 수정
+const oldPassword = ref('')
+const newPassword1 = ref('')
+const newPassword2 = ref('')
+const showPasswordChange = ref(false)
+const closePasswordModal = () => {
+  showPasswordChange.value = true
+  oldPassword.value = ''
+  newPassword1.value = ''
+  newPassword2.value = ''
+}
+
 
 
 // 회원탈퇴
