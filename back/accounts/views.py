@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model,logout
 from django.shortcuts import render,get_list_or_404,get_object_or_404
 
 from dj_rest_auth.models import TokenModel
@@ -104,3 +104,21 @@ def check_username(request):
             return Response({'available' : False, 'message': '이미 사용 중인 ID입니다.'})
         return Response({'available' : True, 'message': '사용 가능한 ID입니다.'})
     return Response({'error': 'username 파라미터가 필요합니다.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete(request):
+    user = request.user
+    password = request.data.get('password')
+
+    if not password:
+        return Response({'message' : '비밀번호를 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not user.check_password(password):
+        return Response({'message': '비밀번호가 틀렸습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    user.delete()
+    logout(request)
+    return Response({'message' : '회원 탈퇴'})
