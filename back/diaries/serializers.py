@@ -38,7 +38,7 @@ class GptAnswerSerializer(serializers.ModelSerializer):
         model = Diary
         fields = [  'id', 'date', 'mood_emoji', 'title', 'content',
             'gpt_comment', 'recommend_reasons', 'author',
-            'recommend_movie_titles', 'like_users','recommend_movie']
+            'recommend_movie_titles', 'like_users','recommend_movie', 'analysis_emotion']
         
     def get_recommend_movie_titles(self, obj):
         return [movie.title for movie in obj.recommend_movie.all()]

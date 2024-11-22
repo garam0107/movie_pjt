@@ -56,6 +56,7 @@
      <h3> {{selectedDate.dateKey}}</h3>
      <h1>{{ diaryTitle }}</h1>
      <h3>{{ diaryContent }}</h3>
+     <h3>당신의 감정은? {{gpt_emotion}}</h3>
      <RouterLink  :to="{ name: 'detail', params: { movie_id: recommend_movieID1 } }">
        <p >첫번째 추천 영화: {{ recommend_movies[0] }}</p>
     </RouterLink>
@@ -230,6 +231,7 @@ const recommend_reasons1 = ref('')
 const recommend_reasons2 = ref('')
 const recommend_movieID1 = ref('')
 const recommend_movieID2 = ref('')
+const gpt_emotion = ref('')
 
 const openDiaryModal = (date) => {
   selectedDate.value = date; // 선택한 날짜 저장
@@ -255,7 +257,7 @@ const openDiaryModal = (date) => {
         recommend_reasons2.value = response.data.recommend_reasons['today_diary_review2']   
         recommend_movieID1.value = response.data.recommend_movie[0]
         recommend_movieID2.value = response.data.recommend_movie[1]
-     
+        gpt_emotion.value = response.data.analysis_emotion
         detailDiaryModal.value = true; // 상세 모달 열기
         showDiaryModal.value = false; // 작성 모달 닫기
       }

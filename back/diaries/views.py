@@ -161,8 +161,12 @@ def user_diary(request, user_username):
                 user.save()
                 user_data = serializer.data['content'] # 사용자가 쓴 일기 내용
                 gpt_answer = gpt_recommend(user_data) # gpt의 답변
+                print(gpt_answer)
                 gpt_json_answer = make_json(gpt_answer) # gpt 답변 json으로 가공
-             
+
+
+                # gpt가 분석한 감정 저장
+                diary.analysis_emotion = gpt_json_answer['detected_emotion']
                 # gpt가 영화를 추천한 이유를 딕셔너리 형태로 저장
                 reasons = {'today_diary_review1' : gpt_json_answer['movies']['reason'][0],
                         'today_diary_review2' : gpt_json_answer['movies']['reason'][1]

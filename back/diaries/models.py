@@ -20,6 +20,7 @@ class Diary(models.Model):
     recommend_movie = models.ManyToManyField(Movie, blank=True)
     recommend_movie_titles = models.JSONField(blank=True, null=True)
     recommend_reasons = models.JSONField(blank=True, null=True)
+    analysis_emotion = models.TextField(blank=True)
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_diaries', blank=True)
     class Meta:
         constraints = [
