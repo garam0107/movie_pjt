@@ -57,6 +57,10 @@ const results = ref([])
 const search = ref('')
 const movieData = ref(null)
 
+router.afterEach(() => {
+  results.value = []
+})
+
 const searchMovie = () => {
     if (search.value.length > 0) {
       axios({
@@ -68,7 +72,7 @@ const searchMovie = () => {
       }).then((res) => {  
           console.log('검색 성공')
           // console.log(res.data)
-        results.value = res.data
+          results.value = res.data
           // console.log(results.value)
       }).catch((err) => {
           console.log(err)
@@ -76,6 +80,7 @@ const searchMovie = () => {
     })
     
     } else {
+      search.value = ''
       results.value = []
     }
   }
@@ -83,15 +88,9 @@ const searchMovie = () => {
 
   const goDetail = (id) => {
     router.push({ name: "detail", params: { movie_id: id } })
+
 }
 
-
-
-  // const selectSuggestion = (result) => {
-  //   search.value = result.title
-  //   results = []
-  //   searchMovie()
-  // }
 
 const debouncedFetchSuggestions = debounce(searchMovie, 200);
   </script>
@@ -182,18 +181,26 @@ const debouncedFetchSuggestions = debounce(searchMovie, 200);
     display: flex;
     flex-direction: column;
   }
+
   .suggestions-list {
   position: absolute;
   top: 100%;
   left: 0;
   width: 100%;
   background-color: white;
+  /* background-color : rgb(255,255,255,0.5); */
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-top: 5px;
+  z-index: 1000;
+
 }
 
+.suggestion-item {
+  margin-left: 10px;
+  width: 90%;
+}
 
   /* 반응형 스타일 */
   @media (max-width: 768px) {
