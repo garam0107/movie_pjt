@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="movie-container" v-if="recommendedMovies.length > 0">
-      <h2>{{ props.userData.username }}님이 추천 받은 영화</h2>
+      <h2>{{ props.userData.username }}님이 추천 받은 마지막 영화들</h2>
       <div
         class="movie-card"
         v-for="movie in recommendedMovies"
@@ -17,7 +17,14 @@
         <h4 class="movie-title">{{ movie.title }}</h4>
         <p class="movie-overview">{{ movie.overview }}</p>
         <div class="rating">
-          <span v-for="star in 5" :key="star" :class="{'filled-star': star <= movie.vote_average / 2, 'empty-star': star > movie.vote_average / 2}">
+          <span
+            v-for="star in 5"
+            :key="star"
+            :class="{
+              'filled-star': star <= movie.vote_average / 2,
+              'empty-star': star > movie.vote_average / 2
+            }"
+          >
             {{ star <= movie.vote_average / 2 ? '⭐' : '☆' }}
           </span>
         </div>
@@ -28,19 +35,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps } from 'vue';
+import { ref, defineProps, watch } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-const router = useRouter()
+
+const router = useRouter();
 const props = defineProps({
   userData: Object,
 });
 
 const recommendedMovies = ref([]);
 
-const goDetail = (id) =>{
-  router.push({name:'detail', params : {movie_id:id}})
-}
+const goDetail = (id) => {
+  router.push({ name: 'detail', params: { movie_id: id } });
+};
+
 // 영화 정보를 가져오는 함수
 const fetchMovieDetails = async (movieId) => {
   try {
@@ -51,16 +60,28 @@ const fetchMovieDetails = async (movieId) => {
     return response.data;
   } catch (error) {
     console.error('영화 정보 가져오기 오류:', error);
+    return null;
   }
 };
 
-// 추천 받은 영화 ID로 영화 정보 들고 오는 함수
+// 추천 받은 영화 ID로 영화 정보를 들고 오는 함수
 const fetchRecommendedMovies = async () => {
-  if (props.userData?.recommend_movie?.[0]?.recommend_movie) {
-    const movieIds = props.userData.recommend_movie[0].recommend_movie;
+  recommendedMovies.value = []; // 이전 추천 초기화
 
-    if (Array.isArray(movieIds)) {
-      for (const movieId of movieIds) {
+  if (
+    props.userData?.recommend_movie &&
+    Array.isArray(props.userData.recommend_movie) &&
+    props.userData.recommend_movie.length > 0
+  ) {
+    const lastRecommendationSet =
+      props.userData.recommend_movie[props.userData.recommend_movie.length - 1];
+    if (
+      lastRecommendationSet?.recommend_movie &&
+      Array.isArray(lastRecommendationSet.recommend_movie) &&
+      lastRecommendationSet.recommend_movie.length > 0
+    ) {
+      // 두 개의 영화 ID 가져오기
+      for (const movieId of lastRecommendationSet.recommend_movie) {
         const movieData = await fetchMovieDetails(movieId);
         if (movieData) {
           recommendedMovies.value.push(movieData);
@@ -74,15 +95,16 @@ const fetchRecommendedMovies = async () => {
   }
 };
 
-// 컴포넌트가 마운트될 때 추천 영화 정보 가져오기
-onMounted(() => {
-  // 데이터가 존재하는지 확인 후 fetchRecommendedMovies 호출
-  if (props.userData && Object.keys(props.userData).length !== 0) {
-    fetchRecommendedMovies();
-  } else {
-    console.warn('userData가 비어있습니다.');
-  }
-});
+// userData 변경 감지 시 추천 영화 정보 가져오기
+watch(
+  () => props.userData,
+  (newValue) => {
+    if (newValue && Object.keys(newValue).length !== 0) {
+      fetchRecommendedMovies();
+    }
+  },
+  { immediate: true, deep: true }
+);
 </script>
 
 <style scoped>

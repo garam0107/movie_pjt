@@ -29,6 +29,9 @@ from .serializers import DiaryCreateSerializer, DiarySerializer,DiaryCommentSeri
 OPENAI_API_KEY = settings.OPENAI_API_KEY
 json_file_path = Path(__file__).resolve().parent/'updated_movies.json'
 
+def clean_movie_title(title):
+    return re.sub(r'^"|"$|\\', '', title)
+
 def gpt_recommend(diary_text):
     try:
         client = OpenAI(
@@ -36,6 +39,7 @@ def gpt_recommend(diary_text):
         )
     except Exception as e:
         print(f'OpenAI API 호출 오류: {e}')
+        return None
 
     try:
         with open(json_file_path, encoding='utf-8') as f:
@@ -43,15 +47,21 @@ def gpt_recommend(diary_text):
             print("파일을 성공적으로 읽었습니다.")
     except json.JSONDecodeError as e:
         print(f"JSON 파일을 파싱하는 도중 오류가 발생했습니다: {e}")
+        return None
     except Exception as e:
         print(f"파일을 여는 도중 예상치 못한 오류가 발생했습니다: {e}")
+        return None
+
     # DB안에 있는 영화에서 검색해서 추천
     try:
-        available_movies_str = "\n".join([f"- {movie['fields']['title']}: {', '.join(movie['fields']['genres'])}" for movie in available_movies])
+        available_movies_str = "\n".join([f"- {clean_movie_title(movie['fields']['title'])}: {', '.join(movie['fields']['genres'])}" for movie in available_movies])
     except KeyError as e:
         print(f'Key 오류: {e}')
+        return None
     except Exception as e:
         print(f'데이터 변환 중 오류 : {e}')
+        return None
+
 
     # 프롬프트 작성
     messages = [
@@ -77,58 +87,71 @@ def gpt_recommend(diary_text):
 
     All responses should be in Korean. Please write Emotion in Korean
     Output format:
-    - Detected Emotion: [Emotion]
-    - Movie 1: [Movie Title], [Reason for recommendation]
-    - Movie 2: [Movie Title], [Reason for recommendation]
+   - Detected Emotion: [Emotion]
+    - Movie 1: [Movie Title] - [Reason for recommendation]
+    - Movie 2: [Movie Title] - [Reason for recommendation]
     - Diary Review: [A short review of the diary entry]
+
+    Please use '-' as a separator between movie title and recommendation reason.
+    Remember, only the labels 'Detected Emotion', 'Movie 1', 'Movie 2', and 'Diary Review' should be in English, while the actual emotion, movie titles, reasons, and review should all be in Korean.
     """}
     ]
 
     # ChatCompletion 엔드포인트 호출하여 감정 분석 및 영화 추천 받기
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",  # 사용할 모델 이름
+            messages=messages,
+            max_tokens=500,  # 응답에서 사용할 최대 토큰 수
+            temperature=0.88  # 응답의 다양성을 위한 온도 설정
+        )
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",  # 사용할 모델 이름
-        messages=messages,
-        max_tokens=500,  # 응답에서 사용할 최대 토큰 수
-        temperature=0.85  # 응답의 다양성을 위한 온도 설정
-    )
-
-    # 응답 내용 출력
-    answer = response.choices[0].message.content
-    return answer
+        # 응답 내용 출력
+        answer = response.choices[0].message.content
+        return answer
+    except Exception as e:
+        print(f'응답 오류 :{e}')
+        return None
 
 
 
+import re
+
+import re
 
 def make_json(answer):
     parsed_data = {}
+
     # 감정 추출
     emotion_match = re.search(r"- Detected Emotion: (.+)", answer)
     if emotion_match:
         parsed_data['detected_emotion'] = emotion_match.group(1).strip()
 
-    # Movie 1과 Movie 2 정보 추출
-    movies = re.findall(r"- Movie \d+: (.*?), \[(.*?)\]", answer)
+    # Movie 1과 Movie 2 정보 추출 (제목과 이유를 정확히 분리)
+    movies = re.findall(r"- Movie \d+: (.*?) - (.*?)$", answer, re.MULTILINE)
 
     # movies 리스트의 길이를 확인하여 안전하게 접근
     if len(movies) >= 2:
         parsed_data['movies'] = {
-            "title": [movies[0][0], movies[1][0]],
-            "reason": [movies[0][1], movies[1][1]]
+            "title": [movies[0][0].strip(), movies[1][0].strip()],
+            "reason": [movies[0][1].strip(), movies[1][1].strip()]
         }
     else:
         # 만약 movies 리스트의 길이가 충분하지 않다면 빈 값 또는 다른 처리를 추가
         parsed_data['movies'] = {
-            "title": [movies[i][0] if i < len(movies) else "" for i in range(2)],
-            "reason": [movies[i][1] if i < len(movies) else "" for i in range(2)]
+            "title": [movies[i][0].strip() if i < len(movies) else "" for i in range(2)],
+            "reason": [movies[i][1].strip() if i < len(movies) else "" for i in range(2)]
         }
 
     # Diary Review 추출
-    review_match = re.search(r"- Diary Review: (.+)", answer)
+    review_match = re.search(r"- Diary Review: (.+)", answer, re.DOTALL)
     if review_match:
         parsed_data['diary_review'] = review_match.group(1).strip()
 
     return parsed_data
+
+
+
 
 
 
