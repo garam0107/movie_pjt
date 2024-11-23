@@ -27,7 +27,7 @@
           >
             <span class="date-number">{{ date.date }}</span>
             <div v-if="date.emoji" class="emoji">
-              <img :src="date.emoji" alt="emoji" class="emoji-image" />
+              <img :src="reverseEmojiMap[date.emoji]" alt="emoji" class="emoji-image" />
             </div>
           </div>
         </div>
@@ -154,7 +154,7 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import axios from 'axios';
-import { useRouter } from 'vue-router';
+import { useRouter,useRoute } from 'vue-router';
 import { useMovieStore } from '@/stores/counter';
 // 이미지 파일 import
 import happy from '@/assets/images/happy.jpg';
@@ -169,18 +169,7 @@ import router from '@/router';
 const props = defineProps({
   userData: Object,
 });
-// watch(
-//   () => props.userData,
-//   (newUserData) => {
-//     if (newUserData && newUserData.pk) {
-//       user_id.value = newUserData.pk;
-//       console.log('User PK has been updated:', user_pk.value);
-//     } else {
-//       console.log('userData가 아직 초기화되지 않았습니다:', newUserData);
-//     }
-//   },
-//   { immediate: true }
-// );
+
 const store = useMovieStore()
 const today = new Date();
 const year = ref(today.getFullYear());
@@ -197,7 +186,19 @@ const selectedEmoji = ref('');
 const Diary_today = new Date().toISOString().split('T')[0]
 const token = localStorage.getItem('token');
 
+
 const currentuser = store.userId
+
+
+const reverseEmojiMap = {
+  'emotions/angry.jpg': angry,
+  'emotions/calm.jpg': calm,
+  'emotions/excited.jpg': excited,
+  'emotions/happy.jpg': happy,
+  'emotions/sad.jpg': sad,
+  'emotions/sleepy.jpg': sleepy,
+};
+
 const emojiMap = {
   '/src/assets/images/angry.jpg': 'emotions/angry.jpg',
   '/src/assets/images/calm.jpg': 'emotions/calm.jpg',
@@ -205,6 +206,34 @@ const emojiMap = {
   '/src/assets/images/happy.jpg': 'emotions/happy.jpg',
   '/src/assets/images/sad.jpg': 'emotions/sad.jpg',
   '/src/assets/images/sleepy.jpg': 'emotions/sleepy.jpg',
+};
+
+const fetchMonthlyEmojis = async (username, year, month) => {
+  try {
+    const response = await axios.get(`http://127.0.0.1:8000/diaries/${username}/${year}/${month}/`, {
+      headers: { Authorization: `Token ${token}` }
+    });
+
+    // 반환된 데이터가 리스트일 경우 바로 사용하도록 처리
+    if (Array.isArray(response.data)) {
+      return response.data; // 이 데이터는 [{ date: '2024-11-05', mood_emoji: 'emotions/happy.jpg' }, ...] 형식이어야 합니다.
+    } else {
+      console.error('서버에서 예상치 못한 데이터 형식이 반환되었습니다.');
+      return [];
+    }
+  } catch (error) {
+    console.error('이모지 데이터를 가져오는 데 실패했습니다:', error);
+    return [];
+  }
+};
+
+const updateCalendarWithEmojis = (calendarDates, emojiData) => {
+  emojiData.forEach(({ date, mood_emoji }) => {
+    const targetDate = calendarDates.find((d) => d.dateKey === date);
+    if (targetDate) {
+      targetDate.emoji = mood_emoji; // 날짜 객체에 이모지를 추가
+    }
+  });
 };
 
 // 달력 생성
@@ -235,7 +264,7 @@ const createCalendar = () => {
 };
 
 // 이전 달로 이동
-const prevMonth = () => {
+const prevMonth = async () => {
   if (month.value === 0) {
     month.value = 11;
     year.value -= 1;
@@ -243,10 +272,14 @@ const prevMonth = () => {
     month.value -= 1;
   }
   createCalendar();
+
+
+  const emojiData = await fetchMonthlyEmojis(props.userData.username, year.value, month.value + 1);
+  updateCalendarWithEmojis(dates.value, emojiData);
 };
 
 // 다음 달로 이동
-const nextMonth = () => {
+const nextMonth = async () => {
   if (month.value === 11) {
     month.value = 0;
     year.value += 1;
@@ -254,13 +287,19 @@ const nextMonth = () => {
     month.value += 1;
   }
   createCalendar();
+
+  const emojiData = await fetchMonthlyEmojis(props.userData.username, year.value, month.value + 1);
+  updateCalendarWithEmojis(dates.value, emojiData);
 };
 
 // 오늘 날짜로 이동
-const goToday = () => {
+const goToday = async () => {
   year.value = today.getFullYear();
   month.value = today.getMonth();
   createCalendar();
+
+  const emojiData = await fetchMonthlyEmojis(props.userData.username, year.value, month.value + 1);
+  updateCalendarWithEmojis(dates.value, emojiData);
 };
 
 // 오늘인지 확인
@@ -321,7 +360,9 @@ const openDiaryModal = (date) => {
       }
 
       else {
+        // console.log(response.data)
         // 다이어리가 있는 경우: 상세 모달 열기
+        console.log('오늘 데이터',selectedDate.value)
         diaryTitle.value = response.data.title;
         diaryContent.value = response.data.content;
         selectedEmoji.value = response.data.mood_emoji;
@@ -406,7 +447,7 @@ const selectEmoji2 = (emoji) => {
 
 
 // 다이어리 저장
-const submitDiary = () => {
+const submitDiary = async () => {
   if (selectedDate.value.dateKey !== Diary_today) {
     // console.log('오늘날짜' ,selectedDate.value.dateKey)
     // console.log(Diary_today)
@@ -428,37 +469,41 @@ const submitDiary = () => {
     alert('로그인이 필요합니다.');
     return;
   }
-
+  
+ 
   // 다이어리 작성 API 호출
-  axios.post(
-    `http://127.0.0.1:8000/diaries/${props.userData.username}/`,
-    {
-      title: diaryTitle.value,
-      content: diaryContent.value,
-      mood_emoji: selectedEmoji.value,
-    },
-    {
-      headers: {
-        Authorization: `Token ${token}`,
+  try {
+    const response = await axios.post(
+      `http://127.0.0.1:8000/diaries/${props.userData.username}/`,
+      {
+        title: diaryTitle.value,
+        content: diaryContent.value,
+        mood_emoji: selectedEmoji.value,
       },
-    }
-  )
-    .then((res) => {
-      // 선택한 날짜에 이모지 표시
-      selectedDate.value.emoji = selectedEmoji.value;
-      console.log(res.data)
-      // 모달 초기화 및 닫기
-      diaryTitle.value = '';
-      diaryContent.value = '';
-      selectedEmoji.value = null;
-      showDiaryModal.value = false;
-    })
-    .catch((error) => {
-      console.log(selectEmoji.value)
-      console.log(token)
-      console.error('다이어리 저장 실패:', error);
-      console.log(error.response.data)
-    });
+      {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      }
+    );
+
+    selectedDate.value.emoji = selectedEmoji.value
+    // 다이어리 저장 후 달력 갱신
+    createCalendar();
+    const emojiData = await fetchMonthlyEmojis(props.userData.username, year.value, month.value + 1);
+    updateCalendarWithEmojis(dates.value, emojiData);
+
+
+    // 모달 초기화 및 닫기
+    diaryTitle.value = '';
+    diaryContent.value = '';
+    selectedEmoji.value = null;
+    showDiaryModal.value = false;
+  } catch (error) {
+    
+    console.log("오류", error.response.data)
+    console.error('다이어리 저장 실패:', error);
+  }
 };
 
 // 하이라이트 표시
@@ -490,10 +535,12 @@ const editSelectedEmoji = ref('');
 
 const updateDiary = (user_username, diary_pk) => {
   // 수정된 데이터 정의
+
+
   const updatedData = {
     title: editDiaryTitle.value,        // 사용자가 입력한 제목
     content: editDiaryContent.value,    // 사용자가 입력한 내용
-    mood_emoji: editSelectedEmoji.value // 사용자가 선택한 감정 이모지
+    mood_emoji: editSelectedEmoji.value, // 사용자가 선택한 감정 이모지
   };
   console.log('수정할 데이터:', updatedData);
   // 수정 함수 호출
@@ -568,8 +615,13 @@ const confirmDelete = () => {
 }
 
 // 컴포넌트가 마운트될 때 달력 생성
-onMounted(() => {
+onMounted(async () => {
   createCalendar();
+
+  const emojiData = await fetchMonthlyEmojis(props.userData.username, year.value, month.value + 1);
+  if (emojiData.length > 0) {
+    updateCalendarWithEmojis(dates.value, emojiData);
+  }
 });
 </script>
 

@@ -42,3 +42,8 @@ class GptAnswerSerializer(serializers.ModelSerializer):
         
     def get_recommend_movie_titles(self, obj):
         return [movie.title for movie in obj.recommend_movie.all()]
+    
+class OptimizedDiarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Diary
+        fields = ['date', 'mood_emoji']

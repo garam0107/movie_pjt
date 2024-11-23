@@ -2,6 +2,7 @@
 import re
 import json
 import datetime
+from datetime import datetime as dt
 from pathlib import Path
 from openai import OpenAI
 
@@ -18,7 +19,7 @@ from rest_framework.decorators import api_view,permission_classes
 
 from .models import Diary
 from movies.models import Movie
-from .serializers import DiaryCreateSerializer, DiarySerializer,DiaryCommentSerializer,DiaryDetailSerializer,GptAnswerSerializer
+from .serializers import DiaryCreateSerializer, DiarySerializer,DiaryCommentSerializer,DiaryDetailSerializer,GptAnswerSerializer,OptimizedDiarySerializer
 # Create your views here.
 
 
@@ -324,3 +325,26 @@ def diary_by_date(request, user_username):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response({"exists": False}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_month_diaries(request, user_username, year, month):
+    User = get_user_model()
+    author = get_object_or_404(User, username=user_username)
+
+    # 날짜 계산 개선
+    start_date = dt(year, month, 1)
+    if month < 12:
+        end_date = dt(year, month + 1, 1)
+    else:
+        end_date = dt(year + 1, 1, 1)
+
+    # 해당 월의 다이어리 데이터를 필터링
+    diaries = Diary.objects.filter(author=author, date__gte=start_date, date__lt=end_date)
+
+    # 빈 리스트로 응답
+    if not diaries.exists():
+        return Response([], status=status.HTTP_200_OK, content_type='application/json')
+
+    # 월별 데이터를 위한 시리얼라이저 사용
+    serializer = OptimizedDiarySerializer(diaries, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK, content_type='application/json')
