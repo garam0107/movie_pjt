@@ -29,6 +29,7 @@
       </div>
     </div>
     
+    <!-- 상세모달 -->
     <div v-if="showModal" class="modal-overlay">
       <div class="modal-content modal-form-style">
         <button class="close-button" @click="closeModal">&times;</button>
@@ -61,6 +62,52 @@
       </div>
     </div>
   </div>
+
+<!-- 수정 모달 -->
+<div v-if="showUpdateModal" class="modal-overlay">
+  <div class="modal-content modal-form-style">
+    <button class="close-button" @click="closeUpdateModal">&times;</button>
+
+    <h3>리뷰 수정하기 🛠️</h3>
+
+    <div class="input-group">
+      <label for="edit-title">Title</label>
+      <input 
+        type="text" 
+        v-model="editReview.title" 
+        id="edit-title" 
+        class="input-field"
+      >
+    </div>
+
+    <div class="input-group">
+      <label for="edit-content">Content</label>
+      <textarea 
+        v-model="editReview.content" 
+        id="edit-content" 
+        class="input-field2"
+      ></textarea>
+    </div>
+
+    <div class="input-group">
+      <label>Rating</label>
+      <div class="rating-container">
+        <span 
+          v-for="star in 5" 
+          :key="star" 
+          :class="{'filled-star': star <= editReview.rating, 'empty-star': star > editReview.rating}"
+          @click="editReview.rating = star"
+        >
+          ★
+        </span>
+      </div>
+    </div>
+
+    <button @click="updateComment" class="updateBtn2">수정 완료</button>
+  </div>
+</div>
+
+
 </template>
 
 <script setup>
@@ -69,14 +116,15 @@ import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { useMovieStore } from '@/stores/counter';
  
-const reviews = ref([]);
-const route = useRoute();
-const movieId = route.params.movie_id;
-const userData = ref({});
-const store = useMovieStore();
-const showModal = ref(false);
-const selectedReview = ref({ title: '', content: '', rating: 0, username: '' });
-
+const reviews = ref([])
+const route = useRoute()
+const movieId = route.params.movie_id
+const userData = ref({})
+const store = useMovieStore()
+const showModal = ref(false)
+const showUpdateModal = ref(false)
+const selectedReview = ref({ title: '', content: '', rating: 0, username: '' })
+const editReview = ref({ id: null, title: '', content: '', rating: 0 })
 onMounted(() => {
   axios({
     method: 'get',
@@ -116,6 +164,38 @@ onMounted(async () => {
   }
 });
 
+// 리뷰 수정 함수
+const updateComment = () => {
+  axios({
+    method: 'put',
+    url: `http://127.0.0.1:8000/movies/detail/${movieId}/create_review/`,
+    headers: {
+      Authorization: `Token ${store.token}`
+    },
+    data: {
+      title: editReview.value.title,
+      content: editReview.value.content,
+      rating: editReview.value.rating
+    }
+  })
+  .then(response => {
+    console.log(response.data.message);
+    // 로컬 데이터 업데이트
+    const updatedReview = reviews.value.find(r => r.id === editReview.value.id);
+    if (updatedReview) {
+      updatedReview.title = editReview.value.title;
+      updatedReview.content = editReview.value.content;
+      updatedReview.rating = editReview.value.rating;
+    }
+    closeUpdateModal(); // 모달 닫기
+    location.reload(); // 페이지 새로고침
+  })
+  .catch(err => {
+    console.error('리뷰 수정 중 오류가 발생했습니다.', err);
+  });
+};
+
+
 const deleteComment = (reviewId) => {
   if(confirm("정말로 리뷰를 삭제하시겠습니까")){
     axios({
@@ -144,6 +224,18 @@ const openModal = (review) => {
 // 모달 닫기
 const closeModal = () => {
   showModal.value = false;
+};
+
+// 수정 모달 열기
+const openUpdateModal = (review) => {
+  editReview.value = { ...review };
+  // selectedReview.value = { ...review };
+  showUpdateModal.value = true;
+};
+
+// 수정 모달 닫기
+const closeUpdateModal = () => {
+  showUpdateModal.value = false;
 };
 
 // 내용이 너무 길 경우 ...으로 축약하는 메서드
@@ -199,7 +291,7 @@ const shortenedContent = (content) => {
 }
 
 .review-title {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: bold;
   margin-bottom: 10px;
   margin-top: 0;
@@ -231,6 +323,20 @@ const shortenedContent = (content) => {
   transition: background-color 0.3s;
   font-size: 0.9rem;
   font-family: 'Noto Sans KR', sans-serif;
+}
+
+.updateBtn2 {
+  background-color: #fdc394;
+  color: #555;
+  border: none;
+  padding: 6px 8px;
+  margin-right: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 0.9rem;
+  font-family: 'Noto Sans KR', sans-serif;
+  margin-top: 10px;
 }
 
 .updateBtn:hover, .deleteBtn:hover {
