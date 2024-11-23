@@ -65,6 +65,10 @@ class UserMovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Diary
         fields = ['recommend_movie']
+class UserReasonSerializer(serializers.ModelSerializer):
+     class Meta:
+        model = Diary
+        fields = ['recommend_reasons']
 
 # 유저의 영화 리뷰들
 class UserReviewSerializer(serializers.ModelSerializer):
@@ -81,6 +85,7 @@ class UserSerializer(serializers.ModelSerializer):
     recommend_movie = UserMovieSerializer(source = 'diaries', many = True, read_only = True)
     followings_count = serializers.SerializerMethodField()
     followers_count = serializers.SerializerMethodField()
+    recommend_reasons = UserReasonSerializer(source = 'diaries', many = True, read_only = True)
     class RecommendMovieSerializer(serializers.ModelSerializer):
         class Meta:
             model = Diary
@@ -89,7 +94,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ['id','name', 'username', 'email', 'first_name', 'last_name', 'nickname', 'profile_image', 'visit_count',
-                  'my_review','recommend_movie','followings','followers','followings_count','followers_count','stone','movies_titles']
+                  'my_review','recommend_movie','recommend_reasons','followings','followers','followings_count','followers_count','stone','movies_titles']
         
     def get_followings_count(self, obj):
         return obj.followings.count()
