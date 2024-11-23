@@ -1,11 +1,10 @@
-
 <template>
   <div class="comment-section">
     <div v-if="userData?.my_review?.length === 0" class="no-comments">
       <p>리뷰가 없습니다.</p>
     </div>
     <div v-else class="review-container">
-      <h2 class="comment-title">{{ userData.username }}님의 리뷰</h2>
+      <h3 class="comment-title">{{ userData.nickname }}님의 리뷰 ✏️</h3>
       <div class="review-grid">
         <div
           class="review-card"
@@ -17,7 +16,7 @@
           :style="{'background-image': `url(https://image.tmdb.org/t/p/w500${review.movie_poster_path})`}"
         >
           <div class="card-content">
-            <h4 class="movie-title">{{ review.movie_title }}</h4>
+            <!-- <h4 class="movie-title">{{ review.movie_title }}</h4> -->
             <h5 class="review-title">{{ review.title }}</h5>
             <p class="review-content">{{ review.content }}</p>
             <div class="rating">
@@ -72,6 +71,8 @@ const handleMouseLeave = (e) => {
 };
 </script>
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Hahmlet:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap');
 /* 전체적인 리뷰 섹션 스타일 */
 .comment-section {
   margin-top: 20px;
@@ -83,10 +84,11 @@ const handleMouseLeave = (e) => {
   margin-bottom: 20px;
   text-align: left;
   padding-left: 10px;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   color: #2c3e50;
+  font-family: "Noto Sans KR", sans-serif;
 }
 
 /* 리뷰가 없을 때 표시할 텍스트 */
@@ -104,10 +106,10 @@ const handleMouseLeave = (e) => {
 
 /* 리뷰 카드들을 가로로 정렬하고 일정 간격 유지 */
 .review-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  justify-content: center;
   perspective: 1500px; /* 카드에 3D 회전 효과를 위한 원근감 추가 */
 }
 
@@ -115,12 +117,12 @@ const handleMouseLeave = (e) => {
 .review-card {
   background-size: cover;
   background-position: center;
-  padding: 20px;
+  padding: 10px;
   border-radius: 15px;
   position: relative;
   overflow: hidden;
-  min-height: 450px;
-  min-width: 300px;
+  height: 250px;
+  width: 150px;
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease-in-out, box-shadow 0.2s ease-in-out;
   color: #ffffff;
@@ -144,8 +146,9 @@ const handleMouseLeave = (e) => {
 /* 카드 내부 내용 영역 */
 .card-content {
   background: rgba(44, 62, 80, 0.8);
-  padding: 20px;
+  padding: 10px;
   border-radius: 10px;
+  height: 200px;
 }
 .movie-title, .review-title, .review-content {
   color: #fff;
@@ -153,7 +156,7 @@ const handleMouseLeave = (e) => {
 
 /* 리뷰 제목 스타일 */
 .review-title {
-  font-size: 1.8rem;
+  font-size: 1rem;
   font-weight: 600;
   margin-bottom: 10px;
   line-height: 1.3;
@@ -161,7 +164,7 @@ const handleMouseLeave = (e) => {
 
 /* 리뷰 영화 제목 스타일 */
 .movie-title {
-  font-size: 1.5rem;
+  font-size: 0.9rem;
   font-weight: 700;
   margin-bottom: 8px;
   color: #ecf0f1;
@@ -169,21 +172,26 @@ const handleMouseLeave = (e) => {
 
 /* 리뷰 본문 스타일 */
 .review-content {
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   margin-bottom: 15px;
   line-height: 1.6;
   color: #ecf0f1;
+  font-family: "Hahmlet", serif;
+  font-optical-sizing: auto;
+
 }
 
 /* 리뷰의 별점 스타일 */
 .rating {
-  margin-bottom: 10px;
+  /* position: absolute; */
+  bottom: 20px;
+  left: 10px;
 }
 
 .filled-star {
   color: #f1c40f;
   cursor: pointer;
-  font-size: 1.6rem;
+  font-size: 1.2rem;
   transition: transform 0.2s;
 }
 
@@ -194,7 +202,7 @@ const handleMouseLeave = (e) => {
 .empty-star {
   color: #bdc3c7;
   cursor: pointer;
-  font-size: 1.6rem;
+  font-size: 1.2rem;
   transition: transform 0.2s;
 }
 
@@ -202,4 +210,3 @@ const handleMouseLeave = (e) => {
   transform: scale(1.2);
 }
 </style>
-
