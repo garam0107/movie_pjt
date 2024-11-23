@@ -28,9 +28,10 @@ class RegisterView(CreateAPIView):
 def mypage(request, user_username):
     User = get_user_model()
     user = get_object_or_404(User, username = user_username)
-    if request.method == 'GET':
+    if user != request.user:
         user.visit_count += 0.5
         user.save()
+    if request.method == 'GET':
         serializer = UserSerializer(user)
         return Response(serializer.data)
     # elif request.method == 'POST':

@@ -1,5 +1,5 @@
 <template>
-  <div class="mypage-container">
+  <div class="mypage-container" v-if="userDataLoaded">
     <div class="top">
       <div class="mydata-container">
         <MyData :userData="userData" />
@@ -10,12 +10,15 @@
     </div>
     <div class="bottom">
       <div class="my-movie">
-        <MyMovie/>
+        <MyMovie :userData="userData"/>
       </div>
       <div class="my-comment">
-        <MyComment/>
+        <MyComment :userData="userData"/>
       </div>
     </div>
+  </div>
+  <div v-else>
+    <p>로딩 중...</p> <!-- 데이터 로딩 중임을 나타내는 표시 -->
   </div>
 </template>
 
@@ -28,9 +31,12 @@ import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import Calendar from '@/components/mypage/Calendar.vue';
 import MyMovie from '@/components/mypage/MyMovie.vue';
 import MyComment from '@/components/mypage/MyComment.vue';
+
 const store = useMovieStore();
 const route = useRoute();
 const userData = ref({});
+const userDataLoaded = ref(false); // 로딩 상태 추적
+
 // 유저 데이터를 가져오는 함수
 const fetchUserData = (userId) => {
   if (store.token) {
@@ -44,14 +50,18 @@ const fetchUserData = (userId) => {
       .then((res) => {
         console.log('유저 데이터:', res.data);
         userData.value = res.data;
+        userDataLoaded.value = true; // 데이터 로드 완료 시 true로 변경
       })
       .catch((err) => {
         console.log('마이페이지 정보를 불러오는 중 오류:', err);
+        userDataLoaded.value = false; // 오류 발생 시 로드 완료 false
       });
   } else {
     console.error('토큰이 없습니다. 로그인 후 다시 시도해주세요.');
+    userDataLoaded.value = false; // 토큰이 없을 때도 로딩 표시
   }
 };
+
 // 컴포넌트 마운트 시 데이터 로드
 onMounted(() => {
   const userId = route.params.user_id; // URL에서 user_id 가져오기

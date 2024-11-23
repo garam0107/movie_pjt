@@ -39,7 +39,7 @@ class Movie_review(models.Model):
     rating = models.IntegerField(validators=[MinValueValidator(1),
                                              MaxValueValidator(5)])
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)   
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews')
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['movie', 'user'], name='unique_movie_user_review')

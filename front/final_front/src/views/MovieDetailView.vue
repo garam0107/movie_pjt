@@ -104,9 +104,10 @@ const fetchMovieDetails = () => {
       },
     })
     .then((res) => {
-      console.log(res)
+      console.log('확인', res)
       isLiked.value = res.data.liked
       likeCount.value = res.data.like_count
+      console.log('영화id',movieId)
     })
     .catch((err) => {
       console.log(err)
@@ -134,7 +135,7 @@ const toggleLike = () => {
   console.log('Request URL:', requestUrl)
   axios({
     method: 'post',
-    url: `http://127.0.0.1:8000/movies/detail/${movieId}/like/`,
+    url: `http://127.0.0.1:8000/movies/detail/${movieId.value}/like/`,
     headers: {
       Authorization: `Token ${store.token}`,
     },
@@ -162,7 +163,7 @@ const submitReview = () => {
     return
   }
 
-  axios.post(`http://127.0.0.1:8000/movies/detail/${movieId}/create_review/`, {
+  axios.post(`http://127.0.0.1:8000/movies/detail/${movieId.value}/create_review/`, {
     title: reviewTitle.value,
     content: reviewContent.value,
     rating: selectedRating.value

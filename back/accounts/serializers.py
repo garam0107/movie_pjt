@@ -69,13 +69,15 @@ class UserMovieSerializer(serializers.ModelSerializer):
 # 유저의 영화 리뷰들
 class UserReviewSerializer(serializers.ModelSerializer):
     movie_title = serializers.CharField(source = 'movie.title', read_only = True)
+    movie_poster_path = serializers.CharField(source = 'movie.poster_path', read_only = True)
+    movie_id = serializers.CharField(source = 'movie.id', read_only = True)
     class Meta:
         model = Movie_review
-        fields= ['title', 'content','movie_title']
+        fields= ['title', 'content','movie_title','rating','created_at','movie_poster_path','movie_id']
         
 # 유저 정보
 class UserSerializer(serializers.ModelSerializer):
-    my_review = UserReviewSerializer(source = 'moviereview_set', many = True, read_only = True)
+    my_review = UserReviewSerializer(source = 'reviews', many = True, read_only = True)
     recommend_movie = UserMovieSerializer(source = 'diaries', many = True, read_only = True)
     followings_count = serializers.SerializerMethodField()
     followers_count = serializers.SerializerMethodField()
