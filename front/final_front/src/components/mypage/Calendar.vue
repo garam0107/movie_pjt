@@ -67,38 +67,42 @@
   <!-- 다이어리 상세 내용 모달 -->
   <div v-if="detailDiaryModal" class="detail-modal">
   <div class="detail-modal-content">
-    <div class="diary-header">
-      <h3 class="diary-date">{{ selectedDate.dateKey }}</h3>
-      <h1 class="diary-title">{{ diaryTitle }}</h1>
-    </div>
-    <div class="diary-content">
-      <p>{{ diaryContent }}</p>
-    </div>
-    <div class="movie-recommendations">
-      <h4>영화 추천</h4>
-      <p style="font-style: bold;">오늘의 감정분석 : {{ gpt_emotion }}</p>
-      <div class="recommendation">
-        <RouterLink :to="{ name: 'detail', params: { movie_id: recommend_movieID2 } }" class="movie-title">
-          <p>🎬 {{ recommend_movies[0] }}</p>
-        </RouterLink>
-        <p class="reason">{{ recommend_reasons1 }}</p>
+    <div class="modal-diary-content">
+      <div class="diary-header">
+        <h3 class="diary-date">{{ selectedDate.dateKey }}</h3>
+        <h1 class="diary-title">{{ diaryTitle }}</h1>
       </div>
-      <div class="recommendation">
-        <RouterLink :to="{ name: 'detail', params: { movie_id: recommend_movieID1 } }" class="movie-title">
-          <p>🎬 {{ recommend_movies[1] }}</p>
-        </RouterLink>
-        <p class="reason">{{ recommend_reasons2 }}</p>
+      <div class="diary-content">
+        <p>{{ diaryContent }}</p>
       </div>
     </div>
-    <div class="gpt-comment">
-      <h4>AI의 한마디</h4>
-      <p>{{ gpt_comment }}</p>
-    </div>
-    
-    <div class="modal-actions">
-      <button @click="openEditModal" class="my-button">수정</button>
-      <button @click="openDeleteModal" class="my-button">삭제</button>      
-      <button @click="closeDiaryModal" class="close-button">닫기</button>
+
+    <div class="detail-modal-diary">
+      <div class="movie-recommendations">
+        <h4>오늘의 영화 추천</h4>
+        <p style="font-style: bold;">오늘의 감정분석 : {{ gpt_emotion }}</p>
+        <div class="recommendation">
+          <RouterLink :to="{ name: 'detail', params: { movie_id: recommend_movieID2 } }" class="movie-title">
+            <p>🎬 {{ recommend_movies[0] }}</p>
+          </RouterLink>
+          <p class="reason">{{ recommend_reasons1 }}</p>
+        </div>
+        <div class="recommendation">
+          <RouterLink :to="{ name: 'detail', params: { movie_id: recommend_movieID1 } }" class="movie-title">
+            <p>🎬 {{ recommend_movies[1] }}</p>
+          </RouterLink>
+          <p class="reason">{{ recommend_reasons2 }}</p>
+        </div>
+      </div>
+      <div class="gpt-comment">
+        <h4>AI의 한마디</h4>
+        <p>{{ gpt_comment }}</p>
+      </div>
+      <div class="modal-actions">
+        <button @click="openEditModal" class="my-button">수정</button>
+        <button @click="openDeleteModal" class="my-button">삭제</button>      
+        <button @click="closeDiaryModal" class="close-button">닫기</button>
+      </div>
     </div>
   </div>
 </div>
@@ -890,6 +894,8 @@ h3 {
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  display: flex;
+  gap: 20px;
 }
 
 /* 다이어리 본문 */
@@ -897,7 +903,7 @@ h3 {
   background: #fffdfa; /* 종이 같은 기본 색 */
   padding: 30px;
   border-radius: 15px;
-  width: 650px;
+  width: 60%;
   max-width: 90%;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   font-family: 'Noto Serif KR', serif; /* 다이어리 느낌 나는 폰트 */
@@ -907,6 +913,9 @@ h3 {
   background-image: url('https://www.transparenttextures.com/patterns/linen-white.png'); /* 종이 질감 배경 */
   background-size: cover;
   background-repeat: repeat;
+  display: flex;
+  gap: 20px;
+  max-height: 99%;
 }
 
 /* 다이어리 헤더 */
@@ -931,7 +940,7 @@ h3 {
 
 /* 다이어리 본문 내용 */
 .diary-content {
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: #444;
   margin-bottom: 30px;
   white-space: pre-line; /* 줄 바꿈 적용 */
@@ -942,6 +951,7 @@ h3 {
   font-size: 1.4rem;
   color: #333;
   margin-bottom: 10px;
+  margin-top: 0
 }
 
 .recommendation {
@@ -989,6 +999,7 @@ h3 {
 
 /* 닫기 버튼 */
 .close-button {
+  font-family: 'Noto Sans KR', sans-serif;
   /* margin-top: 20px; */
   padding: 10px 20px;
   font-size: 1rem;
@@ -1007,11 +1018,12 @@ h3 {
   transform: scale(0.98);
 }
 .my-button{
+  font-family: 'Noto Sans KR', sans-serif;
   padding: 10px 20px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   border: none;
   border-radius: 8px;
-  background-color: #35b5dc;
+  background-color: #f28a3a;
   color: white;
   cursor: pointer;
   margin-right: 10px;
@@ -1023,7 +1035,12 @@ h3 {
   transition: all 0.2s ease-in-out; /* 부드러운 효과 */
 }
 
+.modal-diary-content {
+  flex: 5;
+}
 
-
+.detail-modal-diary {
+  flex: 5;
+}
  </style>
  

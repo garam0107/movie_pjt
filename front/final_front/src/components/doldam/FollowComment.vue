@@ -288,7 +288,6 @@ h2 {
   max-width: 400px;
   width: 100%;
   position: relative;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
 .modal-form-style {
