@@ -2,32 +2,31 @@
   <div class="mydata-container">
     <div class="profile-header">
       <div class="profile-image">
-        <img :src="`/src/assets/${userData.profile_image}`" alt="프로필 이미지">
+        <img :src="`/src/assets/${props.userData.profile_image}`" alt="프로필 이미지">
       </div>
       <div class="user-info">
         <div style="display: flex;">
-          <h2>{{ userData.nickname }}</h2>
+          <h2>{{ props.userData.nickname }}</h2>
           <form v-if="isNotMyPage" @submit.prevent="toggleFollow">
             <button v-if="isFollowing" class="followBtn unfollowBtn">언팔로우</button>
             <button v-else class="followBtn">팔로우</button>
           </form>
         </div>
         <p>{{ userData.email }}</p>
-        <p>팔로워 {{ userData.followers_count }} | 팔로잉 {{ userData.followings_count }}</p>
+        <p>팔로워 {{ props.userData.followers_count }} | 팔로잉 {{ props.userData.followings_count }}</p>
       </div>
     </div>
     <div class="user-stats">
       <div class="stat">
-        <p class="userstatus">방문자 수: {{ userData.visit_count }}</p>
+        <p class="userstatus">방문자 수: {{ props.userData.visit_count }}</p>
         <div style="display: flex; justify-content: center;">
-          <p class="userstatus">모은 조약돌 수: {{ userData.stone }}</p>
+          <p class="userstatus">모은 조약돌 수: {{ props.userData.stone }}</p>
           <img src="@/assets/stone_icon.png" alt="stone icon" class="stone-icon" />
         </div>
       </div>
     </div>
-    <div class="actions" v-if="userId == store.userId">
 
-
+    <div class="actions" v-if="isMyPage">
       <button @click="showModal = true">회원정보 수정</button>
 
       <button @click="showPasswordChange = true">비밀번호 수정</button>
@@ -109,152 +108,167 @@
 </template>
 
 <script setup>
-import { useMovieStore } from '@/stores/counter';
-import axios from 'axios';
-import { onMounted, ref, computed } from 'vue';
-import { useRoute,useRouter} from 'vue-router';
-import { RouterLink } from 'vue-router';
-defineProps({
+import { useMovieStore } from '@/stores/counter'
+import axios from 'axios'
+import { onMounted, ref, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+const props = defineProps({
   userData: Object
 })
-// model
+
+// 프로필 옵션들
 const profileOptions = [
-{ value: "profile_images/profile1.jpg", src: new URL('@/assets/profile_images/profile1.jpg', import.meta.url).href, label: "Image 1" },
-{ value: "profile_images/profile2.jpg", src: new URL('@/assets/profile_images/profile2.jpg', import.meta.url).href, label: "Image 2" },
-{ value: "profile_images/profile3.jpg", src: new URL('@/assets/profile_images/profile3.jpg', import.meta.url).href, label: "Image 3" },
-{ value: "profile_images/profile4.jpg", src: new URL('@/assets/profile_images/profile4.jpg', import.meta.url).href, label: "Image 4" },
-{ value: "profile_images/profile5.jpg", src: new URL('@/assets/profile_images/profile5.jpg', import.meta.url).href, label: "Image 5" },
-{ value: "profile_images/profile6.jpg", src: new URL('@/assets/profile_images/profile6.jpg', import.meta.url).href, label: "Image 6" },
-{ value: "profile_images/default_profile.jpg", src: new URL('@/assets/profile_images/default_profile.jpg', import.meta.url).href, label: "Image 7"}
+  { value: "profile_images/profile1.jpg", src: new URL('@/assets/profile_images/profile1.jpg', import.meta.url).href, label: "Image 1" },
+  { value: "profile_images/profile2.jpg", src: new URL('@/assets/profile_images/profile2.jpg', import.meta.url).href, label: "Image 2" },
+  { value: "profile_images/profile3.jpg", src: new URL('@/assets/profile_images/profile3.jpg', import.meta.url).href, label: "Image 3" },
+  { value: "profile_images/profile4.jpg", src: new URL('@/assets/profile_images/profile4.jpg', import.meta.url).href, label: "Image 4" },
+  { value: "profile_images/profile5.jpg", src: new URL('@/assets/profile_images/profile5.jpg', import.meta.url).href, label: "Image 5" },
+  { value: "profile_images/profile6.jpg", src: new URL('@/assets/profile_images/profile6.jpg', import.meta.url).href, label: "Image 6" },
+  { value: "profile_images/default_profile.jpg", src: new URL('@/assets/profile_images/default_profile.jpg', import.meta.url).href, label: "Image 7" }
 ]
+
+// 상태 변수
 const profile_image = ref('')
-const showModal = ref('')
+const showModal = ref(false)
 const nickname = ref('')
-const route = useRoute();
+const route = useRoute()
 const router = useRouter()
-const userId = route.params.user_id // URL에서 user_id를 가져옴
 const store = useMovieStore()
+const userId = ref(route.params.user_id) 
 const userData = ref({})
 const isFollowing = ref(false)
+// 내 페이지인지 확인하는 변수
+// const isMyPage = ref(false)
+const isNotMyPage = computed(() => !isMyPage.value)
 
-// 내 페이지인지 확인
-const isNotMyPage = computed(() => store.userId !== userId)
-
-// 마운트될 때 사용자 정보 불러오기
-onMounted(() => {
+// 내 페이지인지 확인하는 computed 속성
+const isMyPage = computed(() => String(store.userId) === String(userId.value))
+// 사용자 데이터 불러오기 함수
+const fetchUserData = (id) => {
   if (store.token) {
-    // 특정 사용자의 데이터 요청
     axios({
       method: 'get',
-      url: `http://127.0.0.1:8000/accounts/${userId}/mypage/`,
+      url: `http://127.0.0.1:8000/accounts/${id}/mypage/`,
       headers: {
         Authorization: `Token ${store.token}`
       }
     })
-    .then((res) => {
-      userData.value = res.data
-      nickname.value = res.data.nickname; // 닉네임 초기화
-      profile_image.value = res.data.profile_image; // 프로필 이미지 초기화
-    })
-    .catch((err) => {
-      console.error('유저 정보를 불러오는 중 오류 발생:', err)
-    });
+      .then((res) => {
+        userData.value = res.data
+        nickname.value = res.data.nickname // 닉네임 초기화
+        profile_image.value = res.data.profile_image // 프로필 이미지 초기화
+      })
+      .catch((err) => {
+        console.error('유저 정보를 불러오는 중 오류 발생:', err)
+      })
 
     // 팔로우 상태 확인
     axios({
       method: 'get',
-      url: `http://127.0.0.1:8000/accounts/${userId}/follow/`,
+      url: `http://127.0.0.1:8000/accounts/${id}/follow/`,
       headers: {
         Authorization: `Token ${store.token}`
       }
     })
-    .then((res) => {
-      isFollowing.value = res.data.is_following
-      console.log(res.data.is_following)
-    })
-    .catch((err) => {
-      console.error('팔로우 상태를 확인하는 중 오류 발생:', err)
-    });
+      .then((res) => {
+        isFollowing.value = res.data.is_following
+        console.log(res.data.is_following)
+      })
+      .catch((err) => {
+        console.error('팔로우 상태를 확인하는 중 오류 발생:', err)
+      })
   }
-});
+}
 
+// 마운트될 때와 라우트 변경 시 사용자 정보 불러오기
+onMounted(() => {
+  fetchUserData(userId.value)
+})
+
+// 라우트 변경 시 업데이트
+watch(() => route.params.user_id, (newUserId) => {
+  userId.value = newUserId
+  fetchUserData(userId.value)
+})
+
+// 회원 정보 수정
 const updateData = () => {
   if (!store.token) {
-    alert('로그인이 필요합니다.')
+    alert('로그인이 필요합니다')
     return
   }
   axios({
     method: 'put',
-    url: `http://127.0.0.1:8000/accounts/${userId}/update/`,
+    url: `http://127.0.0.1:8000/accounts/${userId.value}/update/`,
     headers: {
-      Authorization: `Token ${store.token}`,
+      Authorization: `Token ${store.token}`
     },
     data: {
       nickname: nickname.value,
-      profile_image: profile_image.value,
-    },
+      profile_image: profile_image.value
+    }
   })
     .then((res) => {
       userData.value = {
         ...userData.value, // 기존 데이터 유지
-        ...res.data, // 응답으로 온 데이터 덮어쓰기
-      };
-      alert('회원정보가 성공적으로 수정되었습니다.')
-      showModal.value = false; // 모달 닫기
+        ...res.data // 응답으로 온 데이터 덮어쓰기
+      }
+      alert('회원정보가 성공적으로 수정되었습니다')
+      showModal.value = false // 모달 닫기
     })
     .catch((err) => {
       console.error('회원정보 수정 중 오류:', err)
-      alert('회원정보 수정에 실패했습니다.')
+      alert('회원정보 수정에 실패했습니다')
     })
 }
 
 // 팔로우/언팔로우 기능
 const toggleFollow = () => {
   if (!store.token) {
-    alert('로그인이 필요합니다.')
-    return;
+    alert('로그인이 필요합니다')
+    return
   }
 
   axios({
     method: 'post',
-    url: `http://127.0.0.1:8000/accounts/${userId}/follow/`,
+    url: `http://127.0.0.1:8000/accounts/${userId.value}/follow/`,
     headers: {
       Authorization: `Token ${store.token}`
     }
   })
-  .then((res) => {
-    if (res.data.message === '팔로우') {
-      isFollowing.value = true
-      userData.value.followers_count += 1;
-    } else if (res.data.message === '언팔로우') {
-      isFollowing.value = false
-      userData.value.followers_count -= 1;
-    }
-    console.log(res.data.message)
-  })
-  .catch((err) => {
-    console.error('팔로우/언팔로우 요청 중 오류 발생:', err)
-  })
+    .then((res) => {
+      if (res.data.message === '팔로우') {
+        isFollowing.value = true
+        userData.value.followers_count += 1
+      } else if (res.data.message === '언팔로우') {
+        isFollowing.value = false
+        userData.value.followers_count -= 1
+      }
+      console.log(res.data.message)
+    })
+    .catch((err) => {
+      console.error('팔로우/언팔로우 요청 중 오류 발생:', err)
+    })
 }
 
-
-
+// 모달 관련 상태 변수와 함수
 const showDeleteModal = ref(false)
 const password = ref('')
+const oldPassword = ref('')
+const newPassword1 = ref('')
+const newPassword2 = ref('')
+const showPasswordChange = ref(false)
 
 const openDeleteModal = () => {
   showDeleteModal.value = true
 }
+
 const closeDeleteModal = () => {
   showDeleteModal.value = false
   password.value = ''
 }
 
-// 비밀번호 수정
-const oldPassword = ref('')
-const newPassword1 = ref('')
-const newPassword2 = ref('')
-const showPasswordChange = ref(false)
 const closePasswordModal = () => {
   showPasswordChange.value = false
   oldPassword.value = ''
@@ -262,24 +276,28 @@ const closePasswordModal = () => {
   newPassword2.value = ''
 }
 
+// 비밀번호 변경
 const changePassword = () => {
   axios({
     method: 'put',
     url: `http://127.0.0.1:8000/accounts/password/change/`,
     headers: {
-        Authorization: `Token ${store.token}`
+      Authorization: `Token ${store.token}`
     },
     data: {
-      oldPassword : oldPassword.value,
-      newPassword1 : newPassword1.value,
-      newPassword2 : newPassword2.value
-      }
-  }).then((res) => {
-    console.log(res)
-    alert('비밀번호가 성공적으로 변경되었습니다.')
-  }).catch((err) => {
-    console.log(err)
+      oldPassword: oldPassword.value,
+      newPassword1: newPassword1.value,
+      newPassword2: newPassword2.value
+    }
   })
+    .then((res) => {
+      console.log(res)
+      alert('비밀번호가 성공적으로 변경되었습니다')
+      closePasswordModal()
+    })
+    .catch((err) => {
+      console.log(err)
+    })
 }
 
 // 회원탈퇴
@@ -291,19 +309,20 @@ const userDelete = () => {
       Authorization: `Token ${store.token}`
     },
     data: {
-      password : password.value
+      password: password.value
     }
   })
     .then(() => {
-      alert('회원탈퇴가 완료되었습니다.')
-    router.push({name:'main'})
+      alert('회원탈퇴가 완료되었습니다')
+      router.push({ name: 'main' })
     })
     .catch((err) => {
       console.log(err)
-  })
+    })
 }
-
 </script>
+
+
 
 
 <style scoped>

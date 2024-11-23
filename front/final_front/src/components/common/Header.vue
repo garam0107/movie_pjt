@@ -71,12 +71,12 @@ const searchMovie = () => {
         }
       }).then((res) => {  
           console.log('검색 성공')
-          // console.log(res.data)
           results.value = res.data
-          // console.log(results.value)
+      
       }).catch((err) => {
           console.log(err)
           results.value = []
+
     })
     
     } else {
@@ -88,7 +88,9 @@ const searchMovie = () => {
 
   const goDetail = (id) => {
     router.push({ name: "detail", params: { movie_id: id } })
-
+    setTimeout(() => {
+    search.value = ''
+  }, 100)
 }
 
 
