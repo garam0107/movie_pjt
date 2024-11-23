@@ -99,10 +99,6 @@ const handleMouseLeave = (e) => {
   font-family: Arial, sans-serif;
 }
 
-/* 리뷰 그리드 레이아웃 */
-.review-container {
-  padding: 10px;
-}
 
 /* 리뷰 카드들을 가로로 정렬하고 일정 간격 유지 */
 .review-grid {
@@ -149,6 +145,7 @@ const handleMouseLeave = (e) => {
   padding: 10px;
   border-radius: 10px;
   height: 200px;
+  display: block;
 }
 .movie-title, .review-title, .review-content {
   color: #fff;
@@ -183,8 +180,8 @@ const handleMouseLeave = (e) => {
 
 /* 리뷰의 별점 스타일 */
 .rating {
-  /* position: absolute; */
-  bottom: 20px;
+  position: absolute;
+  bottom: 50px;
   left: 10px;
 }
 
