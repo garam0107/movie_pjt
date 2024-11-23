@@ -44,21 +44,25 @@
 
     <!-- 리뷰 작성 모달 -->
     <div v-if="showReviewModal" class="modal">
-      <div class="modal-content">
-        <h3>리뷰 작성</h3>
-        <input type="text" v-model="reviewTitle" placeholder="제목" class="input-field"/>
-        <textarea v-model="reviewContent" placeholder="내용" class="textarea-field"></textarea>
-        <div class="rating-selection">
-          <p>별점 선택</p>
-          <div class="stars">
-            <span 
-              v-for="star in 5" 
-              :key="star" 
-              :class="['star', {'selected': star <= selectedRating, 'hovered': star <= hoveredRating}]" 
-              @click="selectedRating = star"
-              @mouseover="hoveredRating = star"
-              @mouseleave="hoveredRating = 0"
-            >★</span>
+      <div class="modal-content modal-form-style">
+        <h3>리뷰 작성 ✏️</h3>
+        <div form-group>
+          <input type="text" v-model="reviewTitle" placeholder="제목" class="input-field"/>
+          <textarea v-model="reviewContent" placeholder="내용" class="textarea-field"></textarea>
+        </div>
+        <div form-group>
+          <div class="rating-selection">
+            <p>별점 선택</p>
+            <div class="stars">
+              <span 
+                v-for="star in 5" 
+                :key="star" 
+                :class="['star', {'selected': star <= selectedRating, 'hovered': star <= hoveredRating}]" 
+                @click="selectedRating = star"
+                @mouseover="hoveredRating = star"
+                @mouseleave="hoveredRating = 0"
+              >★</span>
+            </div>
           </div>
         </div>
         <div class="modal-actions">
@@ -300,7 +304,7 @@ const submitReview = () => {
 }
 .actors {
   display: flex;
-  gap: 20px;
+  gap: 10px;
   margin-top: 20px;
 }
 
@@ -390,23 +394,33 @@ const submitReview = () => {
   align-items: center;
   justify-content: center;
 }
-
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+.modal-form-style {
+  background: #f8f3e8;
+  padding: 30px;
+  border-radius: 15px;
+  border: 2px solid #e5b299;
+  box-shadow: 10px 10px 0 #f4a261;
+}
 .modal-content {
-  background: #ffffff;
+  background: #f8f3e8;
   padding: 30px;
   border-radius: 10px;
   width: 400px;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .input-field, .textarea-field {
-  width: 80%;
+  width: 90%;
   padding: 10px;
   margin-bottom: 15px;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 1rem;
   transition: border-color 0.3s ease;
+  
 }
 
 .input-field:focus, .textarea-field:focus {

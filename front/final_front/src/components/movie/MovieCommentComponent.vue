@@ -6,14 +6,15 @@
     <div v-if="reviews.length === 0" class="no-comments">
       <p>코멘트가 없습니다. 첫 번째 코멘트를 작성해보세요!</p>
     </div>
-    <div v-else class="review-grid">
+    <div v-else class="review-grid ">
       <div 
-        class="review-card" 
+        class="review-card modal-form-style2" 
         v-for="review in reviews" 
         :key="review.id"
+        @click="openModal(review)"
       >
         <h5 class="review-title">{{ review.title }}</h5>
-        <p class="review-content">{{ review.content }}</p>
+        <p class="review-content">{{ shortenedContent(review.content) }}</p>
         <div class="rating">
           <span v-for="star in 5" :key="star" :class="{'filled-star': star <= review.rating, 'empty-star': star > review.rating}">
             {{ star <= review.rating ? '⭐' : '☆' }}
@@ -22,49 +23,44 @@
         <p class="review-author">작성자: {{ review.username }}</p>
         <p class="review-date">작성일: {{ formatDate(review.created_at) }}</p>
         <div v-if="review.username === userData.username">
-          <button @click="openUpdateModal(review)" class="updateBtn">리뷰 수정</button>
-          <button @click="deleteComment(review.id)" class="deleteBtn">리뷰 삭제</button>
+          <button @click.stop="openUpdateModal(review)" class="updateBtn">수정</button>
+          <button @click.stop="deleteComment(review.id)" class="deleteBtn">삭제</button>
+        </div>
+      </div>
+    </div>
+    
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal-content modal-form-style">
+        <button class="close-button" @click="closeModal">&times;</button>
+
+        
+        <h3>{{ selectedReview.username }}님의 리뷰 📜</h3>
+        
+        <div class="input-group">
+          <label for="title">Title</label>
+          <input type="text" :value="selectedReview.title" id="title" class="input-field" readonly>
+        </div>
+        
+        <div class="input-group">
+          <label for="content">Content</label>
+          <textarea :value="selectedReview.content" id="content" class="input-field2" readonly></textarea>
+        </div>
+
+        <div class="input-group">
+          <label>Rating</label>
+          <div class="rating-container">
+            <span 
+              v-for="star in 5" 
+              :key="star" 
+              :class="{'filled-star': star <= selectedReview.rating, 'empty-star': star > selectedReview.rating}"
+            >
+              ★
+            </span>
+          </div>
         </div>
       </div>
     </div>
   </div>
-
-    <div v-if="showModal" class="modal-overlay">
-      <div class="modal-content">
-        <h3>리뷰 수정</h3>
-        <div class="input-group">
-          <label for="title">제목:</label>
-          <input type="text" v-model="editReview.title" id="title" class="input-field">
-        </div>
-        
-        <div class="input-group" style="display: flex;">
-          <label for="content">내용:</label>
-          <textarea v-model="editReview.content" id="content" class="input-field"></textarea>
-        </div>
-
-        <div class="input-group" style="display: flex;">
-          <label>별점:</label>
-          <div class="rating-container" style="margin-left: 6px;">
-            <span 
-              v-for="star in 5" 
-              :key="star" 
-              @mouseover="setTempRating(star)" 
-              @mouseleave="resetTempRating"
-              @click="setRating(star)"
-              :class="{'filled-star': star <= (tempRating || editReview.rating), 'empty-star': star > (tempRating || editReview.rating)}"
-            >
-            ★
-            </span>
-          </div>
-        </div>
-
-        <div class="modal-buttons">
-          <button @click="updateComment" class="saveBtn">저장</button>
-          <button @click="closeUpdateModal" class="cancelBtn">취소</button>
-        </div>
-      </div>
-    </div>
-
 </template>
 
 <script setup>
@@ -73,14 +69,13 @@ import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { useMovieStore } from '@/stores/counter';
  
-const reviews = ref([])
-const route = useRoute()
+const reviews = ref([]);
+const route = useRoute();
 const movieId = route.params.movie_id;
-const userData = ref({})
-const store = useMovieStore()
-const showModal = ref(false)
-const editReview = ref({ title: '', content: '', rating: 0 })
-const tempRating = ref(null)
+const userData = ref({});
+const store = useMovieStore();
+const showModal = ref(false);
+const selectedReview = ref({ title: '', content: '', rating: 0, username: '' });
 
 onMounted(() => {
   axios({
@@ -88,10 +83,10 @@ onMounted(() => {
     url: `http://127.0.0.1:8000/movies/${movieId}/detail_review/`,
   })
     .then((res) => {
-      reviews.value = res.data
+      reviews.value = res.data;
     })
     .catch((err) => {
-      console.error(err)
+      console.error(err);
     });
 });
 
@@ -110,16 +105,16 @@ onMounted(async () => {
       }
     })
       .then(res => {
-        console.log('유저 데이터:', res.data)
+        console.log('유저 데이터:', res.data);
         userData.value = res.data;
       })
       .catch(err => {
-        console.log('마이페이지 정보를 불러오는 중 오류:', err)
-      })
+        console.log('마이페이지 정보를 불러오는 중 오류:', err);
+      });
   } else {
-    console.error('토큰이 없습니다. 로그인 후 다시 시도해주세요.')
+    console.error('토큰이 없습니다. 로그인 후 다시 시도해주세요.');
   }
-})
+});
 
 const deleteComment = (reviewId) => {
   if(confirm("정말로 리뷰를 삭제하시겠습니까")){
@@ -132,68 +127,32 @@ const deleteComment = (reviewId) => {
     })
     .then(res => {
       console.log(res.data.message);
-      reviews.value = reviews.value.filter(review => review.id !== reviewId)
+      reviews.value = reviews.value.filter(review => review.id !== reviewId);
     })
     .catch(err => {
-      console.log(err)
-    })
+      console.log(err);
+    });
   }
 };
 
 // 모달 열기
-const openUpdateModal = (review) => {
-  editReview.value = { ...review }; 
+const openModal = (review) => {
+  selectedReview.value = { ...review };
   showModal.value = true;
 };
 
 // 모달 닫기
-const closeUpdateModal = () => {
+const closeModal = () => {
   showModal.value = false;
-  tempRating.value = null; 
 };
 
-// 리뷰 수정 함수
-const updateComment = () => {
-  axios({
-    method: 'put',
-    url: `http://127.0.0.1:8000/movies/detail/${movieId}/create_review/`,
-    headers: {
-      Authorization: `Token ${store.token}`
-    },
-    data: {
-      title: editReview.value.title,
-      content: editReview.value.content,
-      rating: editReview.value.rating
-    }
-  })
-  .then(response => {
-    console.log(response.data.message);
-    // 로컬 데이터 업데이트
-    const updatedReview = reviews.value.find(r => r.id === editReview.value.id);
-    if (updatedReview) {
-      updatedReview.title = editReview.value.title;
-      updatedReview.content = editReview.value.content;
-      updatedReview.rating = editReview.value.rating;
-    }
-    closeUpdateModal(); // 모달 닫기
-    location.reload(); // 페이지 새로고침
-  })
-  .catch(err => {
-    console.error('리뷰 수정 중 오류가 발생했습니다.', err);
-  });
-};
-
-// 별점 관련 메서드
-const setTempRating = (rating) => {
-  tempRating.value = rating; // 마우스가 올려진 곳까지의 별점을 임시로 설정
-};
-
-const resetTempRating = () => {
-  tempRating.value = null; // 마우스가 별에서 벗어나면 임시 별점 초기화
-};
-
-const setRating = (rating) => {
-  editReview.value.rating = rating; // 클릭한 별점으로 실제 별점 설정
+// 내용이 너무 길 경우 ...으로 축약하는 메서드
+const shortenedContent = (content) => {
+  const maxLength = 20; // 최대 길이 설정
+  if (content.length > maxLength) {
+    return content.slice(0, maxLength) + '...';
+  }
+  return content;
 };
 </script>
 
@@ -222,11 +181,18 @@ const setRating = (rating) => {
 
 .review-card {
   background: #fff;
-  padding: 15px;
   border-radius: 10px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
+  cursor: pointer;
 }
+.modal-form-style {
+  background: #f8f3e8;
+  border-radius: 15px;
+  border: 2px solid #e5b299;
+  box-shadow: 10px 10px 0 #f4a261;
+}
+
 
 .review-card:hover {
   transform: translateY(-5px);
@@ -236,6 +202,7 @@ const setRating = (rating) => {
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 10px;
+  margin-top: 0;
 }
 
 .review-content {
@@ -247,7 +214,6 @@ const setRating = (rating) => {
   margin-bottom: 10px;
 }
 
-
 .review-author, .review-date {
   font-size: 0.9rem;
   color: #555;
@@ -255,19 +221,20 @@ const setRating = (rating) => {
 
 /* 버튼 스타일링 */
 .updateBtn, .deleteBtn {
-  background-color: gray;
-  color: white;
+  background-color: #fdc394;
+  color: #555;
   border: none;
-  padding: 8px 12px;
+  padding: 6px 8px;
   margin-right: 5px;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
   font-size: 0.9rem;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 .updateBtn:hover, .deleteBtn:hover {
-  background-color: #555;
+  background-color: #fdae6e;
 }
 
 .modal-overlay {
@@ -282,28 +249,68 @@ const setRating = (rating) => {
   justify-content: center;
 }
 
-.modal-content {
-  background: #fff;
-  padding: 30px;
+.modal-form-style2 {
+  background: #f8f3e8;
+  padding: 10px;
   border-radius: 15px;
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-  width: 450px;
-  max-width: 90%;
+  border: 2px solid #e5b299;
+  box-shadow: 10px 10px 0 #f4a261;
+}
+
+.modal-content {
   font-family: 'Noto Sans KR', sans-serif;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 100%;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
 }
 
 .input-group {
-  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
 }
 
-.input-field {
-  width: 80%;
+.input-field2 {
+  height: 140px;
+  width: 90%;
   padding: 10px;
-  margin-left: 6px;
   margin-top: 5px;
   border: 1px solid #ccc;
   border-radius: 5px;
   transition: border-color 0.3s;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 1rem;
+  color: #333;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+input[type="text"],
+textarea {
+  border: none;
+  border-bottom: 2px solid #333;
+  background: none;
+  padding: 5px;
+  font-size: 1rem;
+  color: #333;
+  outline: none;
+  resize: none;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 .input-field:focus {
@@ -324,54 +331,10 @@ const setRating = (rating) => {
   transition: transform 0.2s;
 }
 
-.filled-star:hover {
-  transform: scale(1.2);
-}
-
 .empty-star {
   color: lightgray;
   cursor: pointer;
   font-size: 1.5rem;
   transition: transform 0.2s;
-}
-
-.empty-star:hover {
-  transform: scale(1.2);
-}
-
-/* 모달 버튼 스타일 */
-.modal-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-
-.saveBtn {
-  background-color: gray;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.saveBtn:hover {
-  background-color: #555;
-}
-
-.cancelBtn {
-  background-color: gray;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.cancelBtn:hover {
-  background-color: #555;
 }
 </style>

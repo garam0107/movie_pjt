@@ -1,7 +1,13 @@
 <template>
   <div class="comments-section">
     <div class="comments-grid">
-      <div v-for="(comment, index) in limitedComments" :key="index" class="comment-card">
+      <div 
+        v-for="(comment, index) in limitedComments" 
+        :key="index" 
+        class="comment-card"
+        @mousemove="handleMouse"
+        @mouseleave="resetMouse"
+        @click="openModal(comment)">
         <RouterLink :to="`/mypage/${comment.review_user_id}/`" class="movie-link">
           <div class="profile-section">
             <img :src="`/src/assets/${comment.profile_image}`" alt="프로필 이미지" class="profile-image" />
@@ -14,7 +20,7 @@
             </RouterLink>
             <div class="movie-details">
               <h5 class="movie-title">{{ comment.title }}</h5>
-              <p class="movie-content">{{ comment.content }}</p>
+              <p class="movie-content">{{ shortenedContent(comment.content) }}</p>
               <div class="rating">
                 <span
                 v-for="star in 5"
@@ -26,9 +32,36 @@
           </div>
       </div>
     </div>
+    <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
+      <div class="modal-content modal-form-style">
+        <button class="close-button" @click="closeModal">&times;</button>
+        <form class="modal-form">
+          <div class="form-group">
+            <label for="userId" class="user-modal">{{selectedComment.review_user_id}}님이 작성한 코멘트 📜</label>
+          </div>
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" :value="selectedComment.title" readonly>
+          </div>
+          <div class="form-group">
+            <label for="content">Content</label>
+            <textarea id="content" :value="selectedComment.content" readonly></textarea>
+          </div>
+          <div class="form-group">
+            <label for="rating">Rating</label>
+            <div class="modal-rating">
+              <span
+              v-for="star in 5"
+              :key="star"
+              :class="['star', { filled: star <= Number(selectedComment.rating) }]"
+              >★</span>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
-
 
 <script setup>
 import { useMovieStore } from '@/stores/counter';
@@ -40,6 +73,9 @@ const props = defineProps ({
 const store = useMovieStore()
 const comments = ref([])
 const userData = ref([])
+const isModalOpen = ref(false);
+const selectedComment = ref(null);
+
 onMounted(() => {
   if (store.token) {
     axios({
@@ -72,15 +108,55 @@ onMounted(() => {
     })
   }
 })
+
 // 최신 4개의 코멘트를 가져오는 computed 속성
 const limitedComments = computed(() => {
   return comments.value.slice(0, 4); // 최신 4개의 댓글만 반환
 });
+
+// 내용이 너무 길 경우 ...으로 축약하는 메서드
+const shortenedContent = (content) => {
+  const maxLength = 10; // 최대 길이 설정
+  if (content.length > maxLength) {
+    return content.slice(0, maxLength) + '...';
+  }
+  return content;
+};
+
+// 마우스 이동 효과 추가
+const handleMouse = (event) => {
+  const card = event.currentTarget;
+  const { offsetWidth: width, offsetHeight: height } = card;
+  const { offsetX: x, offsetY: y } = event;
+  const moveX = (x / width) * 30 - 15;
+  const moveY = (y / height) * 30 - 15;
+  card.style.transform = `rotateX(${moveY}deg) rotateY(${moveX}deg)`;
+  card.style.boxShadow = `0 20px 40px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 0, 150, 0.5)`; // 무지개빛 그림자 효과 추가
+};
+
+// 마우스가 카드에서 떠날 때 효과 초기화
+const resetMouse = (event) => {
+  const card = event.currentTarget;
+  card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+  card.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';
+};
+
+// 모달 열기
+const openModal = (comment) => {
+  selectedComment.value = comment;
+  isModalOpen.value = true;
+};
+
+// 모달 닫기
+const closeModal = () => {
+  isModalOpen.value = false;
+  selectedComment.value = null;
+};
 </script>
 
 <style scoped>
 .comments-section {
-  max-width: 1200px; /* 전체 섹션의 최대 너비 */
+  max-width: 1200px;
   padding: 2px;
 }
 
@@ -92,8 +168,8 @@ h2 {
 
 .comments-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4개의 카드가 가로로 배치되도록 설정 */
-  gap: 20px; /* 카드 간격 */
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
 }
 
 .comment-card {
@@ -102,8 +178,9 @@ h2 {
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   background-color: #fff;
-  height: auto; /* 카드 높이를 내용에 따라 조정 */
-
+  height: auto;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; /* 부드러운 이동 및 그림자 효과 */
+  cursor: pointer;
 }
 
 .comment-card:hover {
@@ -123,31 +200,31 @@ h2 {
 }
 
 .movie-link {
-  text-decoration: none; /* 밑줄 제거 */
-  color: inherit; /* 텍스트 색상 상속 */
-  display: inline-block; /* 블록 요소로 표시 */
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
 }
 
 .review-user {
   font-size: 1rem;
   font-weight: bold;
-  color: #333; /* 사용자 이름 색상 */
+  color: #333;
 }
 
 .movie-info {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  background: #fffdfa; /* 종이 같은 배경 */
-  border: 1px dashed #ddd; /* 종이 느낌 테두리 */
+  background: #fffdfa;
+  border: 1px dashed #ddd;
   margin: 5px;
   border-radius: 5%;
 }
 
 .poster {
   width: 100%;
-  height: 150px; /* 일정한 높이로 고정 */
-  object-fit: cover; /* 이미지 비율 유지하며 크기 조정 */
+  height: 150px;
+  object-fit: cover;
   border-radius: 8px;
   margin: 5px;
 }
@@ -170,30 +247,113 @@ h2 {
   font-size: 0.9rem;
   line-height: 1.4;
   margin: 10px 0;
-  flex-grow: 1; /* 내용이 적어도 공간 차지 */
-  overflow: hidden; /* 내용이 많을 경우 잘림 */
+  flex-grow: 1;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .rating {
   display: flex;
-  gap: 2px; /* 별 간격 */
+  gap: 2px;
   justify-content: flex-start;
   margin-top: auto;
 }
 
 .star {
   font-size: 1.2rem;
-  color: #ddd; /* 기본 회색 */
+  color: #ddd;
 }
 
 .star.filled {
-  color: #ffd700; /* 노란색 별 */
+  color: #ffd700;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-form-style {
+  background: #f8f3e8;
+  padding: 30px;
+  border-radius: 15px;
+  border: 2px solid #e5b299;
+  box-shadow: 10px 10px 0 #f4a261;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 1rem;
+  color: #333;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+input[type="text"],
+textarea {
+  border: none;
+  border-bottom: 2px solid #333;
+  background: none;
+  padding: 5px;
+  font-size: 1rem;
+  color: #333;
+  outline: none;
+  resize: none;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.modal-rating {
+  display: flex;
+  gap: 2px;
+  justify-content: flex-start;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.user-modal{
+  font-size: large;
 }
 
 @media (max-width: 900px) {
   .comments-grid {
-    grid-template-columns: repeat(2, 1fr); /* 화면 너비가 더 좁아지면 2열로 변경 */
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 </style>
