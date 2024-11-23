@@ -12,13 +12,14 @@
           :key="review.movie_title"
           @mousemove="handleMouseMove"
           @mouseleave="handleMouseLeave"
-          @click="goDetail(review.movie_id)"
           :style="{'background-image': `url(https://image.tmdb.org/t/p/w500${review.movie_poster_path})`}"
+          @click="openReviewModal(review)"
         >
           <div class="card-content">
-            <!-- <h4 class="movie-title">{{ review.movie_title }}</h4> -->
             <h5 class="review-title">{{ review.title }}</h5>
-            <p class="review-content">{{ review.content }}</p>
+            <p class="review-content">
+              {{ review.content.length > 40 ? review.content.slice(0, 40) + '...' : review.content }}
+            </p>
             <div class="rating">
               <span
                 v-for="star in 5"
@@ -32,34 +33,56 @@
         </div>
       </div>
     </div>
+
+    <div v-if="isModalOpen" class="modal-overlay" @click="closeModal">
+      <div class="modal-content modal-form-style" @click.stop>
+        <button class="close-button" @click="closeModal">X</button>
+        <router-link
+          :to="{ name: 'detail', params: { movie_id: currentReview.movie_id } }"
+          class="movie-title-link"
+        >
+        <h3 class="movie-title-title">🎦 {{ currentReview.movie_title }}</h3>
+        </router-link>
+        <p><strong>Title:</strong> {{ currentReview.title }}</p>
+        <p><strong>Content:</strong> {{ currentReview.content }}</p>
+        <div class="rating2">
+          <span
+            v-for="star in 5"
+            :key="star"
+            :class="{'filled-star': star <= currentReview.rating, 'empty-star': star > currentReview.rating}"
+          >
+            {{ star <= currentReview.rating ? '⭐' : '☆' }}
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+
 defineProps({
   userData: Object
 });
 
-const router = useRouter()
+const router = useRouter();
 
 const goDetail = (id) => {
-  router.push({name : 'detail', params: {movie_id : id}})
-}
-
+  router.push({ name: 'detail', params: { movie_id: id } });
+};
 
 const handleMouseMove = (e) => {
   const card = e.currentTarget;
   const rect = card.getBoundingClientRect();
-  const x = e.clientX - rect.left; // 마우스의 카드 내 위치 (x 좌표)
-  const y = e.clientY - rect.top;  // 마우스의 카드 내 위치 (y 좌표)
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
   const halfWidth = rect.width / 2;
   const halfHeight = rect.height / 2;
-  
-  // 마우스 위치에 따른 각도 계산
-  const rotateX = ((y - halfHeight) / halfHeight) * 15; // 카드의 회전 각도
+
+  const rotateX = ((y - halfHeight) / halfHeight) * 15;
   const rotateY = ((x - halfWidth) / halfWidth) * -15;
 
   card.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
@@ -67,31 +90,43 @@ const handleMouseMove = (e) => {
 
 const handleMouseLeave = (e) => {
   const card = e.currentTarget;
-  card.style.transform = 'rotateY(0deg) rotateX(0deg)'; // 마우스가 떠났을 때 카드 위치 원래대로
+  card.style.transform = 'rotateY(0deg) rotateX(0deg)';
+};
+
+// Modal logic
+const isModalOpen = ref(false);
+const currentReview = ref({});
+
+const openReviewModal = (review) => {
+  currentReview.value = review;
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
 };
 </script>
+
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Hahmlet:wght@100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap');
-/* 전체적인 리뷰 섹션 스타일 */
+
 .comment-section {
   margin-top: 20px;
   font-family: Arial, sans-serif;
 }
 
-/* 제목 스타일 */
 .comment-title {
   margin-bottom: 20px;
   text-align: left;
   padding-left: 10px;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   color: #2c3e50;
   font-family: "Noto Sans KR", sans-serif;
 }
 
-/* 리뷰가 없을 때 표시할 텍스트 */
 .no-comments {
   text-align: center;
   font-size: 1.2rem;
@@ -99,17 +134,14 @@ const handleMouseLeave = (e) => {
   font-family: Arial, sans-serif;
 }
 
-
-/* 리뷰 카드들을 가로로 정렬하고 일정 간격 유지 */
 .review-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   justify-content: center;
-  perspective: 1500px; /* 카드에 3D 회전 효과를 위한 원근감 추가 */
+  perspective: 1500px;
 }
 
-/* 개별 리뷰 카드 스타일 */
 .review-card {
   background-size: cover;
   background-position: center;
@@ -124,22 +156,17 @@ const handleMouseLeave = (e) => {
   color: #ffffff;
   cursor: pointer;
   background-color: #34495e;
-  
-  /* 빛나는 효과 */
+
   background-image: linear-gradient(115deg, #0ff 25%, transparent 50%, #f0f 75%, transparent);
   background-blend-mode: overlay;
 }
 
 .review-card:hover {
-  transform: rotateY(15deg) translateY(-10px) scale(1.05); /* Y축 회전 및 확대 */
-  box-shadow: 
-    -20px -20px 30px -25px #0ff, 
-    20px 20px 30px -25px #f0f, 
-    0 0 13px 4px rgba(255, 255, 255, 0.3), 
-    0 55px 35px -20px rgba(0, 0, 0, 0.5); /* 빛나는 그림자 */
+  transform: rotateY(15deg) translateY(-10px) scale(1.05);
+  box-shadow: -20px -20px 30px -25px #0ff, 20px 20px 30px -25px #f0f, 0 0 13px 4px rgba(255, 255, 255, 0.3),
+    0 55px 35px -20px rgba(0, 0, 0, 0.5);
 }
 
-/* 카드 내부 내용 영역 */
 .card-content {
   background: rgba(44, 62, 80, 0.8);
   padding: 10px;
@@ -147,11 +174,7 @@ const handleMouseLeave = (e) => {
   height: 200px;
   display: block;
 }
-.movie-title, .review-title, .review-content {
-  color: #fff;
-}
 
-/* 리뷰 제목 스타일 */
 .review-title {
   font-size: 1rem;
   font-weight: 600;
@@ -159,7 +182,6 @@ const handleMouseLeave = (e) => {
   line-height: 1.3;
 }
 
-/* 리뷰 영화 제목 스타일 */
 .movie-title {
   font-size: 0.9rem;
   font-weight: 700;
@@ -167,7 +189,6 @@ const handleMouseLeave = (e) => {
   color: #ecf0f1;
 }
 
-/* 리뷰 본문 스타일 */
 .review-content {
   font-size: 0.9rem;
   margin-bottom: 15px;
@@ -175,10 +196,8 @@ const handleMouseLeave = (e) => {
   color: #ecf0f1;
   font-family: "Hahmlet", serif;
   font-optical-sizing: auto;
-
 }
 
-/* 리뷰의 별점 스타일 */
 .rating {
   position: absolute;
   bottom: 50px;
@@ -205,5 +224,70 @@ const handleMouseLeave = (e) => {
 
 .empty-star:hover {
   transform: scale(1.2);
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-form-style {
+  background: #f8f3e8;
+  padding: 30px;
+  border-radius: 15px;
+  border: 2px solid #e5b299;
+  box-shadow: 10px 10px 0 #f4a261;
+}
+
+.modal-content {
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  font-family: 'Noto Sans KR', sans-serif;
+  position: relative;
+}
+
+.modal-content h3 {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+  color: #2c3e50;
+}
+
+.modal-content p {
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #34495e;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #2c3e50;
+}
+.movie-title-link {
+  text-decoration: none;
+  color: #3498db;
+}
+
+.movie-title-link:hover {
+  text-decoration: underline;
+}
+
+.movie-title-title {
+  font-family: 'Hahmlet', serif;
 }
 </style>
