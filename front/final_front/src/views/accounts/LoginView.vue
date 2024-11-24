@@ -26,7 +26,8 @@ const login = function() {
         password: password.value
     };
     store.login(payload);
-};
+
+}
 
 </script>
 

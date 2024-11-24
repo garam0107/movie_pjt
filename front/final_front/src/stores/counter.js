@@ -54,17 +54,25 @@ export const useMovieStore = defineStore('movie', () => {
             Authorization: `Token ${res.data.key}`
           }
         })
-        .then(userRes => {
-          userId.value = userRes.data.username;
-          localStorage.setItem('userId', userRes.data.username);
-          router.push({ name: 'MainDolDam' });
-        })
-        .catch(err => {
-          console.log(err);
-        });
+          .then(userRes => {
+            userId.value = userRes.data.username;
+            localStorage.setItem('userId', userRes.data.username);
+            router.push({ name: 'MainDolDam' });
+          })
+          .catch(err => {
+            console.log(err);
+          });
       })
-      .catch(err => {
-        console.log(err);
+      .catch((err) => {
+        // 로그인 실패 처리
+        if (err.response && err.response.status === 400) {
+          alert('아이디 혹은 비밀번호가 틀렸습니다.');
+        } else if (err.request) {
+          alert('서버 응답이 없습니다. 네트워크 상태를 확인해주세요.');
+        } else {
+          alert('로그인 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        }
+        console.error('로그인 요청 실패:', err);
       });
   };
 
