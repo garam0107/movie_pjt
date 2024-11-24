@@ -3,6 +3,7 @@
     <div class="backdrop-container">
       <img :src="`https://image.tmdb.org/t/p/w500/${store.detailMovie.backdrop_path}`" alt="backdrop" class="backdrop">
       <div class="backdrop-info noto-sans-kr-backdrop-info">
+        <img :src="youtubeLogo" alt="YouTube" class="youtube-logo" />
         <h2>{{ store.detailMovie.title }}</h2>
         <p>장르: {{ store.detailMovie.genres?.map(genre => genre.name).join(', ') }}</p>
         <p>개봉일: {{ store.detailMovie.release_date }}</p>
@@ -77,7 +78,7 @@
 </template>
 
 <script setup>
-
+import youtubeLogo from "@/assets/youtubeLogo.svg";
 import MovieCommentComponent from '@/components/movie/MovieCommentComponent.vue';
 import router from '@/router';
 import { useMovieStore } from '@/stores/counter';
@@ -493,4 +494,9 @@ const submitReview = () => {
   background-color: #e00070;
   transform: translateY(-2px);
 }
+.youtube-logo {
+  width: 36px;
+  height: 36px;
+}
+
 </style>
