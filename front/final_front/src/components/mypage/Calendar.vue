@@ -504,6 +504,7 @@ const submitDiary = async () => {
     diaryContent.value = '';
     selectedEmoji.value = null;
     showDiaryModal.value = false;
+    router.go(0)
   } catch (error) {
     
     console.log("오류", error.response.data)
@@ -564,6 +565,7 @@ const updateDiary = (user_username, diary_pk) => {
     // 수정된 날짜 하이라이트
     const updatedDateKey = selectedDate.value.dateKey; // 수정된 날짜의 dateKey 사용
     highlightDate(updatedDateKey);
+    router.go(0)
   })
   .catch((err) => {
     console.log(err.data)
