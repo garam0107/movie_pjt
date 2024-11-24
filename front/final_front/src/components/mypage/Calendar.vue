@@ -37,7 +37,7 @@
     <!-- 다이어리 작성 모달 -->
     <div v-if="showDiaryModal" class="modal">
     <div class="modal-content">
-    <h3>다이어리 작성</h3>
+    <h3>오늘 당신의 감정은? ✏️</h3>
     <div class="form-group">
       <input type="text" v-model="diaryTitle" placeholder="제목" class="form-input" />
     </div>
@@ -45,7 +45,7 @@
       <textarea v-model="diaryContent" placeholder="내용" class="form-textarea"></textarea>
     </div>
     <div class="emoji-selection">
-      <h4>이모지 선택</h4>
+      <h4>감정 선택</h4>
       <div class="emoji-container">
         <button
           v-for="emoji in emojis"
@@ -64,6 +64,7 @@
       </div>
     </div>
   </div>
+
   <!-- 다이어리 상세 내용 모달 -->
   <div v-if="detailDiaryModal" class="detail-modal">
   <div class="detail-modal-content">
@@ -98,7 +99,7 @@
         <h4>AI의 한마디</h4>
         <p>{{ gpt_comment }}</p>
       </div>
-      <div class="modal-actions">
+      <div class="modal-actions2">
         <button @click="openEditModal" class="my-button">수정</button>
         <button @click="openDeleteModal" class="my-button">삭제</button>      
         <button @click="closeDiaryModal" class="close-button">닫기</button>
@@ -110,7 +111,7 @@
 <!-- 다이어리 수정 모달 -->
 <div v-if="showEditDiaryModal" class="modal">
   <div class="modal-content">
-    <h3>다이어리 수정</h3>
+    <h3>오늘의 일기 수정 ✏️</h3>
     <div class="form-group">
       <input type="text" v-model="editDiaryTitle" placeholder="제목" class="form-input" />
     </div>
@@ -118,7 +119,7 @@
       <textarea v-model="editDiaryContent" placeholder="내용" class="form-textarea"></textarea>
     </div>
     <div class="emoji-selection">
-      <h4>이모지 선택</h4>
+      <h4>감정 선택</h4>
       <div class="emoji-container">
         <button
           v-for="emoji in emojis"
@@ -650,9 +651,50 @@ onMounted(async () => {
  }
  
  .nav {
-   display: flex;
-   gap: 5px;
- }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* 버튼 사이 간격 */
+}
+
+.nav-btn {
+  background-color: #f4c895; /* 따뜻한 주황색 배경 */
+  color: #fff; /* 흰색 텍스트 */
+  border: none;
+  border-radius: 50%; /* 버튼을 동그랗게 */
+  height: 20px;
+  font-size: 0.7rem; /* 화살표 및 텍스트 크기 */
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 약간의 그림자 효과 */
+  transition: all 0.3s ease; /* 부드러운 애니메이션 */
+}
+
+.nav-btn:hover {
+  background-color: #f1a447; /* 호버 시 더 짙은 주황색 */
+  transform: scale(1.1); /* 버튼이 살짝 커짐 */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* 그림자 강조 */
+}
+
+.nav-btn:active {
+  transform: scale(0.95); /* 클릭 시 버튼이 살짝 눌리는 효과 */
+}
+
+
+.go-today {
+  font-size: 0.7rem; /* Today 버튼의 텍스트 크기 */
+  border-radius: 10px; /* Today 버튼은 약간 둥글게 */
+  background-color: #f4c895;
+}
+
+.go-today:hover {
+  background-color: #f1a447;
+}
+
+.go-today:active {
+  transform: scale(0.95);
+}
+
  
  .main {
    margin-top: 20px;
@@ -686,6 +728,7 @@ onMounted(async () => {
    position: absolute;
    top: 5px;
    left: 5px;
+   font-family: 'Noto Serif KR', serif; 
  }
  
  .today {
@@ -709,31 +752,112 @@ onMounted(async () => {
    height: 100%;
  }
  
- .modal {
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   background: rgba(0, 0, 0, 0.5);
-   display: flex;
-   align-items: center;
-   justify-content: center;
- } 
- 
+  /* ㅇㅇ */
  .modal-content {
-   background: white;
-   padding: 20px;
-   border-radius: 5px;
-   width: 300px;
- }
- 
- .emoji-select-image {
-   width: 30px;
-   height: 30px;
-   margin: 5px;
- } 
+  background-color: #fffaf0;
+  border: 2px solid #f4c895;
+  border-radius: 15px;
+  width: 30%;
+  padding: 20px;
+  font-family: 'Noto Serif KR', serif; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
 
+.modal-content h3 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+
+.form-textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 14px;
+  background-color: #fffaf0;
+  resize: none;
+}
+
+.emoji-selection h4 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.emoji-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.emoji-button:hover {
+  transform: scale(1.2);
+}
+
+.emoji-select-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+
+.emoji-selected .emoji-select-image {
+  border: 2px solid #f4c895;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+.modal-actions2 {
+  display: flex;
+  /* justify-content: space-between; */
+  margin-top: 20px;
+}
+
+.submit-button,
+.cancel-button {
+  width: 25%;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.submit-button {
+  background-color: #f4c895;
+  color: #fff;
+}
+
+.submit-button:hover {
+  background-color: #f1a447;
+}
+
+.cancel-button {
+  background-color: #d8d8d8;
+  color: #333;
+}
+
+.cancel-button:hover {
+  background-color: #b8b8b8;
+}
+
+/* ㅇㅇ */
  .modal {
   position: fixed;
   top: 0;
@@ -747,15 +871,6 @@ onMounted(async () => {
   z-index: 1000;
 }
 
-.modal-content {
-  background: #fff;
-  padding: 30px;
-  border-radius: 10px;
-  width: 400px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  font-family: 'Noto Sans KR', sans-serif;
-  text-align: center;
-}
 
 h3 {
   font-size: 1.5rem;
@@ -768,7 +883,7 @@ h3 {
 }
 
 .form-input {
-  width: 80%;
+  width: 90%;
   padding: 15px;
   font-size: 1rem;
   border: 1px solid #ddd;
@@ -776,28 +891,31 @@ h3 {
   outline: none;
   transition: border-color 0.3s, box-shadow 0.3s;
   background-color: #fafafa;
+  font-family: 'Noto Serif KR', serif; 
+  color: #4a4a4a;  
 }
 
 .form-input:focus {
-  border-color: #ff007f;
+  border-color: #fe7547;
   box-shadow: 0 0 5px rgba(255, 0, 127, 0.3);
 }
 
 .form-textarea {
-  width: 80%;
+  width: 90%;
   height: 150px;
   padding: 15px;
   font-size: 1rem;
-  border: 1px solid #ddd;
   border-radius: 8px;
   outline: none;
   resize: none;
   transition: border-color 0.3s, box-shadow 0.3s;
   background-color: #fafafa;
+  font-family: 'Noto Serif KR', serif; 
+  color: #4a4a4a; 
 }
 
 .form-textarea:focus {
-  border-color: #ff007f;
+  border-color: #fe7547;
   box-shadow: 0 0 5px rgba(255, 0, 127, 0.3);
 }
 
@@ -814,7 +932,7 @@ h3 {
 
 .emoji-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 윗줄에 4개 배치 */
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px; /* 이모지 간격 */
   justify-content: center;
   margin-bottom: 20px;
@@ -848,12 +966,6 @@ h3 {
   transform: scale(1.15); /* 살짝 확대 */
 }
 
-.modal-actions {
-  margin-top: 20px;
-  display: flex;
-
-}
-
 .submit-button,
 .cancel-button {
   width: 48%;
@@ -863,15 +975,7 @@ h3 {
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
-}
-
-.submit-button {
-  background-color: #28a745;
-  color: white;
-}
-
-.submit-button:hover {
-  background-color: #218838;
+  font-family: 'Noto Serif KR', serif; 
 }
 
 .cancel-button {
@@ -906,7 +1010,7 @@ h3 {
   width: 60%;
   max-width: 90%;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  font-family: 'Noto Serif KR', serif; /* 다이어리 느낌 나는 폰트 */
+  font-family: 'Noto Serif KR', serif; 
   line-height: 1.6;
   text-align: left;
   position: relative;
@@ -1002,7 +1106,7 @@ h3 {
   font-family: 'Noto Sans KR', sans-serif;
   /* margin-top: 20px; */
   padding: 10px 20px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   border: none;
   border-radius: 8px;
   background-color: #dc3545;
@@ -1041,6 +1145,13 @@ h3 {
 
 .detail-modal-diary {
   flex: 5;
+}
+
+.year-month{
+  font-family: 'Noto Serif KR', serif; 
+}
+.day {
+  font-family: 'Noto Serif KR', serif; 
 }
  </style>
  
