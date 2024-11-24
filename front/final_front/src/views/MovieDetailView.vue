@@ -2,9 +2,12 @@
   <div class="container noto-sans-kr-container">
     
     
-    <div class="backdrop-container">
+    <div class="backdrop-container"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
+    >
       <img :src="`https://image.tmdb.org/t/p/w500/${store.detailMovie.backdrop_path}`" alt="backdrop" class="backdrop">
-      <img :src="youtubeLogo" alt="YouTube" class="youtube-logo" />
+      <img :src="youtubeLogo" alt="YouTube" class="youtube-logo" @click="fetchTraier" />
       <div class="backdrop-info noto-sans-kr-backdrop-info">
         <h2>{{ store.detailMovie.title }}</h2>
         <p>장르: {{ store.detailMovie.genres?.map(genre => genre.name).join(', ') }}</p>
@@ -74,8 +77,25 @@
         </div>
       </div>
     </div>
-
-
+    <!-- 유튜브 예고편 모달 -->
+    <div v-if="showTrailerModal" class="custom-modal-overlay">
+      <div class="custom-modal-content">
+        <div class="modal-header">
+          <h5>{{ store.detailMovie.title }} 공식 예고편</h5>
+          <button @click="closeTrailerModal" class="close-button">닫기</button>
+        </div>
+        <div class="modal-body">
+          <div v-if="isLoading" class="spinner">Loading...</div>
+          <iframe
+            v-else-if="videoData"
+            class="trailer-iframe"
+            :src="videoData"
+            frameborder="0"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -100,6 +120,12 @@ const reviewTitle = ref('');
 const reviewContent = ref('');
 const selectedRating = ref(0);
 const hoveredRating = ref(0);
+const videoData = ref('')
+const isLoading = ref(false)
+const showTrailerModal = ref(false)
+let timer = null
+
+const youtubeApiKey = "AIzaSyBl8AwKZwMB2QH29s_ZfNEF8sXQ1MzpgRk"
 const fetchMovieDetails = () => {
   store.getDetailMovie(movieId.value);
   if(store.token) {
@@ -133,6 +159,50 @@ onBeforeRouteUpdate((to) => {
   fetchMovieDetails(); // 새 데이터를 가져옴
 });
 
+// 예고편 
+const fetchTraier = () => {
+  isLoading.value = true
+  const baseURL = "https://www.googleapis.com/youtube/v3/search"
+  axios ({
+    method : 'get',
+    url : baseURL,
+    params : {
+      key : youtubeApiKey,
+      part : "snippet",
+      type : "video",
+      q : `${store.detailMovie.title} 공식 예고편`,
+      maxResults : 1,
+    }
+  }).then ((res) => {
+    const videoId = res.data.items[0]?.id?.videoId
+    if(videoId){
+      videoData.value = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`
+      showTrailerModal.value = true
+    }
+  }).catch((err) => {
+    console.err("서버 에러:",err)
+  }).finally(()=>{
+    isLoading.value = false
+  })
+}
+// 포스터에 마우스 올림
+const handleMouseEnter = () => {
+  timer = setTimeout(() => {
+    fetchTraier()
+  }, 3000)
+}
+// 포스터에 마우스 뗌
+const handleMouseLeave = () => {
+  if(timer){
+    clearTimeout(timer)
+    timer = null
+  }
+}
+// 비디오 중지 및 모달 닫기
+const closeTrailerModal = () => {
+  videoData.value = ""
+  showTrailerModal.value = false
+}
 const toggleLike = () => {
   if(!store.token){
     alert('로그인이 필요합니다.')
@@ -502,6 +572,49 @@ const submitReview = () => {
   right: 10px;
   width: 40px; 
   z-index: 10; 
+  transition: transform 0.3s ease-in-out;
+}
+.youtube-logo:hover {
+  transform: scale(1.2);
+}
+
+/* 유튜브 예고편 */
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.custom-modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 720px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+
+.trailer-iframe {
+  width: 100%;
+  height: 450px;
+  display: block;
+  margin: 0 auto;
+}
+
+.spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #007bff;
 }
 
 </style>
