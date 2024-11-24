@@ -25,9 +25,9 @@ from .serializers import DiaryCreateSerializer, DiarySerializer,DiaryCommentSeri
 
 
 
-# OPENAI_API_KEY = "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"
+OPENAI_API_KEY = "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"
 
-OPENAI_API_KEY = settings.OPENAI_API_KEY
+# OPENAI_API_KEY = settings.OPENAI_API_KEY
 json_file_path = Path(__file__).resolve().parent/'updated_movies.json'
 
 def clean_movie_title(title):

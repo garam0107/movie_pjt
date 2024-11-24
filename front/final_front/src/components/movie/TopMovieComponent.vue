@@ -9,7 +9,7 @@
             <div class="movie-info">
               <p class="movie_title">{{ movie.title }}</p>
               <p class="movie-details">
-                {{ movie.release_date.slice(0, 4) }} •  {{ store.detailMovie.production_country || '정보 없음' }}<br>
+                {{ movie.release_date.slice(0, 4) }} •  {{ movie.production_country || '정보 없음' }}<br>
                 평점:  {{ movie.vote_average.toFixed(1) }} ★
               </p>
             </div>
@@ -27,7 +27,7 @@
             <div class="movie-info">
               <p class="movie_title">{{ movie.title }}</p>
               <p class="movie-details">
-                {{ movie.release_date.slice(0, 4) }} •  {{ store.detailMovie.production_country || '정보 없음' }}<br>
+                {{ movie.release_date.slice(0, 4) }} •  {{ movie.production_country || '정보 없음' }}<br>
                 평점:  {{ movie.vote_average.toFixed(1) }} ★
               </p>
             </div>
