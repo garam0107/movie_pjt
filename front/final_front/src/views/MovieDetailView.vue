@@ -1,9 +1,11 @@
 <template>
   <div class="container noto-sans-kr-container">
+    
+    
     <div class="backdrop-container">
       <img :src="`https://image.tmdb.org/t/p/w500/${store.detailMovie.backdrop_path}`" alt="backdrop" class="backdrop">
+      <img :src="youtubeLogo" alt="YouTube" class="youtube-logo" />
       <div class="backdrop-info noto-sans-kr-backdrop-info">
-        <img :src="youtubeLogo" alt="YouTube" class="youtube-logo" />
         <h2>{{ store.detailMovie.title }}</h2>
         <p>장르: {{ store.detailMovie.genres?.map(genre => genre.name).join(', ') }}</p>
         <p>개봉일: {{ store.detailMovie.release_date }}</p>
@@ -495,8 +497,11 @@ const submitReview = () => {
   transform: translateY(-2px);
 }
 .youtube-logo {
-  width: 36px;
-  height: 36px;
+  position : absolute ;
+  top: 10px;
+  right: 10px;
+  width: 40px; 
+  z-index: 10; 
 }
 
 </style>
