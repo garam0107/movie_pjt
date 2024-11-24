@@ -101,7 +101,7 @@
       </div> 
       <div class="modal-actions2">
         <div v-if="currentuser == props.userData.username">
-          <button @click="openEditModal" class="my-button" v-if="selectedDate.dateKey === Diary_today"">수정</button>
+          <button @click="openEditModal" class="my-button" v-if="selectedDate.dateKey === Diary_today">수정</button>
           <button @click="openDeleteModal" class="my-button">삭제</button>      
         </div>
         <button @click="closeDiaryModal" class="close-button">닫기</button>
