@@ -5,7 +5,7 @@
         <MyData :userData="userData" />
       </div>
       <div class="calendar-container">
-        <Calendar :userData="userData"/>
+        <Calendar :userData="userData" :key="userData.id"/>
       </div>
     </div>
     <div class="bottom">
@@ -25,17 +25,20 @@
 <script setup>
 import MyData from '@/components/mypage/MyData.vue';
 import { useMovieStore } from '@/stores/counter';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, onUpdated} from 'vue';
 import axios from 'axios';
-import { onBeforeRouteUpdate, useRoute } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute,useRouter } from 'vue-router';
 import Calendar from '@/components/mypage/Calendar.vue';
 import MyMovie from '@/components/mypage/MyMovie.vue';
 import MyComment from '@/components/mypage/MyComment.vue';
 
 const store = useMovieStore();
 const route = useRoute();
+const router = useRouter()
 const userData = ref({});
 const userDataLoaded = ref(false); // 로딩 상태 추적
+
+
 
 // 유저 데이터를 가져오는 함수
 const fetchUserData = (userId) => {
@@ -72,6 +75,7 @@ onMounted(() => {
 onBeforeRouteUpdate((to) => {
   const newUserId = to.params.user_id; // 새 라우트의 user_id 가져오기
   fetchUserData(newUserId); // 새 데이터 로드
+  
 });
 </script>
 

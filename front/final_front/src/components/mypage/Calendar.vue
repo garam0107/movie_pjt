@@ -215,6 +215,8 @@ const emojiMap = {
   '/src/assets/images/sleepy.jpg': 'emotions/sleepy.jpg',
 };
 
+
+
 const fetchMonthlyEmojis = async (username, year, month) => {
   try {
     const response = await axios.get(`http://127.0.0.1:8000/diaries/${username}/${year}/${month}/`, {
@@ -374,7 +376,7 @@ const openDiaryModal = (date) => {
         diaryContent.value = response.data.content;
         selectedEmoji.value = response.data.mood_emoji;
         gpt_comment.value = response.data.gpt_comment
-     
+        console.log(selectedEmoji.value)
         recommend_movies.value = response.data.recommend_movie_titles
         recommend_reasons1.value = response.data.recommend_reasons['today_diary_review1']
         recommend_reasons2.value = response.data.recommend_reasons['today_diary_review2']   
@@ -622,6 +624,10 @@ const confirmDelete = () => {
 
   closeDeleteModal()
 }
+watch(dates, (newDates) => {
+  console.log("dates가 변경되었습니다:", newDates);
+  // 이 시점에서 Vue가 배열의 변경을 감지하고 UI를 업데이트할 것임
+}, { deep: true });
 
 // 컴포넌트가 마운트될 때 달력 생성
 onMounted(async () => {
