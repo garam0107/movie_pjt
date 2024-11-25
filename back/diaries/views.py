@@ -31,7 +31,11 @@ OPENAI_API_KEY = "sk-proj-KudlWTNSJAMG__qaUdhqkVo7eHpgtYjhMG8ytDRGEQ98o58JEJFS7f
 json_file_path = Path(__file__).resolve().parent/'updated_movies.json'
 
 def clean_movie_title(title):
-    return re.sub(r'^"|"$|\\', '', title)
+    # 모든 불필요한 특수문자, 이스케이프 문자 및 별표 제거
+    cleaned_title = re.sub(r'[\\*"]', '', title)  # \, *, " 제거
+    cleaned_title = re.sub(r"^'+|'+$", '', cleaned_title)  # 제목 앞뒤의 단일 따옴표 제거
+    cleaned_title = cleaned_title.strip()  # 앞뒤 공백 제거
+    return cleaned_title
 
 def gpt_recommend(diary_text):
     try:
@@ -45,13 +49,14 @@ def gpt_recommend(diary_text):
     try:
         with open(json_file_path, encoding='utf-8') as f:
             available_movies = json.load(f)
-            print("파일을 성공적으로 읽었습니다.")
+            # 제목을 정리하여 불필요한 특수 문자가 추가되지 않도록 처리
+            for movie in available_movies:
+                movie['fields']['title'] = clean_movie_title(movie['fields']['title'])
+            print("파일을 성공적으로 읽고 제목을 정리했습니다.")
     except json.JSONDecodeError as e:
         print(f"JSON 파일을 파싱하는 도중 오류가 발생했습니다: {e}")
-        return None
     except Exception as e:
         print(f"파일을 여는 도중 예상치 못한 오류가 발생했습니다: {e}")
-        return None
 
     # DB안에 있는 영화에서 검색해서 추천
     try:
@@ -120,9 +125,6 @@ def gpt_recommend(diary_text):
 
 
 
-import re
-
-import re
 
 def make_json(answer):
     parsed_data = {}
@@ -138,13 +140,13 @@ def make_json(answer):
     # movies 리스트의 길이를 확인하여 안전하게 접근
     if len(movies) >= 2:
         parsed_data['movies'] = {
-            "title": [movies[0][0].strip(), movies[1][0].strip()],
+            "title": [clean_movie_title(movies[0][0]), clean_movie_title(movies[1][0])],
             "reason": [movies[0][1].strip(), movies[1][1].strip()]
         }
     else:
         # 만약 movies 리스트의 길이가 충분하지 않다면 빈 값 또는 다른 처리를 추가
         parsed_data['movies'] = {
-            "title": [movies[i][0].strip() if i < len(movies) else "" for i in range(2)],
+            "title": [clean_movie_title(movies[i][0]) if i < len(movies) else "" for i in range(2)],
             "reason": [movies[i][1].strip() if i < len(movies) else "" for i in range(2)]
         }
 
