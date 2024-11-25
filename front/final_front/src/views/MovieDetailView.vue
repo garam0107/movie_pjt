@@ -235,7 +235,10 @@ const toggleLike = () => {
 const openReviewModal = () => {
   console.log('리뷰한 사람들', store.detailMovie.movie_reviews);
   console.log('유저아이디', userId.value);
-
+  if(!store.token){
+    alert('로그인이 필요합니다.')
+    router.push({ name: 'LoginView' })
+  }
   for (let review of store.detailMovie.movie_reviews) {
     console.log('각 리뷰', review.username);
     if (userId.value === review.username) {
