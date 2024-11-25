@@ -64,10 +64,10 @@ def gpt_recommend(diary_text):
         return None
 
 
-    # 프롬프트 작성
+        # 프롬프트 작성
     messages = [
-        {"role": "system", "content": "You are an assistant that helps users analyze their emotions from diary entries and provides movie recommendations. All responses should be in Korean."},
-        {"role": "user", "content": f"""
+    {"role": "system", "content": "You are an assistant that helps users analyze their emotions from diary entries and provides personalized movie recommendations. All responses should be in Korean, and they should sound empathetic and supportive, as if you're talking to a close friend."},
+    {"role": "user", "content": f"""
     Here is a diary entry written by the user: "{diary_text}"
 
     Based on the following available movies, analyze the emotion in the diary entry and recommend two movies from the list: 
@@ -84,19 +84,23 @@ def gpt_recommend(diary_text):
 
     2. If the detected emotion is not among the six defined categories, analyze it freely and recommend a movie based on the detected emotion.
 
-    3. Provide two movie recommendations: one that matches the detected emotion and one that is the opposite to help balance the user's mood.
+    3. Provide two movie recommendations: one that matches the detected emotion and one that contrasts with it to help balance the user's mood. 
+    - Please make sure that each recommendation includes a warm and empathetic explanation. Try to make it feel like you understand the user's emotions and why the suggested movie would be comforting or inspiring to them.
 
-    All responses should be in Korean. Please write Emotion in Korean
+    4. Write a detailed diary review with a length of 4-6 sentences. The review should focus on understanding the user's feelings, recognizing their efforts or struggles, and providing a comforting or insightful comment. Make it feel like you're truly listening to their story and offering thoughtful support.
+    5. You can analyze your emotions in various ways. You must write the detected emotion in Korean and describe it in a natural way, not in English.
+    
+    All responses should be in Korean. Please write 'Detected Emotion', 'Movie 1', 'Movie 2', and 'Diary Review' labels in English, while the actual content should be in Korean.
     Output format:
    - Detected Emotion: [Emotion]
     - Movie 1: [Movie Title] - [Reason for recommendation]
     - Movie 2: [Movie Title] - [Reason for recommendation]
-    - Diary Review: [A short review of the diary entry]
+    - Diary Review: [A review of the diary entry]
 
-    Please use '-' as a separator between movie title and recommendation reason.
-    Remember, only the labels 'Detected Emotion', 'Movie 1', 'Movie 2', and 'Diary Review' should be in English, while the actual emotion, movie titles, reasons, and review should all be in Korean.
+    Please remember to be empathetic and supportive in your responses.
     """}
-    ]
+]
+
 
     # ChatCompletion 엔드포인트 호출하여 감정 분석 및 영화 추천 받기
     try:
