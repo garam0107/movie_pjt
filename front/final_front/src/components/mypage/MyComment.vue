@@ -290,6 +290,7 @@ const closeModal = () => {
 
 .movie-title-title {
   font-family: 'Hahmlet', serif;
+  margin-top: 5px;
 }
 
 .no-comments{
