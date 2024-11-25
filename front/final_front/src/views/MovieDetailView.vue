@@ -495,7 +495,11 @@ const submitReview = () => {
   border-radius: 5px;
   font-size: 1rem;
   transition: border-color 0.3s ease;
-  
+  font-family: "Noto Sans KR", sans-serif;  font-family: "Noto Sans KR", sans-serif;
+}
+
+textarea {
+  height: 100px;
 }
 
 .input-field:focus, .textarea-field:focus {

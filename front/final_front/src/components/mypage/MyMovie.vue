@@ -26,7 +26,7 @@
         </div>
       </div>
     </div>
-    <p v-else>추천된 영화가 없습니다.</p>
+    <p v-else class="no-mymovie">추천된 영화가 없습니다.</p>
   </div>
 </template>
 
@@ -224,6 +224,10 @@ watch(
   border-radius: 8px;
   border: 1px solid #e63946;
   font-family: "Jua", sans-serif;
+}
+
+.no-mymovie {
+  font-family: "Noto Sans KR", sans-serif;
 }
 
 </style>

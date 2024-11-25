@@ -240,7 +240,7 @@ const closeUpdateModal = () => {
 
 // 내용이 너무 길 경우 ...으로 축약하는 메서드
 const shortenedContent = (content) => {
-  const maxLength = 20; // 최대 길이 설정
+  const maxLength = 25; // 최대 길이 설정
   if (content.length > maxLength) {
     return content.slice(0, maxLength) + '...';
   }
