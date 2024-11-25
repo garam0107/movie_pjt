@@ -14,7 +14,7 @@
           </form>
         </div>
         <p>{{ userData.email }}</p>
-        <p @click="followModal = true">팔로워 {{ props.userData.followers_count }} | 팔로잉 {{ props.userData.followings_count }}</p>
+        <p @click="followModal = true" class="follow-hover">팔로워 {{ props.userData.followers_count }} | 팔로잉 {{ props.userData.followings_count }}</p>
       </div>
     </div>
     <div class="user-stats">
@@ -102,29 +102,36 @@
   </div>
   <!-- 팔로워, 팔로잉 목록 모달 -->
   <div v-if="followModal" class="modal-overlay">
-    <div class="modal-content">
-      <p>팔로잉:</p>
-        <ul>
-          <li 
-          v-for="user in props.userData.followings" 
-          :key="user.id"
-          @click="goDetail(user.username)"
-          >
-            {{ user.nickname }} (ID: {{ user.username }})
-          </li>
-        </ul>
-
-      <p>팔로워:</p>
-        <ul>
-          <li 
-          v-for="user in props.userData.followers" 
-          :key="user.id"
-          @click="goDetail(user.username)"
-          >
-            {{ user.nickname }} (ID: {{ user.username }})
-          </li>
-        </ul>
-
+    <div class="modal-content2">
+      <button @click="closeFollow" class="close-follow inside-modal">X</button>
+      <div class="follow-section">
+        <div class="follow-list">
+          <p class="follow-title">팔로잉</p>
+          <ul>
+            <li 
+            v-for="user in props.userData.followings" 
+            :key="user.id"
+            @click="goDetail(user.username)"
+            class="follow-item follow-link"
+            >
+              {{ user.nickname }} (ID: {{ user.username }})
+            </li>
+          </ul>
+        </div>
+        <div class="follow-list">
+          <p class="follow-title">팔로워</p>
+            <ul>
+              <li 
+              v-for="user in props.userData.followers" 
+              :key="user.id"
+              @click="goDetail(user.username)"
+              class="follow-item follow-link"
+              >
+                {{ user.nickname }} (ID: {{ user.username }})
+              </li>
+            </ul>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -304,6 +311,10 @@ const closePasswordModal = () => {
   oldPassword.value = ''
   newPassword1.value = ''
   newPassword2.value = ''
+}
+
+const closeFollow = () => {
+  followModal.value= false
 }
 
 // 비밀번호 변경
@@ -522,10 +533,12 @@ button:active {
   text-align: center;
 }
 
+
+
 .modal-actions {
   margin-top: 20px;
   display: flex;
-  justify-content: space-between;
+
 }
 
 .modal-actions button {
@@ -646,5 +659,71 @@ input[type="radio"]:checked + .profile-img {
 .public-btn:hover {
   background-color: #ff007f;
 
+}
+
+.close-follow.inside-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+}
+
+.modal-content2 {
+  font-family: "Noto Sans KR", sans-serif;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #e599d2;
+  width: 500px;
+  box-shadow: 10px 10px 0 #f4619e;
+  position: relative;
+}
+.follow-section {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+}
+
+.follow-list {
+  padding: 10px 0;
+}
+
+.follow-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.follow-item {
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.follow-item:hover {
+  background-color: #f0f0f0;
+}
+
+.follow-link {
+  color: #333;
+  /* text-decoration: underline; */
+}
+
+.follow-link:hover {
+  text-decoration: none;
+  color: black;
+}
+
+.follow-hover {
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.follow-hover:hover {
+  color: #ff398b;
 }
 </style>
