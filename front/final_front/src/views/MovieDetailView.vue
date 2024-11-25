@@ -35,7 +35,9 @@
       <p>Actors</p>
       <div class="actors">
         <div v-for="actor in store.detailMovie.actors.slice(0, 10)" :key="actor.id" class="actor">
-          <img :src="`https://image.tmdb.org/t/p/w500/${actor.poster_path}`" alt="actor" class="actor-poster">
+          <img :src="actor.poster_path ? `https://image.tmdb.org/t/p/w500/${actor.poster_path}` : 'src/assets/profile_images/default_profile.jpg'" 
+          alt="actor" 
+          class="actor-poster">
           <p class="actor_name">{{ actor.name }}</p>
         </div>
       </div>
@@ -81,8 +83,8 @@
     <div v-if="showTrailerModal" class="custom-modal-overlay">
       <div class="custom-modal-content">
         <div class="modal-header">
-          <h5>{{ store.detailMovie.title }} 공식 예고편</h5>
-          <button @click="closeTrailerModal" class="close-button">닫기</button>
+          <h3 class="youtubeh3">{{ store.detailMovie.title }} 공식 예고편</h3>
+          <button @click="closeTrailerModal" class="youtube-close">X</button>
         </div>
         <div class="modal-body">
           <div v-if="isLoading" class="spinner">Loading...</div>
@@ -189,7 +191,7 @@ const fetchTraier = () => {
 const handleMouseEnter = () => {
   timer = setTimeout(() => {
     fetchTraier()
-  }, 3000)
+  }, 2000)
 }
 // 포스터에 마우스 뗌
 const handleMouseLeave = () => {
@@ -569,7 +571,7 @@ const submitReview = () => {
 .youtube-logo {
   position : absolute ;
   top: 10px;
-  right: 10px;
+  right: 15px;
   width: 40px; 
   z-index: 10; 
   transition: transform 0.3s ease-in-out;
@@ -594,7 +596,6 @@ const submitReview = () => {
 
 .custom-modal-content {
   background: #fff;
-  padding: 20px;
   border-radius: 10px;
   width: 720px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
@@ -617,4 +618,17 @@ const submitReview = () => {
   color: #007bff;
 }
 
+.youtube-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.youtubeh3 {
+  padding-left: 10px;
+}
 </style>

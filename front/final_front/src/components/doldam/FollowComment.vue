@@ -111,7 +111,7 @@ onMounted(() => {
 
 // 최신 4개의 코멘트를 가져오는 computed 속성
 const limitedComments = computed(() => {
-  return comments.value.slice(0, 4); // 최신 4개의 댓글만 반환
+  return comments.value.slice(0, 5); // 최신 4개의 댓글만 반환
 });
 
 // 내용이 너무 길 경우 ...으로 축약하는 메서드
@@ -155,6 +155,7 @@ const closeModal = () => {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Parkinsans:wght@300..800&display=swap');
 .comments-section {
   max-width: 1200px;
   padding: 2px;
@@ -164,6 +165,7 @@ h2 {
   text-align: center;
   font-size: 1.8rem;
   margin-bottom: 20px;
+
 }
 
 .comments-grid {
@@ -209,6 +211,7 @@ h2 {
   font-size: 1rem;
   font-weight: bold;
   color: #333;
+  font-family: "Parkinsans", sans-serif;
 }
 
 .movie-info {
@@ -218,7 +221,6 @@ h2 {
   background: #fffdfa;
   border: 1px dashed #ddd;
   margin: 5px;
-  border-radius: 5%;
 }
 
 .poster {
@@ -241,6 +243,7 @@ h2 {
   font-size: 0.9rem;
   font-weight: bold;
   margin: 0;
+  font-family: "Noto Sans KR", sans-serif;
 }
 
 .movie-content {
@@ -250,6 +253,7 @@ h2 {
   flex-grow: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: "Noto Sans KR", sans-serif;
 }
 
 .rating {
