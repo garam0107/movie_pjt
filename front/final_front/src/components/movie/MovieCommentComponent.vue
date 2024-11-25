@@ -35,7 +35,7 @@
         <button class="close-button" @click="closeModal">&times;</button>
 
         
-        <h3 @click="godetail(selectedReview.username)">{{ selectedReview.nickname }}님의 리뷰 📜</h3>
+        <h3 @click="godetail(selectedReview.username)" class="review-hover">{{ selectedReview.nickname }}님의 리뷰 📜</h3>
         
         <div class="input-group">
           <label for="title">Title</label>
@@ -448,5 +448,12 @@ textarea {
   cursor: pointer;
   font-size: 1.5rem;
   transition: transform 0.2s;
+}
+.review-hover{
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+.review-hover:hover {
+  color: #ff398b;
 }
 </style>

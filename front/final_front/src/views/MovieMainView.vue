@@ -15,9 +15,9 @@ import TopMovieComponent from '@/components/movie/TopMovieComponent.vue';
 import { useMovieStore } from '@/stores/counter';
 import { onMounted } from 'vue';
 const store = useMovieStore()
-onMounted(() => {
-  store.checkAuthentication()
-})
+// onMounted(() => {
+//   store.checkAuthentication()
+// })
 
 </script>
 
