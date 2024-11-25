@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
         "password": "pbkdf2_sha256$600000$IinaL4CdJWVzTlqNuLp3on$rfSm4SQu3Ytt40vwGVrtz2jqdane4R+K+WXeLD8Zk8A=",
-        "last_login": "2024-11-25T01:56:26.336Z",
+        "last_login": "2024-11-25T06:40:28.261Z",
         "is_superuser": false,
         "username": "jiin",
         "first_name": "",
@@ -15,9 +15,9 @@
         "date_joined": "2024-11-25T01:19:33.902Z",
         "name": "",
         "nickname": "징이",
-        "stone": 45,
+        "stone": 75,
         "profile_image": "profile_images/profile2.jpg",
-        "visit_count": 3.0,
+        "visit_count": 25.0,
         "is_public": true,
         "groups": [],
         "user_permissions": [],
@@ -33,7 +33,7 @@
     "pk": 2,
     "fields": {
         "password": "pbkdf2_sha256$600000$PWlrpEs8SZHkqbVC10yNvs$u6tfIgg6ZVQ762OS0+efAjKNpYjQLbtbAewu1K+XHCM=",
-        "last_login": "2024-11-25T01:29:39.610Z",
+        "last_login": "2024-11-25T06:16:40.467Z",
         "is_superuser": false,
         "username": "garam",
         "first_name": "",
@@ -44,13 +44,16 @@
         "date_joined": "2024-11-25T01:29:34.022Z",
         "name": "",
         "nickname": "커람",
-        "stone": 20,
+        "stone": 65,
         "profile_image": "profile_images/profile1.jpg",
-        "visit_count": 7.0,
+        "visit_count": 24.0,
         "is_public": true,
         "groups": [],
         "user_permissions": [],
-        "followings": []
+        "followings": [
+            1,
+            3
+        ]
     }
 },
 {
@@ -58,7 +61,7 @@
     "pk": 3,
     "fields": {
         "password": "pbkdf2_sha256$600000$uK7My2mu3X4d7HMk4cOUPT$wZh4qHy7mC60UeaeL29+0g4pr0davOV7X9sd4oYLgZM=",
-        "last_login": "2024-11-25T01:36:22.506Z",
+        "last_login": "2024-11-25T06:40:19.905Z",
         "is_superuser": false,
         "username": "faker",
         "first_name": "",
@@ -68,10 +71,10 @@
         "is_active": true,
         "date_joined": "2024-11-25T01:36:13.084Z",
         "name": "",
-        "nickname": "불사대마왕",
-        "stone": 15,
-        "profile_image": "profile_images/profile4.jpg",
-        "visit_count": 8.0,
+        "nickname": "불사대왕",
+        "stone": 35,
+        "profile_image": "profile_images/profile2.jpg",
+        "visit_count": 28.0,
         "is_public": false,
         "groups": [],
         "user_permissions": [],
@@ -86,7 +89,7 @@
     "pk": 4,
     "fields": {
         "password": "pbkdf2_sha256$600000$WukKzNh9uCC3HAsGR5AoE9$irX0eCkcXWYxPVIdfwM4/j+LGPO4F9VHh9x5v06mAek=",
-        "last_login": "2024-11-25T01:51:42.183Z",
+        "last_login": "2024-11-25T06:06:13.293Z",
         "is_superuser": false,
         "username": "oner",
         "first_name": "",
@@ -97,9 +100,9 @@
         "date_joined": "2024-11-25T01:51:35.876Z",
         "name": "",
         "nickname": "오창섭",
-        "stone": 15,
+        "stone": 30,
         "profile_image": "profile_images/profile5.jpg",
-        "visit_count": 11.0,
+        "visit_count": 15.0,
         "is_public": true,
         "groups": [],
         "user_permissions": [],
@@ -107,6 +110,145 @@
             1,
             2,
             3
+        ]
+    }
+},
+{
+    "model": "accounts.user",
+    "pk": 5,
+    "fields": {
+        "password": "pbkdf2_sha256$600000$HCmH3tlr8zk4ohj5GQqrNR$aO1ei9wnA/Funk2RvQRRgLzxG5IeE5UX5+BFeZWruxg=",
+        "last_login": "2024-11-25T03:15:20.547Z",
+        "is_superuser": false,
+        "username": "guma",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2024-11-25T03:15:14.232Z",
+        "name": "",
+        "nickname": "전어유시",
+        "stone": 25,
+        "profile_image": "profile_images/profile5.jpg",
+        "visit_count": 0.0,
+        "is_public": true,
+        "groups": [],
+        "user_permissions": [],
+        "followings": [
+            1,
+            4
+        ]
+    }
+},
+{
+    "model": "accounts.user",
+    "pk": 8,
+    "fields": {
+        "password": "pbkdf2_sha256$600000$iq25RMxts4LtwdUJBTR8Ls$3vDLq2L2iZiW3J/F4dEvbBWKRqw0hRJJQ1nh+hhYsM4=",
+        "last_login": "2024-11-25T06:09:52.918Z",
+        "is_superuser": false,
+        "username": "keria",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2024-11-25T06:09:46.809Z",
+        "name": "",
+        "nickname": "역천괴",
+        "stone": 25,
+        "profile_image": "profile_images/profile4.jpg",
+        "visit_count": 0.0,
+        "is_public": true,
+        "groups": [],
+        "user_permissions": [],
+        "followings": [
+            1,
+            2
+        ]
+    }
+},
+{
+    "model": "accounts.user",
+    "pk": 9,
+    "fields": {
+        "password": "pbkdf2_sha256$600000$Gdn45V17R2zFEZW4YR3RLS$vBgKVLMLD00aW6wvT2uXoWlPgQtu8VkS8auh4nQWFrA=",
+        "last_login": "2024-11-25T06:18:57.616Z",
+        "is_superuser": false,
+        "username": "doran",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2024-11-25T06:18:47.889Z",
+        "name": "",
+        "nickname": "도란도란",
+        "stone": 20,
+        "profile_image": "profile_images/profile3.jpg",
+        "visit_count": 1.0,
+        "is_public": true,
+        "groups": [],
+        "user_permissions": [],
+        "followings": [
+            3,
+            4
+        ]
+    }
+},
+{
+    "model": "accounts.user",
+    "pk": 10,
+    "fields": {
+        "password": "pbkdf2_sha256$600000$84hUwmZPZbAp87Mdg6M3g3$50uqVKl+tutDzyym58LvoHpix9S8PBIuugivgtx0AzQ=",
+        "last_login": "2024-11-25T06:23:37.088Z",
+        "is_superuser": false,
+        "username": "guhyun",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2024-11-25T06:23:09.752Z",
+        "name": "",
+        "nickname": "구현핑",
+        "stone": 20,
+        "profile_image": "profile_images/profile6.jpg",
+        "visit_count": 0.0,
+        "is_public": true,
+        "groups": [],
+        "user_permissions": [],
+        "followings": [
+            4
+        ]
+    }
+},
+{
+    "model": "accounts.user",
+    "pk": 11,
+    "fields": {
+        "password": "pbkdf2_sha256$600000$1n7lZUpWLvhjG4MZBP8xp1$006ib+RQBdnTaFpXpnkHiXVXMYOa8sDsqapMH8IqQKw=",
+        "last_login": "2024-11-25T06:33:43.002Z",
+        "is_superuser": false,
+        "username": "tom",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2024-11-25T06:33:32.425Z",
+        "name": "",
+        "nickname": "꼬마감독",
+        "stone": 15,
+        "profile_image": "profile_images/profile6.jpg",
+        "visit_count": 0.0,
+        "is_public": true,
+        "groups": [],
+        "user_permissions": [],
+        "followings": [
+            4,
+            9
         ]
     }
 }
