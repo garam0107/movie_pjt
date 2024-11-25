@@ -2,7 +2,7 @@
   <div class="mypage-container" v-if="userDataLoaded">
     <div class="top">
       <div class="mydata-container">
-        <MyData :userData="userData" />
+        <MyData :userData="userData" :key="userData.id"/>
       </div>
       <div class="calendar-container">
         <Calendar :userData="userData" :key="userData.id"/>

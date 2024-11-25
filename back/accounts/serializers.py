@@ -93,7 +93,7 @@ class UserSerializer(serializers.ModelSerializer):
     movies_titles = RecommendMovieSerializer(source='diaries', many=True, read_only=True)  
     class Meta:
         model = UserModel
-        fields = ['id','name', 'username', 'email', 'first_name', 'last_name', 'nickname', 'profile_image', 'visit_count',
+        fields = ['id','name', 'username', 'is_public', 'email', 'first_name', 'last_name', 'nickname', 'profile_image', 'visit_count',
                   'my_review','recommend_movie','recommend_reasons','followings','followers','followings_count','followers_count','stone','movies_titles']
         
     def get_followings_count(self, obj):
@@ -130,7 +130,7 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
         if hasattr(UserModel, 'visit_count'):
             extra_fields.append('visit_count')                
         model = UserModel
-        fields = ['pk','followers_count','followings_count','stone','my_review','recommend_movie','name', *extra_fields]
+        fields = ['pk','followers_count','followings_count','stone','my_review','recommend_movie','name','is_public', *extra_fields]
         read_only_fields = ('email',)
 
     def get_followings_count(self, obj):

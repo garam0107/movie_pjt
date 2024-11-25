@@ -7,6 +7,7 @@
       <div class="user-info">
         <div style="display: flex;">
           <h2>{{ props.userData.nickname }}</h2>
+          <button v-if="isMyPage" @click="isPublicDiary">{{ userData.is_public ? '공개' : '비공개' }}</button>
           <form v-if="isNotMyPage" @submit.prevent="toggleFollow">
             <button v-if="isFollowing" class="followBtn unfollowBtn">언팔로우</button>
             <button v-else class="followBtn">팔로우</button>
@@ -319,6 +320,23 @@ const userDelete = () => {
     .catch((err) => {
       console.log(err)
     })
+}
+
+// 다이어리 공개/비공개 여부
+const isPublicDiary = () => {
+  axios({
+    method: 'post',
+    url: `http://127.0.0.1:8000/accounts/${userId.value}/public/`,
+    headers: {
+       Authorization: `Token ${store.token}`
+    }
+  }).then((res) => {
+    userData.value.is_public = res.data.is_public
+    alert(res.data.message)
+  }).catch((err) => {
+    console.err('공개 상태 변경 중 오류 발생:', err)
+    alert('공개 상태 변경에 실패했습니다.')
+  })
 }
 </script>
 
