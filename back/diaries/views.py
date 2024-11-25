@@ -31,8 +31,8 @@ OPENAI_API_KEY = "sk-proj-KudlWTNSJAMG__qaUdhqkVo7eHpgtYjhMG8ytDRGEQ98o58JEJFS7f
 json_file_path = Path(__file__).resolve().parent/'updated_movies.json'
 
 def clean_movie_title(title):
-    # 모든 불필요한 특수문자, 이스케이프 문자 및 별표 제거
-    cleaned_title = re.sub(r'[\\*"》<>]', '', title)  # \, *, " 제거
+    # 이스케이프 문자, 불필요한 특수문자 제거 (`:`, `-` 등은 남겨둠)
+    cleaned_title = re.sub(r'[\\*"》<>]', '', title)  # \, *, ", 》, <, > 제거
     cleaned_title = re.sub(r"^'+|'+$", '', cleaned_title)  # 제목 앞뒤의 단일 따옴표 제거
     cleaned_title = cleaned_title.strip()  # 앞뒤 공백 제거
     return cleaned_title
