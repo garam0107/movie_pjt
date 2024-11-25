@@ -75,21 +75,21 @@ def gpt_recommend(diary_text):
     {"role": "user", "content": f"""
     Here is a diary entry written by the user: "{diary_text}"
 
-    Based on the following available movies, analyze the emotion in the diary entry and recommend two movies from the list: 
+    Based on the following available movies, analyze the emotion in the diary entry and recommend two movies from the list:
     {available_movies_str}
 
     1. Analyze the emotion in this diary entry. If the detected emotion is one of Joy, Sadness, Anger, Melancholy, Calm, or Excitement, provide a movie recommendation based on the genres associated with that emotion.
-    - Emotion-based movie genres:
-    Joy: Comedy (35), Animation (16), Family (10751), Music (10402), Romance (10749), Adventure (12)
-    Sadness: Drama (18), Romance (10749), History (36)
-    Anger: Action (28), Crime (80), Thriller (53), War (10752)
-    Melancholy: Drama (18), Documentary (99), Mystery (9648)
-    Calm: Documentary (99), Family (10751), Fantasy (14)
-    Excitement: Adventure (12), Romance (10749), Animation (16), Music (10402), Science Fiction (878)
+    - Emotion-based movie genres (with additional genres for variety):
+    Joy: Comedy (35), Animation (16), Family (10751), Music (10402), Romance (10749), Adventure (12), Action (28), Fantasy (14)
+    Sadness: Drama (18), Romance (10749), History (36), Family (10751)
+    Anger: Action (28), Crime (80), Thriller (53), War (10752), Adventure (12)
+    Melancholy: Drama (18), Documentary (99), Mystery (9648), Romance (10749)
+    Calm: Documentary (99), Family (10751), Fantasy (14), Music (10402), Science Fiction (878)
+    Excitement: Adventure (12), Romance (10749), Animation (16), Music (10402), Science Fiction (878), Action (28)
 
     2. If the detected emotion is not among the six defined categories, analyze it freely and recommend a movie based on the detected emotion.
 
-    3. Provide two movie recommendations: one that matches the detected emotion and one that contrasts with it to help balance the user's mood. 
+    3. Provide two movie recommendations: one that matches the detected emotion and one that contrasts with it to help balance the user's mood. Avoid recommending movies that have been previously recommended too frequently to ensure variety. Try to provide lesser-known but well-received movies where appropriate.
     - Please make sure that each recommendation includes a warm and empathetic explanation. Try to make it feel like you understand the user's emotions and why the suggested movie would be comforting or inspiring to them.
 
     4. Write a detailed diary review with a length of 4-6 sentences. The review should focus on understanding the user's feelings, recognizing their efforts or struggles, and providing a comforting or insightful comment. Make it feel like you're truly listening to their story and offering thoughtful support.
@@ -101,11 +101,10 @@ def gpt_recommend(diary_text):
     - Movie 1: [Movie Title] - [Reason for recommendation]
     - Movie 2: [Movie Title] - [Reason for recommendation]
     - Diary Review: [A review of the diary entry]
-
-    Please remember to be empathetic and supportive in your responses.
+    Please stop recommending movies 'inside out'
+    Please remember to be empathetic and supportive in your responses, and ensure that each recommendation is diverse, considering both popular and less well-known titles for variety.
     """}
 ]
-
 
     # ChatCompletion 엔드포인트 호출하여 감정 분석 및 영화 추천 받기
     try:
@@ -113,7 +112,8 @@ def gpt_recommend(diary_text):
             model="gpt-4o-mini",  # 사용할 모델 이름
             messages=messages,
             max_tokens=500,  # 응답에서 사용할 최대 토큰 수
-            temperature=0.88  # 응답의 다양성을 위한 온도 설정
+            temperature=0.9,   # 응답의 다양성을 위한 온도 설정
+            top_p=0.8
         )
 
         # 응답 내용 출력
