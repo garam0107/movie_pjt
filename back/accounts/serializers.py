@@ -78,6 +78,11 @@ class UserReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie_review
         fields= ['title', 'content','movie_title','rating','created_at','movie_poster_path','movie_id']
+    
+class FollowerFollowingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = ['id', 'nickname', 'profile_image','username']
         
 # 유저 정보
 class UserSerializer(serializers.ModelSerializer):
@@ -86,6 +91,8 @@ class UserSerializer(serializers.ModelSerializer):
     followings_count = serializers.SerializerMethodField()
     followers_count = serializers.SerializerMethodField()
     recommend_reasons = UserReasonSerializer(source = 'diaries', many = True, read_only = True)
+    followings = FollowerFollowingSerializer(many=True, read_only=True)  # 팔로잉 유저들의 정보를 가져옴
+    followers = FollowerFollowingSerializer(many=True, read_only=True)  # 팔로워 유저들의 정보를 가져옴
     class RecommendMovieSerializer(serializers.ModelSerializer):
         class Meta:
             model = Diary
@@ -101,14 +108,15 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_followers_count(self, obj):
         return obj.followers.count()
-    
-    
+
 # 유저 정보 가져오기
 class CustomUserDetailsSerializer(UserDetailsSerializer):
     my_review = UserReviewSerializer(source='moviereview_set', many=True, read_only=True)
     recommend_movie = UserMovieSerializer(source='diaries', many=True, read_only=True)
     followings_count = serializers.SerializerMethodField()
     followers_count = serializers.SerializerMethodField()
+    followings = FollowerFollowingSerializer(many=True, read_only=True)  # 팔로잉 유저들의 정보를 가져옴
+    followers = FollowerFollowingSerializer(many=True, read_only=True)  # 팔로워 유저들의 정보를 가져옴
     class Meta:
         extra_fields = []
         # see https://github.com/iMerica/dj-rest-auth/issues/181
@@ -130,7 +138,7 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
         if hasattr(UserModel, 'visit_count'):
             extra_fields.append('visit_count')                
         model = UserModel
-        fields = ['pk','followers_count','followings_count','stone','my_review','recommend_movie','name','is_public', *extra_fields]
+        fields = ['pk','followers_count','followings_count','stone','my_review','recommend_movie','name','is_public','followings','followers', *extra_fields]
         read_only_fields = ('email',)
 
     def get_followings_count(self, obj):
