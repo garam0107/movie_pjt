@@ -185,12 +185,12 @@ h1 {
 
 .profile-selection {
   width: 100%;
-  text-align: left;
+  /* text-align: left; */
 }
 
 .profile-images {
   display: flex;
-  gap: 40px;
+  gap: 20px;
   flex-wrap: wrap;
   justify-content: center;
 }

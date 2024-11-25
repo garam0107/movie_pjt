@@ -1,10 +1,10 @@
 <template>
   <div class="comment-section">
     <div v-if="userData?.my_review?.length === 0" class="no-comments">
-      <p>리뷰가 없습니다.</p>
+      <p class="no-comment">리뷰가 없습니다. 리뷰를 작성해보세요 !</p>
     </div>
     <div v-else class="review-container">
-      <h3 class="comment-title">{{ userData.nickname }}님의 리뷰 ✏️</h3>
+      <h3 class="comment-title">{{ userData.nickname }}님의 최근 리뷰 ✏️</h3>
       <div class="review-grid">
         <div
           class="review-card"
@@ -180,6 +180,7 @@ const closeModal = () => {
   font-weight: 600;
   margin-bottom: 10px;
   line-height: 1.3;
+  font-family: "Noto Sans KR", sans-serif;
 }
 
 .movie-title {
@@ -289,5 +290,10 @@ const closeModal = () => {
 
 .movie-title-title {
   font-family: 'Hahmlet', serif;
+}
+
+.no-comments{
+  font-family: "Noto Sans KR", sans-serif;
+
 }
 </style>

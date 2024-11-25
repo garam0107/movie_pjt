@@ -7,7 +7,7 @@
       <div class="user-info">
         <div style="display: flex;">
           <h2>{{ props.userData.nickname }}</h2>
-          <button v-if="isMyPage" @click="isPublicDiary">{{ userData.is_public ? '공개' : '비공개' }}</button>
+          <button v-if="isMyPage" @click="isPublicDiary" class="public-btn">{{ userData.is_public ? '공개' : '비공개' }}</button>
           <form v-if="isNotMyPage" @submit.prevent="toggleFollow">
             <button v-if="isFollowing" class="followBtn unfollowBtn">언팔로우</button>
             <button v-else class="followBtn">팔로우</button>
@@ -345,7 +345,7 @@ const isPublicDiary = () => {
 
 <style scoped>
 .followBtn {
-  margin-left: 15px;
+  /* margin-left: 15px; */
   font-size: 0.85rem;
   padding: 6px 12px;
   background-color: #28a745;
@@ -387,6 +387,7 @@ const isPublicDiary = () => {
 .user-info h2 {
   font-size: 1.5rem;
   margin: 0;
+  font-family: "Noto Sans KR", sans-serif;
 }
 
 .user-info p {
@@ -587,5 +588,19 @@ input[type="radio"]:checked + .profile-img {
   outline: none;
   transition: border-color 0.3s, box-shadow 0.3s;
   background-color: #fafafa;
+}
+
+.public-btn {
+  margin: 3px;
+  padding: 5px;
+  font-family: "Noto Sans KR", sans-serif;
+  margin-left: 10px;
+  background-color: #f857a7;
+  font-size: 1rem;
+}
+
+.public-btn:hover {
+  background-color: #ff007f;
+
 }
 </style>

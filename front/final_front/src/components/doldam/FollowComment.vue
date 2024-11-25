@@ -333,7 +333,9 @@ textarea {
   resize: none;
   font-family: 'Noto Sans KR', sans-serif;
 }
-
+textarea {
+  height: 140px;
+}
 .modal-rating {
   display: flex;
   gap: 2px;

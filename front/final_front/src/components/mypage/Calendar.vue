@@ -34,6 +34,10 @@
       </div>
     </div>
 
+    <div v-else>
+      <h2 class="not-ispublic">비공개 계정입니다 🔒</h2>
+    </div>
+
     <!-- 다이어리 작성 모달 -->
     <div v-if="showDiaryModal" class="modal">
     <div class="modal-content">
@@ -1163,6 +1167,11 @@ h3 {
 }
 .day {
   font-family: 'Noto Serif KR', serif; 
+}
+.not-ispublic {
+  font-family: 'Noto Serif KR', serif; 
+  text-align: center;
+  padding: 100px;
 }
  </style>
  
