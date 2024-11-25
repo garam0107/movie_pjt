@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="calendar">
+    <div v-if="isMyPage || (!isMyPage && is_public)" class="calendar">
       <div class="header">
         <div class="year-month">{{ year }}년 {{ month + 1 }}월</div>
         <div class="nav">
@@ -159,7 +159,7 @@
 
  
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted,computed } from 'vue';
 import axios from 'axios';
 import { useRouter,useRoute } from 'vue-router';
 import { useMovieStore } from '@/stores/counter';
@@ -192,9 +192,10 @@ const diaryContent = ref('');
 const selectedEmoji = ref('');
 const Diary_today = new Date().toISOString().split('T')[0]
 const token = localStorage.getItem('token');
-
-
+const is_public = props.userData.is_public
+const route = useRoute()
 const currentuser = store.userId
+const isMyPage = computed(() => String(store.userId) === String(route.params.user_id));
 
 
 const reverseEmojiMap = {
@@ -625,7 +626,7 @@ const confirmDelete = () => {
   closeDeleteModal()
 }
 watch(dates, (newDates) => {
-  console.log("dates가 변경되었습니다:", newDates);
+  // console.log("dates가 변경되었습니다:", newDates);
   // 이 시점에서 Vue가 배열의 변경을 감지하고 UI를 업데이트할 것임
 }, { deep: true });
 

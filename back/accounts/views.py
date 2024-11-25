@@ -123,3 +123,21 @@ def delete(request):
     user.delete()
     logout(request)
     return Response({'message' : '회원 탈퇴'})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def public(request,user_username):
+    now_user = get_user_model()
+    target_user = get_object_or_404(now_user, username = user_username)
+    user = request.user
+    if user == target_user:
+        user.is_public = not user.is_public
+        user.save()
+
+    # 성공적으로 저장된 경우 응답 반환
+    return Response({
+        "message": "공개 상태가 성공적으로 변경되었습니다.",
+        "is_public": user.is_public
+    }, status=200)
+
+   
