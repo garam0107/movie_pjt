@@ -11,6 +11,7 @@ export const useMovieStore = defineStore('movie', () => {
   
   const userData = ref([]);
   const userId = ref(localStorage.getItem('userId') || null);
+
   const getMovies = function() {
     axios({
       method: 'get',
@@ -29,6 +30,7 @@ export const useMovieStore = defineStore('movie', () => {
     })
       .then(res => {
         detailMovie.value = res.data;
+        console.log('정보확인',res.data)
       })
       .catch(err => console.log(err));
   };

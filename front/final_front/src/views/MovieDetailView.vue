@@ -125,6 +125,7 @@ const hoveredRating = ref(0);
 const videoData = ref('')
 const isLoading = ref(false)
 const showTrailerModal = ref(false)
+const userId = computed(() => store.userId)
 let timer = null
 
 const youtubeApiKey = "AIzaSyBl8AwKZwMB2QH29s_ZfNEF8sXQ1MzpgRk"
@@ -139,7 +140,7 @@ const fetchMovieDetails = () => {
       },
     })
     .then((res) => {
-      console.log('확인', res)
+      // console.log('확인', res.data)
       isLiked.value = res.data.liked
       likeCount.value = res.data.like_count
       console.log('영화id',movieId)
@@ -232,8 +233,21 @@ const toggleLike = () => {
 
 // 모달 열기
 const openReviewModal = () => {
+  console.log('리뷰한 사람들', store.detailMovie.movie_reviews);
+  console.log('유저아이디', userId.value);
+
+  for (let review of store.detailMovie.movie_reviews) {
+    console.log('각 리뷰', review.username);
+    if (userId.value === review.username) {
+      alert('이미 리뷰를 작성하였습니다');
+      return; // 루프 종료
+    }
+  }
+
+  // 리뷰를 작성하지 않았다면 모달 열기
   showReviewModal.value = true;
 };
+
 
 // 리뷰 제출
 const submitReview = () => {

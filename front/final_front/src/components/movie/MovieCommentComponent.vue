@@ -209,6 +209,7 @@ const deleteComment = (reviewId) => {
     .then(res => {
       console.log(res.data.message);
       reviews.value = reviews.value.filter(review => review.id !== reviewId);
+      router.go(0)
     })
     .catch(err => {
       console.log(err);
@@ -372,7 +373,7 @@ const godetail = (user_username) => {
   font-family: 'Noto Sans KR', sans-serif;
   padding: 20px;
   border-radius: 10px;
-  max-width: 400px;
+  max-width: 600px;
   width: 100%;
   position: relative;
 }
