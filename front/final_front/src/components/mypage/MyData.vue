@@ -14,7 +14,7 @@
           </form>
         </div>
         <p>{{ userData.email }}</p>
-        <p>팔로워 {{ props.userData.followers_count }} | 팔로잉 {{ props.userData.followings_count }}</p>
+        <p @click="followModal = true">팔로워 {{ props.userData.followers_count }} | 팔로잉 {{ props.userData.followings_count }}</p>
       </div>
     </div>
     <div class="user-stats">
@@ -100,8 +100,33 @@
       <button @click="showModal = false" class="cancel-button">취소</button>
     </div>
   </div>
+  <!-- 팔로워, 팔로잉 목록 모달 -->
+  <div v-if="followModal" class="modal-overlay">
+    <div class="modal-content">
+      <p>팔로잉:</p>
+        <ul>
+          <li 
+          v-for="user in props.userData.followings" 
+          :key="user.id"
+          @click="goDetail(user.username)"
+          >
+            {{ user.nickname }} (ID: {{ user.username }})
+          </li>
+        </ul>
 
+      <p>팔로워:</p>
+        <ul>
+          <li 
+          v-for="user in props.userData.followers" 
+          :key="user.id"
+          @click="goDetail(user.username)"
+          >
+            {{ user.nickname }} (ID: {{ user.username }})
+          </li>
+        </ul>
 
+    </div>
+  </div>
 
 
 
@@ -139,6 +164,7 @@ const store = useMovieStore()
 const userId = ref(route.params.user_id) 
 const userData = ref({})
 const isFollowing = ref(false)
+const followModal = ref(false)
 // 내 페이지인지 확인하는 변수
 // const isMyPage = ref(false)
 const isNotMyPage = computed(() => !isMyPage.value)
@@ -185,6 +211,8 @@ const fetchUserData = (id) => {
 // 마운트될 때와 라우트 변경 시 사용자 정보 불러오기
 onMounted(() => {
   fetchUserData(userId.value)
+  console.log('팔로잉',props.userData.followings)
+  console.log('팔로워',props.userData.followers)
 })
 
 // 라우트 변경 시 업데이트
@@ -349,6 +377,11 @@ const isPublicDiary = () => {
     alert('공개 상태 변경에 실패했습니다.')
   })
 }
+
+const goDetail = (user_username) => {
+  router.push({name : 'MyPageView', params:{user_id: user_username}})
+}
+
 </script>
 
 
