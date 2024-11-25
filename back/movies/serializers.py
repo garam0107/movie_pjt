@@ -13,22 +13,25 @@ class ActorSerializer(serializers.ModelSerializer):
         model = Actor
         fields= '__all__'
 
-# 영화 정보
-class MoiveSerializer(serializers.ModelSerializer):
-    genres = GenreSerializer(read_only = True, many = True)
-    actors = ActorSerializer(read_only =True, many = True)
-    class Meta:
-        model = Movie
-        fields = '__all__'
 
 # 영화 리뷰
 class MovieReviewsSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
     nickname = serializers.CharField(source='user.nickname', read_only=True)
+    user_id = serializers.CharField(source='user.id', read_only=True)
+ 
     
     class Meta:
         model = Movie_review
-        fields = ['id', 'title', 'content', 'created_at', 'updated_at', 'likes_count', 'rating', 'username','nickname']
+        fields = ['id', 'title', 'content', 'created_at', 'updated_at', 'likes_count', 'rating', 'username','nickname','user_id']
+# 영화 정보
+class MoiveSerializer(serializers.ModelSerializer):
+    genres = GenreSerializer(read_only = True, many = True)
+    actors = ActorSerializer(read_only =True, many = True)
+    movie_reviews = MovieReviewsSerializer(many=True, read_only=True)
+    class Meta:
+        model = Movie
+        fields = '__all__'
 
 #영화 리뷰의 댓글
 class ReviewCommentSerializer(serializers.ModelSerializer):
