@@ -35,7 +35,7 @@
       <p>Actors</p>
       <div class="actors">
         <div v-for="actor in store.detailMovie.actors.slice(0, 10)" :key="actor.id" class="actor">
-          <img :src="actor.poster_path ? `https://image.tmdb.org/t/p/w500/${actor.poster_path}` : 'src/assets/profile_images/default_profile.jpg'" 
+          <img :src="actor.poster_path ? `https://image.tmdb.org/t/p/w500/${actor.poster_path}` : defaultImage" 
           alt="actor" 
           class="actor-poster">
           <p class="actor_name">{{ actor.name }}</p>
@@ -46,7 +46,7 @@
       <p>배우 정보가 없습니다.</p>
     </div>
     <div>
-      <MovieCommentComponent/>
+      <MovieCommentComponent :movieId = "movieId"/>
     </div>
 
 
@@ -109,7 +109,7 @@ import { useMovieStore } from '@/stores/counter';
 import axios from 'axios';
 import { onMounted, ref, computed, onBeforeMount } from 'vue';
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
-
+import defaultImage from '@/assets/profile_images/default_profile.jpg'
 const store = useMovieStore();
 const route = useRoute();
 

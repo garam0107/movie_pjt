@@ -23,10 +23,12 @@ class MoiveSerializer(serializers.ModelSerializer):
 
 # 영화 리뷰
 class MovieReviewsSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)  
+    username = serializers.CharField(source='user.username', read_only=True)
+    nickname = serializers.CharField(source='user.nickname', read_only=True)
+    
     class Meta:
         model = Movie_review
-        fields = ['id', 'title', 'content', 'created_at', 'updated_at', 'likes_count', 'rating', 'username']
+        fields = ['id', 'title', 'content', 'created_at', 'updated_at', 'likes_count', 'rating', 'username','nickname']
 
 #영화 리뷰의 댓글
 class ReviewCommentSerializer(serializers.ModelSerializer):

@@ -35,7 +35,7 @@
         <button class="close-button" @click="closeModal">&times;</button>
 
         
-        <h3>{{ selectedReview.username }}님의 리뷰 📜</h3>
+        <h3 @click="godetail(selectedReview.username)">{{ selectedReview.nickname }}님의 리뷰 📜</h3>
         
         <div class="input-group">
           <label for="title">Title</label>
@@ -113,9 +113,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import { useRoute } from 'vue-router';
+import { useRoute,useRouter } from 'vue-router';
 import { useMovieStore } from '@/stores/counter';
- 
+
+const router = useRouter()
 const reviews = ref([])
 const route = useRoute()
 const movieId = route.params.movie_id
@@ -246,6 +247,10 @@ const shortenedContent = (content) => {
   }
   return content;
 };
+
+const godetail = (user_username) => {
+  router.push({name: 'MyPageView', params :{user_id:user_username}})
+}
 </script>
 
 <style scoped>

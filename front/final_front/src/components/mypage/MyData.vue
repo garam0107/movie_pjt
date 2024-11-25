@@ -19,7 +19,7 @@
     </div>
     <div class="user-stats">
       <div class="stat">
-        <p class="userstatus">방문자 수: {{ props.userData.visit_count }}</p>
+        <p class="userstatus">방문자 수: {{ Math.round(props.userData.visit_count) }}</p>
         <div style="display: flex; justify-content: center;">
           <p class="userstatus">모은 조약돌 수: {{ props.userData.stone }}</p>
           <img src="@/assets/stone_icon.png" alt="stone icon" class="stone-icon" />
@@ -217,6 +217,7 @@ const updateData = () => {
       }
       alert('회원정보가 성공적으로 수정되었습니다')
       showModal.value = false // 모달 닫기
+      router.go(0)
     })
     .catch((err) => {
       console.error('회원정보 수정 중 오류:', err)
@@ -279,6 +280,10 @@ const closePasswordModal = () => {
 
 // 비밀번호 변경
 const changePassword = () => {
+  if (newPassword1.value !== newPassword2.value) {
+    alert('새 비밀번호가 일치하지 않습니다. 다시 확인해주세요.');
+    return;
+  }
   axios({
     method: 'put',
     url: `http://127.0.0.1:8000/accounts/password/change/`,
@@ -297,7 +302,11 @@ const changePassword = () => {
       closePasswordModal()
     })
     .catch((err) => {
+      if (err.response && err.response.status === 400) {
+        alert(err.response.data.message)
+      }
       console.log(err)
+      alert('비밀번호 변경 중 오류가 발생했습니다.')
     })
 }
 
@@ -315,10 +324,12 @@ const userDelete = () => {
   })
     .then(() => {
       alert('회원탈퇴가 완료되었습니다')
-      router.push({ name: 'main' })
+      store.logout2()
+      
     })
     .catch((err) => {
       console.log(err)
+      alert(err.response.data.message)
     })
 }
 
