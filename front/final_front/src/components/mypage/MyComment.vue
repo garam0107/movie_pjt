@@ -252,7 +252,7 @@ const closeModal = () => {
 .modal-content {
   padding: 20px;
   border-radius: 10px;
-  width: 400px;
+  width: 600px;
   font-family: 'Noto Sans KR', sans-serif;
   position: relative;
 }
