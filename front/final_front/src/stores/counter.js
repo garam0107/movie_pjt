@@ -159,7 +159,32 @@ export const useMovieStore = defineStore('movie', () => {
       console.log(err.response.data)
     })
   }
-
+  // 회원탈퇴 후 로그아웃
+  const logout2 = function() {
+    const storedToken = localStorage.getItem('token') || token.value;
+  
+    if (!storedToken) {
+      console.warn("로그아웃 실패: 저장된 토큰이 없습니다.")
+      clearAuthState(); // 클라이언트 상태 초기화
+      return
+    }
+  
+    axios({
+      method: 'post',
+      url: `${API_URL}accounts/logout/`,
+      headers: {
+        Authorization: `Token ${storedToken}`
+      }
+    })
+      .then(() => {
+        console.log("로그아웃 성공")
+        clearAuthState2() // 로그아웃 성공 시 상태 초기화
+      })
+      .catch(err => {
+        console.error("로그아웃 실패:", err)
+        clearAuthState2()// 실패해도 클라이언트 상태 초기화
+      })
+  }
 
   // 클라이언트 상태 초기화 함수
   const clearAuthState = function() {
@@ -169,7 +194,13 @@ export const useMovieStore = defineStore('movie', () => {
     localStorage.removeItem('userId')
     router.push({ name: 'LoginView' })
   }
-  
+  const clearAuthState2 = function() {
+    token.value = null
+    userId.value = null
+    localStorage.removeItem('token')
+    localStorage.removeItem('userId')
+    router.push({ name: 'MainDolDam' })
+  }
   const checkAuthentication = function() {
     const storedToken = localStorage.getItem('token')
     const storedUserId = localStorage.getItem('userId')
@@ -191,6 +222,7 @@ export const useMovieStore = defineStore('movie', () => {
     login,
     signup,
     logout,
+    logout2,
     checkAuthentication,
     isAuthenticated,
     token,
