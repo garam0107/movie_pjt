@@ -152,13 +152,10 @@ watch(
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
-/* .movie-container {
-  padding-top: 20px;
-  background: #f9f9f9;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-} */
+.movie-container {
+  padding-top: 3px;
+ 
+}
 
 .movie-header {
   font-size: 1.3rem;

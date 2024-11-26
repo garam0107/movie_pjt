@@ -58,6 +58,9 @@
         </div>
         <div class="spoke"></div>
       </div>
+      <div class = "loading-text">
+        <p>AI가 당신의 일기를 분석중입니다...</p>
+      </div>
     </div>
 
 
@@ -678,7 +681,7 @@ onMounted(async () => {
 
  
  <style scoped>
-
+  @import url("https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap");
  .calendar {
    max-width: 900px;
    margin: 20px auto;
@@ -1253,6 +1256,7 @@ h3 {
   height: 100%;
   background-color: rgba(255, 255, 255, 0.8);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 2000;
@@ -1419,8 +1423,26 @@ h3 {
   background: radial-gradient(100% 100% at center,hsl(0,0%,60%) 4.8%,hsla(0,0%,60%,0) 5%),
 		linear-gradient(hsla(0,0%,55%,0) 46.9%,hsl(0,0%,65%) 47% 52.9%,hsla(0,0%,65%,0) 53%) 50% 50% / 99% 99% no-repeat;
 }
+.loading-text p {
+  margin-top: 20px; /* 햄스터와 텍스트 사이 간격 */
+  font-family: 'Nanum Pen Script', cursive; /* 예쁜 글씨체 */
+  font-size: 2rem; /* 글씨 크기 */
+  color: #ff5722; /* 주황색 텍스트 */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* 약간의 그림자 효과 */
+  animation: fadeIn 2s ease-in-out infinite; /* 페이드 효과 */
+}
 
 /* Animations */
+@keyframes fadeIn {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+
 @keyframes hamster {
   from, to {
     transform: rotate(4deg) translate(-0.8em,1.85em);

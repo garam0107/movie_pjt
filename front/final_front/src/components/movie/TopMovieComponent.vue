@@ -76,7 +76,7 @@ watch(() => store.movies, (newMovies) => {
 @import url('https://fonts.googleapis.com/css2?family=Hahmlet:wght@100..900&family=Noto+Sans+KR:wght@100..900&family=Noto+Serif+KR:wght@200..900&display=swap');
 .h2tag {
   font-family: "Noto Sans KR", sans-serif;
-  font-weight: 400; 
+  font-weight: 800; 
   font-size: large;
   font-style: normal;
 }

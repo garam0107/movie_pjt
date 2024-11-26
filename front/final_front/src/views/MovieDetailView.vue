@@ -32,7 +32,7 @@
       </div>
     </div>
     <div v-if="store.detailMovie.actors && store.detailMovie.actors.length > 0">
-      <p>Actors</p>
+      <p class="noto-sans-kr-actor-info">배우</p>
       <div class="actors">
         <div v-for="actor in store.detailMovie.actors.slice(0, 10)" :key="actor.id" class="actor">
           <img :src="actor.poster_path ? `https://image.tmdb.org/t/p/w500/${actor.poster_path}` : defaultImage" 
@@ -313,6 +313,13 @@ const submitReview = () => {
   font-weight: 400;
   font-style: normal;
 }
+.noto-sans-kr-actor-info {
+  font-family: "Noto Sans KR", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 1.2rem;
+}
 
 .container {
   width: 80%;
@@ -383,7 +390,6 @@ const submitReview = () => {
 }
 
 .movie-info {
-  width: 70%;
   color: #333;
 }
 
