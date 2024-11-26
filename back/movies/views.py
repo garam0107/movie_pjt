@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render,get_list_or_404,get_object_or_404
 
@@ -129,9 +130,12 @@ def create_comment(request,review_pk):
 
 @api_view(['GET'])
 def search(request):
-    query = request.GET.get('title', '')
+    query = request.GET.get('title', '').strip()
+
     if query:
-        movies = Movie.objects.filter(title__icontains=query)
+        movies = Movie.objects.filter(
+            Q(title__icontains=query)|
+            Q(title__icontains=query.replace(' ','')))
         serializer = MovieSearchSerializer(movies, many = True)
         return Response(serializer.data)
     return JsonResponse({'movies': []}, safe=False, json_dumps_params={'ensure_ascii' : False})
