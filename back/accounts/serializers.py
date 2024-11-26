@@ -7,7 +7,7 @@ from dj_rest_auth.registration.serializers import RegisterSerializer
 
 
 from diaries.models import Diary
-from movies.models import Movie_review
+from movies.models import Movie_review,Movie
 
 UserModel = get_user_model()
 
@@ -83,7 +83,15 @@ class FollowerFollowingSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ['id', 'nickname', 'profile_image','username']
-        
+
+class LikeMovieSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = ['id','title','poster_path']
+
+
+
+
 # 유저 정보
 class UserSerializer(serializers.ModelSerializer):
     my_review = UserReviewSerializer(source = 'reviews', many = True, read_only = True)
@@ -93,6 +101,7 @@ class UserSerializer(serializers.ModelSerializer):
     recommend_reasons = UserReasonSerializer(source = 'diaries', many = True, read_only = True)
     followings = FollowerFollowingSerializer(many=True, read_only=True)  # 팔로잉 유저들의 정보를 가져옴
     followers = FollowerFollowingSerializer(many=True, read_only=True)  # 팔로워 유저들의 정보를 가져옴
+    like_movies = LikeMovieSerializer(many = True, read_only =True)
     class RecommendMovieSerializer(serializers.ModelSerializer):
         class Meta:
             model = Diary
@@ -101,7 +110,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ['id','name', 'username', 'is_public', 'email', 'first_name', 'last_name', 'nickname', 'profile_image', 'visit_count',
-                  'my_review','recommend_movie','recommend_reasons','followings','followers','followings_count','followers_count','stone','movies_titles']
+                  'my_review','recommend_movie','recommend_reasons','followings','followers','followings_count','followers_count','stone','movies_titles',
+                  'like_movies']
         
     def get_followings_count(self, obj):
         return obj.followings.count()
