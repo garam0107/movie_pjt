@@ -294,11 +294,14 @@ def update_diary(request, user_username, diary_pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
+        User = get_user_model()
+        user = get_object_or_404(User, username = user_username)
         diary = get_object_or_404(Diary, id=diary_pk, author__username = user_username)
 
         if request.user != diary.author:
             return Response({"message": "삭제할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
-
+        user.stone -= 5
+        user.save()
         diary.delete()
         return Response({"message": "다이어리가 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
 @api_view(['POST','PUT', 'DELETE'])

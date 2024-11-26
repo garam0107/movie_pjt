@@ -12,8 +12,12 @@
       </div>
       <div class="header-right">
         <div class = "search-container">
-          <input type="text" v-model.trim="search" @input="debouncedFetchSuggestions"
-          placeholder="콘텐츠, 인물, 컬렉션, 유저를 검색해보세요" class="search-input" >
+          <input 
+          type="text" 
+          v-model.trim="search"
+          @input="debouncedFetchSuggestions"
+          placeholder="콘텐츠, 인물, 컬렉션, 유저를 검색해보세요" 
+          class="search-input" >
           <div v-if = "results.length > 0" class = "suggestions-list">
            <p
               v-for = "(result,index) in results"
@@ -45,10 +49,12 @@ import { RouterLink, useRouter, useRoute, onBeforeRouteUpdate} from 'vue-router'
 import axios from 'axios';
 import { debounce } from 'vue-debounce';
 
+
 const route = useRoute()
 const router = useRouter()  
 const store = useMovieStore()
 const userId = computed(() => store.userId)
+
 const logout = () => {
   store.logout()
 }
@@ -61,15 +67,17 @@ router.afterEach(() => {
   results.value = []
 })
 
-const searchMovie = () => {
-    if (search.value.length > 0) {
+  const searchMovie = () => {
+    if (search.value.trim().length > 0) {
+ 
       axios({
         method: 'get',
         url: 'http://127.0.0.1:8000/movies/search/',
         params: {
-          title: search.value
+          title: search.value.trim()
         }
-      }).then((res) => {  
+      }).then((res) => {
+  
           console.log('검색 성공')
           results.value = res.data
       
@@ -85,7 +93,10 @@ const searchMovie = () => {
     }
   }
 
-
+watch(results, (newResults) => {
+  console.log('검색 결과 업데이트:', newResults);
+  // 필요하다면 추가 작업 수행
+});
   const goDetail = (id) => {
     router.push({ name: "detail", params: { movie_id: id } })
     setTimeout(() => {
@@ -94,7 +105,7 @@ const searchMovie = () => {
 }
 
 
-const debouncedFetchSuggestions = debounce(searchMovie, 200);
+const debouncedFetchSuggestions = debounce(searchMovie, 100);
   </script>
   
   <style scoped>
