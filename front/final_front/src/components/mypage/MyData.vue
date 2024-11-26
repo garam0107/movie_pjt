@@ -145,8 +145,12 @@
         <div class="follow-list">
           <p class="follow-title">좋아요한 영화</p>
           <ul>
-            <li>
-              <p>대충 내가 좋아요한 영화</p>
+            <li v-for = "movie in props.userData.like_movies"
+            :key ="movie.id"
+            @click="goMovie(movie.id)"
+            class="follow-item follow-link"
+            >
+              {{movie.title}}
             </li>
           </ul>
         </div>
@@ -412,7 +416,9 @@ const isPublicDiary = () => {
 const goDetail = (user_username) => {
   router.push({name : 'MyPageView', params:{user_id: user_username}})
 }
-
+const goMovie = (movie_id) => {
+  router.push({name:'detail', params:{movie_id:movie_id}})
+}
 </script>
 
 
