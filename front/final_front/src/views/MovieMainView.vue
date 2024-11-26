@@ -1,16 +1,24 @@
 <template>
-<h1>영화 메인</h1>
+<div>
+  <div>
+    <!-- <MovieTrailer/> -->
+  </div>
+  <div>
+    <TopMovieComponent/>
+  </div>
+</div>
 </template>
 
 <script setup>
-import MovieMain from '@/components/movie/MovieMain.vue';
+import MovieTrailer from '@/components/movie/MovieTrailer.vue';
+import TopMovieComponent from '@/components/movie/TopMovieComponent.vue';
 import { useMovieStore } from '@/stores/counter';
 import { onMounted } from 'vue';
+const store = useMovieStore()
+// onMounted(() => {
+//   store.checkAuthentication()
+// })
 
-const movies = useMovieStore()
-onMounted(() => {
-  movies.getMovies()
-})
 </script>
 
 <style scoped>
