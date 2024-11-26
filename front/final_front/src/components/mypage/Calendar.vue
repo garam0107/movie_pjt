@@ -114,13 +114,13 @@
         <p style="font-style: bold;">오늘의 감정분석 : {{ gpt_emotion }}</p>
         <div class="recommendation">
           <RouterLink :to="{ name: 'detail', params: { movie_id: recommend_movieID2 } }" class="movie-title">
-            <p>🎬 {{ recommend_movies[0] }}</p>
+            <p class="recommend-movie-title">🎬 {{ recommend_movies[0] }}</p>
           </RouterLink>
           <p class="reason">{{ recommend_reasons1 }}</p>
         </div>
         <div class="recommendation">
           <RouterLink :to="{ name: 'detail', params: { movie_id: recommend_movieID1 } }" class="movie-title">
-            <p>🎬 {{ recommend_movies[1] }}</p>
+            <p class="recommend-movie-title">🎬 {{ recommend_movies[1] }}</p>
           </RouterLink>
           <p class="reason">{{ recommend_reasons2 }}</p>
         </div>
@@ -1065,7 +1065,7 @@ h3 {
   background-repeat: repeat;
   display: flex;
   gap: 20px;
-  max-height: 99%;
+  max-height: 91%;
 }
 
 /* 다이어리 헤더 */
@@ -1105,7 +1105,7 @@ h3 {
 }
 
 .recommendation {
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   padding: 7px;
   background: #fffcf2; /* 약간 어두운 종이 느낌 */
   border: 1px dashed #ddd;
@@ -1124,7 +1124,7 @@ h3 {
 }
 
 .reason {
-  font-size: 1rem;
+  font-size: 0.92rem;
   color: #555;
   margin-top: 5px;
   font-style: italic;
@@ -1135,6 +1135,7 @@ h3 {
   font-size: 1.2rem;
   color: #333;
   margin-bottom: 10px;
+  margin-top: 1px;
 }
 
 .gpt-comment p {
@@ -1430,6 +1431,11 @@ h3 {
   color: #ff5722; /* 주황색 텍스트 */
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* 약간의 그림자 효과 */
   animation: fadeIn 2s ease-in-out infinite; /* 페이드 효과 */
+}
+
+.recommend-movie-title {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 /* Animations */
