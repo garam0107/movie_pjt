@@ -8,6 +8,7 @@
         <div style="display: flex;">
           <h2>{{ props.userData.nickname }}</h2>
           <button v-if="isMyPage" @click="isPublicDiary" class="public-btn">{{ userData.is_public ? '공개' : '비공개' }}</button>
+          <button v-if="isMyPage" @click="isMovieLike = true" class="public-btn2">❤️</button>
           <form v-if="isNotMyPage" @submit.prevent="toggleFollow">
             <button v-if="isFollowing" class="followBtn unfollowBtn">언팔로우</button>
             <button v-else class="followBtn">팔로우</button>
@@ -100,6 +101,7 @@
       <button @click="showModal = false" class="cancel-button">취소</button>
     </div>
   </div>
+
   <!-- 팔로워, 팔로잉 목록 모달 -->
   <div v-if="followModal" class="modal-overlay">
     <div class="modal-content2">
@@ -135,8 +137,22 @@
     </div>
   </div>
 
-
-
+  <!-- 좋아요한 뮤비 modal -->
+  <div v-if="isMovieLike" class="modal-overlay">
+    <div class="modal-content2">
+      <button @click="closeMyMovie" class="close-follow inside-modal">X</button>
+      <div class="follow-section">
+        <div class="follow-list">
+          <p class="follow-title">좋아요한 영화</p>
+          <ul>
+            <li>
+              <p>대충 내가 좋아요한 영화</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </template>
 
@@ -315,6 +331,10 @@ const closePasswordModal = () => {
 
 const closeFollow = () => {
   followModal.value= false
+}
+const isMovieLike = ref(false)
+const closeMyMovie = () => {
+  isMovieLike.value = false
 }
 
 // 비밀번호 변경
@@ -655,9 +675,20 @@ input[type="radio"]:checked + .profile-img {
   background-color: #f857a7;
   font-size: 1rem;
 }
+.public-btn2{
+  padding: 5px;
+  margin-left: 10px;
+  background-color: white;
+  font-size: 1.5rem;
+  margin: 0;
+}
 
 .public-btn:hover {
   background-color: #ff007f;
+
+}
+.public-btn2:hover {
+  background-color: white;
 
 }
 
