@@ -15,7 +15,7 @@
           </form>
         </div>
         <p>{{ userData.email }}</p>
-        <p @click="followModal = true" class="follow-hover">팔로워 {{ props.userData.followers_count }} | 팔로잉 {{ props.userData.followings_count }}</p>
+        <p @click="followModal = true" class="follow-hover">팔로워 {{ localUserData.followers_count }} | 팔로잉 {{ props.userData.followings_count }}</p>
       </div>
     </div>
     <div class="user-stats">
@@ -195,6 +195,7 @@ const followModal = ref(false)
 // 내 페이지인지 확인하는 변수
 // const isMyPage = ref(false)
 const isNotMyPage = computed(() => !isMyPage.value)
+const localUserData = ref({ ...props.userData });
 
 // 내 페이지인지 확인하는 computed 속성
 const isMyPage = computed(() => String(store.userId) === String(userId.value))
@@ -247,6 +248,9 @@ watch(() => route.params.user_id, (newUserId) => {
   userId.value = newUserId
   fetchUserData(userId.value)
 })
+watch(() => props.userData, (newValue) => {
+  localUserData.value = { ...newValue };
+});
 
 // 회원 정보 수정
 const updateData = () => {
@@ -294,16 +298,22 @@ const toggleFollow = () => {
       Authorization: `Token ${store.token}`
     }
   })
-    .then((res) => {
-      if (res.data.message === '팔로우') {
-        isFollowing.value = true
-        userData.value.followers_count += 1
-      } else if (res.data.message === '언팔로우') {
-        isFollowing.value = false
-        userData.value.followers_count -= 1
-      }
-      console.log(res.data.message)
-    })
+  .then((res) => {
+  if (res.data.message === '팔로우') {
+    isFollowing.value = true;
+    localUserData.value = {
+      ...localUserData.value, // 기존 데이터 복사
+      followers_count: localUserData.value.followers_count + 1, // 변경된 값
+    };
+  } else if (res.data.message === '언팔로우') {
+    isFollowing.value = false;
+    localUserData.value = {
+      ...localUserData.value,
+      followers_count: localUserData.value.followers_count - 1, // 변경된 값
+    };
+  }
+})
+
     .catch((err) => {
       console.error('팔로우/언팔로우 요청 중 오류 발생:', err)
     })
