@@ -285,20 +285,25 @@ const createCalendar = () => {
   dates.value = [];
   // 이전 달의 남은 날짜 추가
   for (let i = firstDay - 1; i >= 0; i--) {
+    const date = lastDatePrevMonth - i
+    const formattedMonth = String(month.value === 0 ? 12 : month.value).padStart(2, "0")
+    const formattedDate = String(date).padStart(2, "0")
     dates.value.push({
-      date: lastDatePrevMonth - i,
+      date,
       isCurrentMonth: false,
       emoji: null,
-      dateKey: `${year.value}-${month.value === 0 ? 12 : month.value}-${lastDatePrevMonth - i}`,
+      dateKey: `${year.value}-${formattedMonth}-${formattedDate}`,
     });
   }
   // 현재 달의 날짜 추가
   for (let i = 1; i <= lastDate; i++) {
+    const formattedMonth = String(month.value + 1).padStart(2, "0")
+    const formattedDate = String(i).padStart(2, "0")
     dates.value.push({
       date: i,
       isCurrentMonth: true,
       emoji: null,
-      dateKey: `${year.value}-${month.value+1}-${i}`,
+      dateKey: `${year.value}-${formattedMonth}-${formattedDate}`,
     });
   }
 };
@@ -489,8 +494,8 @@ const selectEmoji2 = (emoji) => {
 // 다이어리 저장
 const submitDiary = async () => {
   if (selectedDate.value.dateKey !== Diary_today) {
-    // console.log('오늘날짜' ,selectedDate.value.dateKey)
-    // console.log(Diary_today)
+    console.log('오늘날짜' ,selectedDate.value.dateKey)
+    console.log(Diary_today)
     alert('당일에만 다이어리를 작성할 수 있습니다.')
     return
   }
